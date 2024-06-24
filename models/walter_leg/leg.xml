@@ -1,0 +1,33 @@
+<mujoco model="walter_leg">
+    <compiler angle="radian" inertiafromgeom="false"/>
+
+    <option iterations="1" ls_iterations="5">
+        <flag eulerdamp="disable"/>
+    </option>
+
+    <worldbody>
+        <body name="fixed_base" pos="0.0 0.0 0.5" quat="1 0 0 0">
+        <geom type="box" size="0.01 0.01 0.01" rgba="0 1 0 1" quat="1 1 0 0"/>
+        <geom name="x" type="capsule" pos="0.2 0.2 0.2" size="0.01 0.05" rgba="0 1 0 1" quat="1 1 0 0"/>
+        <geom name="y" type="capsule" pos="0.2 0.2 0.2" size="0.01 0.05" rgba="1 0 0 1" quat="1 0 1 0"/>
+        <geom name="z" type="capsule" pos="0.2 0.2 0.2" size="0.01 0.05" rgba="0 0 1 1" quat="1 0 0 1"/>
+            <body name="thigh" pos="0 0 -0.05" quat="1 0 1 0">
+                <inertial pos="0 0 0" mass="0.20157" diaginertia="0.0005212 0.000114 0.0005585" quat="1 0 0 1"/>
+                <joint name="hip" type="hinge" pos="-0.05 0 0" armature="0.0020502"/>
+                <geom type="box" size="0.005 0.01 0.1" rgba="1 0 0 1" quat="1 0 1 0"/>
+                <body name="shin" pos="0.05 0 0" quat="1 0 0 1">
+                    <inertial pos="0 0 0" mass="0.843" diaginertia="0.000972 0.005802 0.005651" quat="1 0 0 0"/>
+                    <joint name="knee" type="hinge" pos="0 0 0" armature="0.0006119575"/>
+                    <geom type="box" size="0.005 0.01 0.1" rgba="0 0 1 1" quat="1 0 1 0"/>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <general name="hip_actuator" joint="hip" forcerange="-18 18" biastype="affine" gainprm="50 0 0" biasprm="0 -50 -0.5"/>
+        <general name="knee_actuator" joint="knee" forcerange="-18 18" biastype="affine" gainprm="50 0 0" biasprm="0 -50 -0.5"/>
+    </actuator>
+
+</mujoco>
+
