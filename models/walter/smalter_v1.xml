@@ -27,12 +27,12 @@
                     <joint type="hinge" axis="1 0 0" name="fr_knee" damping="4"/>
                         <!-- Front Right Wheel 1 -->
                         <body name="fr_wheel1" pos=".08 0 -0.1" zaxis = "1 0 0">
-                        <geom type="ellipsoid" size="0.08 0.08 0.05" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                        <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
                         <joint type="hinge" axis="0 0 1" name="fr_wheel1_joint" damping="4"/>
                         </body>
                         <!-- Front Right Wheel 2 -->
                         <body name="fr_wheel2" pos=".08 0 0.1" zaxis = "1 0 0">
-                        <geom type="ellipsoid" size="0.08 0.08 0.05" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                        <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
                         <joint type="hinge" axis="0 0 1" name="fr_wheel2_joint" damping="4"/>
 
                         </body>
@@ -49,12 +49,12 @@
                     <joint type="hinge" axis="1 0 0" name="fl_knee" damping="4"/>
                         <!-- Front Left Wheel 1 -->
                         <body name="fl_wheel1" pos="-.08 0 -0.1" zaxis = "1 0 0">
-                        <geom type="ellipsoid" size="0.08 0.08 0.05" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                        <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
                         <joint type="hinge" axis="0 0 1" name="fl_wheel1_joint" damping="4"/>
                         </body>
                         <!-- Front Left Wheel 2 -->
                         <body name="fl_wheel2" pos="-.08 0 0.1" zaxis = "1 0 0">
-                        <geom type="ellipsoid" size="0.08 0.08 0.05" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                        <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
                         <joint type="hinge" axis="0 0 1" name="fl_wheel2_joint" damping="4"/>
                         </body>
                     </body>
@@ -72,12 +72,12 @@
                 <joint type="hinge" axis="1 0 0" name="br_knee" damping="4"/>
                     <!-- Back Right Wheel 1 -->
                     <body name="br_wheel1" pos=".08 0 -0.1" zaxis = "1 0 0">
-                    <geom type="ellipsoid" size="0.08 0.08 0.05" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                    <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
                     <joint type="hinge" axis="0 0 1" name="br_wheel1_joint" damping="4"/>
                     </body>
                     <!-- Back Right Wheel 2 -->
                     <body name="br_wheel2" pos=".08 0 0.1" zaxis = "1 0 0">
-                    <geom type="ellipsoid" size="0.08 0.08 0.05" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                    <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
                     <joint type="hinge" axis="0 0 1" name="br_wheel2_joint" damping="4"/>
                     </body>
                 </body>
@@ -94,12 +94,12 @@
                 <joint type="hinge" axis="1 0 0" name="bl_knee" damping="4"/>
                     <!-- Back Left Wheel 1 -->
                     <body name="bl_wheel1" pos="-.08 0 -0.1" zaxis = "1 0 0">
-                    <geom type="ellipsoid" size="0.08 0.08 0.05" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                    <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
                     <joint type="hinge" axis="0 0 1" name="bl_wheel1_joint" damping="4"/>
                     </body>
                     <!-- Back Left Wheel 2 -->
                     <body name="bl_wheel2" pos="-.08 0 0.1" zaxis = "1 0 0">
-                    <geom type="ellipsoid" size="0.08 0.08 0.05" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                    <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
                     <joint type="hinge" axis="0 0 1" name="bl_wheel2_joint" damping="4"/>
                     </body>
                 </body>
@@ -127,4 +127,21 @@
         <position joint="bl_wheel1_joint" kp="30"/>
         <position joint="bl_wheel2_joint" kp="30"/>
     </actuator>
+    <keyframe>
+    <key name="home"
+        qpos="0 0 0.28
+            1 0 0 0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5"
+        ctrl="0 0 0 0
+             0 0 0 0
+             0 0 0 0
+             0 0 0 0"/>
+</keyframe>
 </mujoco>
+
+

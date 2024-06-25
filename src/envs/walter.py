@@ -19,7 +19,7 @@ import mujoco
 
 class WalterEnv(PipelineEnv):
 
-    def __init__(self, filename: str = 'walter/scene_mjx.xml', **kwargs):
+    def __init__(self, filename: str = 'walter/scene.xml', **kwargs):
         # Load the MJCF file
         filename = f'models/{filename}'
         self.filepath = os.path.join(
@@ -31,8 +31,9 @@ class WalterEnv(PipelineEnv):
             filename,
         )
         # Create the mjcf system
+        print(self.filepath)
         sys = mjcf.load(self.filepath)
-
+        print(sys.nv)
         # Defining time variables
         self._dt = 0.02
         sys = sys.tree_replace({'opt.timestep': 0.004, 'dt': 0.02})
@@ -77,3 +78,5 @@ class WalterEnv(PipelineEnv):
         
         
 envs.register_environment('walter', WalterEnv)
+
+walter = WalterEnv()
