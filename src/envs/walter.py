@@ -36,7 +36,6 @@ class WalterEnv(PipelineEnv):
         print(sys.nv)
         # Defining time variables
         self._dt = 0.02
-        sys = sys.tree_replace({'opt.timestep': 0.004, 'dt': 0.02})
         n_frames = kwargs.pop('n_frames', int(self.dt/sys.opt.timestep))
         # Super init to pipeline env
         super().__init__(sys, backend='mjx', n_frames = n_frames)

@@ -1,0 +1,147 @@
+
+
+<mujoco>
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2=".6 .8 1" width="256" height="256"/>
+  </asset>
+
+    <worldbody>
+        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
+        <!-- Rear Body Section -->
+        <body name="rearBody" pos="0 0 0.4">
+        <geom  type="box" size="0.1 0.17 0.05" rgba="1 0 0 1"/>
+        <joint type = "free"/>
+            <!-- Front Body Section -->
+            <body name="frontBody" pos = "0 .3 0">
+            <joint type = "hinge" axis = "0 1 0" name = "waist" damping="4" stiffness = "8"/>
+            <geom type="box" size="0.1 0.1 0.05" rgba="0 1 0 1"/>
+                <!-- Font Right Leg-->
+                <!-- Front Right Thigh -->
+                
+                <body name="fr_thigh" pos=".12 0 -0.065">
+                <joint type="hinge" axis="1 0 0" pos = "0 0 .065" name="fr_hip" damping="4"/>
+                <geom type="capsule" size="0.02 0.065" rgba="0 0 1 1"/>
+                <!-- Front Right Calf -->
+                    <body name="fr_calf" pos=".03 0 -0.1">
+                    <geom type="capsule" size="0.02 0.1" rgba="0 0 1 1"/>
+                    <joint type="hinge" axis="1 0 0" name="fr_knee" damping="4"/>
+                        <!-- Front Right Wheel 1 -->
+                        <body name="fr_wheel1" pos=".08 0 -0.1" zaxis = "1 0 0">
+                        <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                        <joint type="hinge" axis="0 0 1" name="fr_wheel1_joint" damping="4"/>
+                        </body>
+                        <!-- Front Right Wheel 2 -->
+                        <body name="fr_wheel2" pos=".08 0 0.1" zaxis = "1 0 0">
+                        <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                        <joint type="hinge" axis="0 0 1" name="fr_wheel2_joint" damping="4"/>
+
+                        </body>
+                    </body>
+                </body>
+                <!-- Front Left Leg -->
+                <!-- Front Left Thigh -->
+                <body name="fl_thigh" pos="-.12 0 -0.065">
+                <joint type="hinge" axis="1 0 0" pos = "0 0 .065" name="fl_hip" damping="4"/>
+                <geom type="capsule" size="0.02 0.065" rgba="0 0 1 1"/>
+                    <!-- Front Left Calf -->
+                    <body name="fl_calf" pos="-.03 0 -0.1">
+                    <geom type="capsule" size="0.02 0.1" rgba="0 0 1 1"/>
+                    <joint type="hinge" axis="1 0 0" name="fl_knee" damping="4"/>
+                        <!-- Front Left Wheel 1 -->
+                        <body name="fl_wheel1" pos="-.08 0 -0.1" zaxis = "1 0 0">
+                        <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                        <joint type="hinge" axis="0 0 1" name="fl_wheel1_joint" damping="4"/>
+                        </body>
+                        <!-- Front Left Wheel 2 -->
+                        <body name="fl_wheel2" pos="-.08 0 0.1" zaxis = "1 0 0">
+                        <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                        <joint type="hinge" axis="0 0 1" name="fl_wheel2_joint" damping="4"/>
+                        </body>
+                    </body>
+                </body>
+            </body>
+
+            <!-- Back Right Leg -->
+            <!-- Back Right Thigh -->
+            <body name="br_thigh" pos=".12 -0.08 -0.065">
+            <joint type="hinge" axis="1 0 0" pos = "0 0 .065" name="br_hip" damping="4"/>
+             <geom type="capsule" size="0.02 0.065" rgba="0 0 1 1"/>
+                <!-- Back Right Calf -->
+                <body name="br_calf" pos=".03 0 -0.1">
+                <geom type="capsule" size="0.02 0.1" rgba="0 0 1 1"/>
+                <joint type="hinge" axis="1 0 0" name="br_knee" damping="4"/>
+                    <!-- Back Right Wheel 1 -->
+                    <body name="br_wheel1" pos=".08 0 -0.1" zaxis = "1 0 0">
+                    <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                    <joint type="hinge" axis="0 0 1" name="br_wheel1_joint" damping="4"/>
+                    </body>
+                    <!-- Back Right Wheel 2 -->
+                    <body name="br_wheel2" pos=".08 0 0.1" zaxis = "1 0 0">
+                    <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                    <joint type="hinge" axis="0 0 1" name="br_wheel2_joint" damping="4"/>
+                    </body>
+                </body>
+                </body>
+
+            <!-- Back Left Leg -->
+            <!-- Back Left Thigh -->
+            <body name="bl_thigh" pos="-.12 -0.08 -0.065">
+            <joint type="hinge" axis="1 0 0" pos = "0 0 .065" name="bl_hip" damping="4"/>
+            <geom type="capsule" size="0.02 0.065" rgba="0 0 1 1"/>
+                <!-- Back Left Calf -->
+                <body name="bl_calf" pos="-.03 0 -0.1">
+                <geom type="capsule" size="0.02 0.1" rgba="0 0 1 1"/>
+                <joint type="hinge" axis="1 0 0" name="bl_knee" damping="4"/>
+                    <!-- Back Left Wheel 1 -->
+                    <body name="bl_wheel1" pos="-.08 0 -0.1" zaxis = "1 0 0">
+                    <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                    <joint type="hinge" axis="0 0 1" name="bl_wheel1_joint" damping="4"/>
+                    </body>
+                    <!-- Back Left Wheel 2 -->
+                    <body name="bl_wheel2" pos="-.08 0 0.1" zaxis = "1 0 0">
+                    <geom type="sphere" size="0.08" rgba="0 0 1 1" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+                    <joint type="hinge" axis="0 0 1" name="bl_wheel2_joint" damping="4"/>
+                    </body>
+                </body>
+            </body>
+
+        </body>
+    </worldbody>
+    <!-- Defining the actuators -->
+    <actuator>
+        <!-- <position joint="waist"/> -->
+        <position joint="fr_hip" kp="30"/>
+        <position joint="fr_knee" kp="30"/>
+        <position joint="fr_wheel1_joint" kp="30"/>
+        <position joint="fr_wheel2_joint" kp="30"/>
+        <position joint="fl_hip" kp="30"/>
+        <position joint="fl_knee" kp="30"/>
+        <position joint="fl_wheel1_joint" kp="30"/>
+        <position joint="fl_wheel2_joint" kp="30"/>
+        <position joint="br_hip" kp="30"/>
+        <position joint="br_knee" kp="30"/>
+        <position joint="br_wheel1_joint" kp="30"/>
+        <position joint="br_wheel2_joint" kp="30"/>
+        <position joint="bl_hip" kp="30"/>
+        <position joint="bl_knee" kp="30"/>
+        <position joint="bl_wheel1_joint" kp="30"/>
+        <position joint="bl_wheel2_joint" kp="30"/>
+    </actuator>
+    <keyframe>
+    <key name="home"
+        qpos="0 0 0.28
+            1 0 0 0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5"
+        ctrl="0 0 0 0
+             0 0 0 0
+             0 0 0 0
+             0 0 0 0"/>
+</keyframe>
+</mujoco>
+
+
