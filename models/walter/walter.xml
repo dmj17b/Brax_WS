@@ -1,0 +1,47 @@
+
+
+<mujoco>
+
+    <default class="thigh">
+        <geom rgba="0.89 0.78 0.6 1"/>
+    </default>
+
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2=".6 .8 1" width="256" height="256"/>
+        <mesh name="thigh" file="assets/Thigh.stl" scale="0.00254 0.00254 0.00254"/>
+        <mesh name="shin" file="assets/Shin.stl" scale="0.00254 0.00254 0.00254"/>
+
+    </asset>
+
+    <worldbody>
+        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
+        <!-- Rear Body Section -->
+        <body name="rearBody" pos="0 0 0.4">
+        <geom  type="box" size="0.2 0.34 0.1" rgba="1 0 0 1"/>
+        <!-- <joint type = "free"/> -->
+            <!-- Front Body Section -->
+            <body name="frontBody" pos = "0 0.58 0">
+            <joint type = "hinge" axis = "0 1 0" name = "waist" damping="4" stiffness = "8"/>
+            <geom type="box" size="0.2 0.2 0.1" rgba="0 1 0 1"/>
+                <!-- Font Right Leg-->
+                <!-- Front Right Thigh -->
+                <body name = "fr_thigh" pos = "0.22 -0.254 0" zaxis="1 0 0" >
+                    <geom type="mesh" class = "thigh" mesh="thigh"/>
+                    <joint type="hinge" pos = "0 0.254 0"/>
+                    
+                    <!-- Front Right Shin -->
+                    <body name = "fr_shin" pos = "0 0 0.12" zaxis="0 0 1" >
+                        <geom type="mesh" class = "thigh" mesh = "shin" />
+                        <joint type="hinge" pos = "0 0 0"/>
+                    </body>
+                </body>
+            </body>
+
+        </body>
+    </worldbody>
+    <!-- Defining the actuators -->
+    <actuator>
+
+    </actuator>
+</mujoco>
