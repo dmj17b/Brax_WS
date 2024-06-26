@@ -1,0 +1,104 @@
+
+
+<mujoco model="walter">
+
+    <!--Defining the assets for the model-->
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2=".6 .8 1" width="256" height="256"/>
+    <mesh name = "thigh_mesh" file = "assets/Thigh.stl"/>
+    <mesh name = "shin_mesh" file = "assets/Shin.stl"/>
+    <mesh name = "wheel_mesh" file = "assets/Wheel.stl"/>
+    <mesh name = "wheelshin_mesh" file = "assets/WheelShin.stl"/>
+    <mesh name = "body_mesh" file = "assets/Body.stl"/>
+    <mesh name = "head_mesh" file = "assets/Head.stl"/>
+  </asset>
+
+  <!--Defining default classes for components-->
+  <default>
+    <geom rgba="0.89 0.78 0.6 1"/>
+
+    <!-- Default thigh class -->
+    <default class="thigh">
+        <geom type="mesh" mesh="thigh_mesh"/>
+    </default> 
+
+    <!-- Default shin class -->
+    <default class="shin">
+        <geom type="mesh" mesh="shin_mesh"/>
+    </default>
+
+    <!-- Default wheel class -->
+    <default class="wheel">
+        <geom type="mesh" mesh="wheel_mesh"/>
+    </default>
+
+  </default>
+
+  <!-- WALTER MODEL -->
+    <worldbody>
+        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
+        <!-- Rear Body Section -->
+        <body name="body" pos="0 0 0.4">
+            <geom type="mesh" mesh = "body_mesh" />
+            <!-- Add rear legs here -->
+
+            <!-- Back right thigh -->
+             <body name = "bl_thigh" pos = "-0.274 0.075 -0.03" quat = "0 0 1 1">
+                <joint name="bl_hip" type="hinge" axis = "0 0 1" />
+                <geom class="thigh"/>
+                <!-- Back right shin -->
+                <body name = "bl_shin" pos = "0 -0.1 0.043" >
+                    <joint name="bl_knee" type="hinge" axis = "0 0 1"/>
+                    <geom class="shin"/>
+                    <!-- Back right wheels -->
+                     <body name = "bl_wheel1" pos = "0.06 0 0.05">
+                        <geom class="wheel"/>
+                        <joint name="bl_wheel1_joint" type="hinge" axis="0 0 1"/>
+                     </body>
+                </body>
+             </body>
+
+
+            <!-- Front Body Section -->
+            <body name="head" pos="0 0 0">
+                <joint name="body_joint" type="hinge" axis = "1 0 0"/>
+                <geom type="mesh" mesh = "head_mesh"/>
+            </body> 
+
+        </body>
+    </worldbody>
+    <!-- Defining the actuators -->
+    <!-- <actuator>
+        <position joint="fr_hip" kp="30"/>
+        <position joint="fr_knee" kp="30"/>
+        <position joint="fr_wheel1_joint" kp="30"/>
+        <position joint="fr_wheel2_joint" kp="30"/>
+        <position joint="fl_hip" kp="30"/>
+        <position joint="fl_knee" kp="30"/>
+        <position joint="fl_wheel1_joint" kp="30"/>
+        <position joint="fl_wheel2_joint" kp="30"/>
+        <position joint="br_hip" kp="30"/>
+        <position joint="br_knee" kp="30"/>
+        <position joint="br_wheel1_joint" kp="30"/>
+        <position joint="br_wheel2_joint" kp="30"/>
+        <position joint="bl_hip" kp="30"/>
+        <position joint="bl_knee" kp="30"/>
+        <position joint="bl_wheel1_joint" kp="30"/>
+        <position joint="bl_wheel2_joint" kp="30"/>
+    </actuator> -->
+    <!-- <keyframe>
+    <key name="home"
+        qpos="0 0 0.28
+            1 0 0 0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5"
+        ctrl="0 0 0 0
+             0 0 0 0
+             0 0 0 0
+             0 0 0 0"/>
+    </keyframe> -->
+</mujoco>
