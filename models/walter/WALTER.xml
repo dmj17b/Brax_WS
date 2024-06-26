@@ -8,7 +8,6 @@
     <mesh name = "thigh_mesh" file = "assets/Thigh.stl"/>
     <mesh name = "shin_mesh" file = "assets/Shin.stl"/>
     <mesh name = "wheel_mesh" file = "assets/Wheel.stl"/>
-    <mesh name = "wheelshin_mesh" file = "assets/WheelShin.stl"/>
     <mesh name = "body_mesh" file = "assets/Body.stl"/>
     <mesh name = "head_mesh" file = "assets/Head.stl"/>
   </asset>
@@ -42,27 +41,94 @@
             <geom type="mesh" mesh = "body_mesh" />
             <!-- Add rear legs here -->
 
-            <!-- Back right thigh -->
+            <!-- Back left thigh -->
              <body name = "bl_thigh" pos = "-0.274 0.075 -0.03" quat = "0 0 1 1">
                 <joint name="bl_hip" type="hinge" axis = "0 0 1" />
                 <geom class="thigh"/>
-                <!-- Back right shin -->
+                <!-- Back left shin -->
                 <body name = "bl_shin" pos = "0 -0.1 0.043" >
                     <joint name="bl_knee" type="hinge" axis = "0 0 1"/>
                     <geom class="shin"/>
-                    <!-- Back right wheels -->
-                     <body name = "bl_wheel1" pos = "0.06 0 0.05">
+                    <!-- Back left wheels -->
+                     <body name = "bl_wheel1" pos = "0.08 0 0.088">
                         <geom class="wheel"/>
                         <joint name="bl_wheel1_joint" type="hinge" axis="0 0 1"/>
                      </body>
+                     <body name = "bl_wheel2" pos = "-0.08 0 0.088">
+                        <geom class="wheel"/>
+                        <joint name="bl_wheel2_joint" type="hinge" axis="0 0 1"/>
+                     </body>
                 </body>
              </body>
+
+            
+            <!-- Back right thigh -->
+            <body name = "br_thigh" pos = "-0.274 -0.075 -0.03" quat = "1 1 0 0">
+                <joint name="br_hip" type="hinge" axis = "0 0 1" />
+                <geom class="thigh"/>
+                <!-- Back right shin -->
+                <body name = "br_shin" pos = "0 -0.1 0.043" >
+                    <joint name="br_knee" type="hinge" axis = "0 0 1"/>
+                    <geom class="shin"/>
+                    <!-- Back right wheels -->
+                     <body name = "br_wheel1" pos = "0.08 0 0.088">
+                        <geom class="wheel"/>
+                        <joint name="br_wheel1_joint" type="hinge" axis="0 0 1"/>
+                     </body>
+                     <body name = "br_wheel2" pos = "-0.08 0 0.088">
+                        <geom class="wheel"/>
+                        <joint name="br_wheel2_joint" type="hinge" axis="0 0 1"/>
+                     </body>
+                </body>
+             </body>
+
 
 
             <!-- Front Body Section -->
             <body name="head" pos="0 0 0">
                 <joint name="body_joint" type="hinge" axis = "1 0 0"/>
                 <geom type="mesh" mesh = "head_mesh"/>
+
+                <!-- Add front legs here -->
+                 <!-- Front left thigh -->
+                 <body name = "fl_thigh" pos = "0.094 0.075 -0.03" quat = "0 0 1 1">
+                    <joint name="fl_hip" type="hinge" axis = "0 0 1" />
+                    <geom class="thigh"/>
+                    <!-- Back left shin -->
+                    <body name = "fl_shin" pos = "0 -0.1 0.043" >
+                        <joint name="fl_knee" type="hinge" axis = "0 0 1"/>
+                        <geom class="shin"/>
+                        <!-- Back left wheels -->
+                         <body name = "fl_wheel1" pos = "0.08 0 0.088">
+                            <geom class="wheel"/>
+                            <joint name="fl_wheel1_joint" type="hinge" axis="0 0 1"/>
+                         </body>
+                         <body name = "fl_wheel2" pos = "-0.08 0 0.088">
+                            <geom class="wheel"/>
+                            <joint name="fl_wheel2_joint" type="hinge" axis="0 0 1"/>
+                         </body>
+                    </body>
+                 </body>
+
+                <!-- Front right thigh -->
+                <body name = "fr_thigh" pos = "0.094 -0.075 -0.03" quat = "1 1 0 0">
+                <joint name="fr_hip" type="hinge" axis = "0 0 1" />
+                <geom class="thigh"/>
+                <!-- Back left shin -->
+                <body name = "fr_shin" pos = "0 -0.1 0.043" >
+                    <joint name="fr_knee" type="hinge" axis = "0 0 1"/>
+                    <geom class="shin"/>
+                    <!-- Back left wheels -->
+                        <body name = "fr_wheel1" pos = "0.08 0 0.088">
+                            <geom class="wheel"/>
+                            <joint name="fr_wheel1_joint" type="hinge" axis="0 0 1"/>
+                        </body>
+                        <body name = "fr_wheel2" pos = "-0.08 0 0.088">
+                            <geom class="wheel"/>
+                            <joint name="fr_wheel2_joint" type="hinge" axis="0 0 1"/>
+                        </body>
+                </body>
+                </body>
             </body> 
 
         </body>
