@@ -26,7 +26,7 @@
                 <joint type="hinge" axis="1 0 0" pos = "0 0 .065" name="fr_hip" damping="4"/>
                 <geom type="capsule" size="0.02 0.065" rgba="0 0 1 1"/>
                 <!-- Front Right Calf -->
-                    <body name="fr_calf" pos=".03 0 -0.1">
+                    <body name="fr_calf" pos=".0315 0 -0.1">
                     <geom type="capsule" size="0.02 0.1" rgba="0 0 1 1"/>
                     <joint type="hinge" axis="1 0 0" name="fr_knee" damping="4"/>
                         <!-- Front Right Wheel 1 -->
@@ -48,7 +48,7 @@
                 <joint type="hinge" axis="1 0 0" pos = "0 0 .065" name="fl_hip" damping="4"/>
                 <geom type="capsule" size="0.02 0.065" rgba="0 0 1 1"/>
                     <!-- Front Left Calf -->
-                    <body name="fl_calf" pos="-.03 0 -0.1">
+                    <body name="fl_calf" pos="-.0315 0 -0.1">
                     <geom type="capsule" size="0.02 0.1" rgba="0 0 1 1"/>
                     <joint type="hinge" axis="1 0 0" name="fl_knee" damping="4"/>
                         <!-- Front Left Wheel 1 -->
@@ -71,7 +71,7 @@
             <joint type="hinge" axis="1 0 0" pos = "0 0 .065" name="br_hip" damping="4"/>
              <geom type="capsule" size="0.02 0.065" rgba="0 0 1 1"/>
                 <!-- Back Right Calf -->
-                <body name="br_calf" pos=".03 0 -0.1">
+                <body name="br_calf" pos=".0315 0 -0.1">
                 <geom type="capsule" size="0.02 0.1" rgba="0 0 1 1"/>
                 <joint type="hinge" axis="1 0 0" name="br_knee" damping="4"/>
                     <!-- Back Right Wheel 1 -->
@@ -93,7 +93,7 @@
             <joint type="hinge" axis="1 0 0" pos = "0 0 .065" name="bl_hip" damping="4"/>
             <geom type="capsule" size="0.02 0.065" rgba="0 0 1 1"/>
                 <!-- Back Left Calf -->
-                <body name="bl_calf" pos="-.03 0 -0.1">
+                <body name="bl_calf" pos="-.0315 0 -0.1">
                 <geom type="capsule" size="0.02 0.1" rgba="0 0 1 1"/>
                 <joint type="hinge" axis="1 0 0" name="bl_knee" damping="4"/>
                     <!-- Back Left Wheel 1 -->
