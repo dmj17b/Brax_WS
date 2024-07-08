@@ -125,8 +125,6 @@ def control(m,d):
 
 
 
-
-
   # Left stick will control knees
   left_knees = 0.01*(right_stick_lr - right_stick_ud)
   right_knees = 0.01*(right_stick_lr + right_stick_ud)

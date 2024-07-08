@@ -1,17 +1,15 @@
 from typing import Any, List, Sequence
 import os 
-
 import jax
 import jax.numpy as jnp
 import numpy as np
-
 from brax import base
 from brax import envs
 from brax import math
 from brax.base import Motion, Transform
 from brax.envs.base import PipelineEnv, State
-from brax.io import mjcf
-
+from brax.io import mjcf, html
+from brax.mjx import pipeline
 from etils import epath
 from ml_collections import config_dict
 import mujoco
@@ -36,7 +34,7 @@ class WalterEnv(PipelineEnv):
         print(sys.nv)
         # Defining time variables
         self._dt = 0.02
-        n_frames = kwargs.pop('n_frames', int(self.dt/sys.opt.timestep))
+        n_frames = kwargs.pop('n_frames', int(self._dt/self.sys.opt.timestep))
         # Super init to pipeline env
         super().__init__(sys, backend='mjx', n_frames = n_frames)
 
@@ -61,12 +59,21 @@ class WalterEnv(PipelineEnv):
 
     # Function to define how a simulation step is done
     def step(self, state: State, action: jax.Array)->State:
-        pipeline_state = self.pipeline_init(self._init_q)
+        
+        # Perform a forward physics step
+        pipeline_state = self.pipeline_step(state.pipeline_state, action)
+
+        # Get Observation from new state:
+        observation = self.get_obs(pipeline_state)
+
+        # Get reward from new state:
+        print(pipeline_state)
 
 
     # Function that defines how the environment is reset with each
     # new episode
     def reset(self):
+
         ...
     def get_obs(
             self,
@@ -78,4 +85,12 @@ class WalterEnv(PipelineEnv):
         
 envs.register_environment('walter', WalterEnv)
 
-walter = WalterEnv()
+# Dummy test script:
+
+def test():
+    env = WalterEnv()
+    env.step()
+
+
+if __name__ == '__main__':
+    test()
