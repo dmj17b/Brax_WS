@@ -1,5 +1,4 @@
 import time
-
 import mujoco
 import mujoco.viewer
 import numpy as npi
@@ -12,6 +11,9 @@ js = pygame.joystick.Joystick(0)
 js.init()
 print(js.get_name())
 
+def nearest_pi(current_angle):
+  near_pi = npi.round(current_angle/npi.pi)*npi.pi
+  return near_pi
 
 # Joystick control function
 def control(m,d):
@@ -31,6 +33,10 @@ def control(m,d):
   back_button = js.get_button(6)
   home_button = js.get_button(8)
   hat = js.get_hat(0)
+
+  if(start_button):
+    mujoco.mj_resetData(m, d)
+
 
   # Add deadzone to joystick inputs
   if(abs(left_stick_lr) < js_deadzone):
@@ -62,17 +68,52 @@ def control(m,d):
   bl_wheel1_joint = 14
   bl_wheel2_joint = 15
 '''
-  # Fix hip position for now:
-  control.hip_splay += 0.005*hat[1]
-  print(control.hip_splay)
-  d.ctrl[0] = control.hip_splay
-  d.ctrl[4] = -control.hip_splay
-  d.ctrl[8] =  -control.hip_splay
-  d.ctrl[12] = control.hip_splay
+  # Get knee angles and figure out the closest multiple of pi
+  br_knee_angle = d.joint('br_knee').qpos
+  bl_knee_angle = d.joint('bl_knee').qpos
+  fr_knee_angle = d.joint('fr_knee').qpos
+  fl_knee_angle = d.joint('fl_knee').qpos
+  closest_br = nearest_pi(br_knee_angle)
+  closest_bl = nearest_pi(bl_knee_angle)
+  closest_fr = nearest_pi(fr_knee_angle)
+  closest_fl = nearest_pi(fl_knee_angle)
+
+
+  # # Hat will control hip splay if no button is pressed
+  # control.hip_splay += 0.005*hat[1]
+  # d.ctrl[0] = control.hip_splay
+  # d.ctrl[4] = -control.hip_splay
+  # d.ctrl[8] =  -control.hip_splay
+  # d.ctrl[12] = control.hip_splay
+
+
+  # A button will extend hips and put knees in "T" position
+  if(a_button):
+    d.ctrl[9] = closest_br
+    d.ctrl[13] = closest_bl
+    d.ctrl[0] = 3.14/2
+    d.ctrl[4] = -3.14/2
+    d.ctrl[8] = -3.14/2
+    d.ctrl[12] = 3.14/2 
+  # B button will put robot in standing start position
+  elif(b_button):
+    # Back knees just off from 90 degrees
+    d.ctrl[9] = closest_br - npi.pi/3
+    d.ctrl[13] = closest_bl + npi.pi/3
+    # Front knees parallel with thigh
+    d.ctrl[1] = closest_fr-npi.pi/2
+    d.ctrl[5] = closest_fl+npi.pi/2
+    # Hips straight
+    d.ctrl[0] = -0.3
+    d.ctrl[4] = 0.3
+    d.ctrl[8] = 0.5
+    d.ctrl[12] = -0.5
+  # Otherwise, the knees will be controlled by the hat
+  # else:
 
   # Right stick will control wheels
-  left_wheels = 0.07*(right_stick_lr - right_stick_ud)
-  right_wheels = 0.07*(right_stick_lr + right_stick_ud)
+  left_wheels = 0.07*(left_stick_lr - left_stick_ud)
+  right_wheels = 0.07*(left_stick_lr + left_stick_ud)
   d.ctrl[2] = d.ctrl[2] + right_wheels
   d.ctrl[3] = d.ctrl[3] + right_wheels
   d.ctrl[6] = d.ctrl[6] + left_wheels
@@ -82,18 +123,19 @@ def control(m,d):
   d.ctrl[14] = d.ctrl[14] + left_wheels
   d.ctrl[15] = d.ctrl[15] + left_wheels
 
-  knee_joint = d.joint
-  print(knee_joint)
+
+
 
 
   # Left stick will control knees
-  left_knees = 0.01*(left_stick_lr - left_stick_ud)
-  right_knees = 0.01*(left_stick_lr + left_stick_ud)
+  left_knees = 0.01*(right_stick_lr - right_stick_ud)
+  right_knees = 0.01*(right_stick_lr + right_stick_ud)
 
   d.ctrl[1] = d.ctrl[1] + right_knees
   d.ctrl[5] = d.ctrl[5] + left_knees
   d.ctrl[9] = d.ctrl[9] + right_knees
   d.ctrl[13] = d.ctrl[13] + left_knees
+
 
 control.hip_splay = 0
 
