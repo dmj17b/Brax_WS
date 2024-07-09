@@ -1,13 +1,7 @@
 
 
 <mujoco>
-  <asset>
-    <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2=".6 .8 1" width="256" height="256"/>
-    <mesh name = "thigh" file = "assets/Thigh.stl"/>
-    <mesh name = "shin" file = "assets/Shin.stl"/>
-    <mesh name = "wheel" file = "assets/Wheel.stl"/>
-    <mesh name = "wheelshin" file = "assets/WheelShin.stl"/>
-  </asset>
+
 
     <worldbody>
         <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>

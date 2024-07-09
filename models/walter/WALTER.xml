@@ -149,9 +149,8 @@
                     </body>
                 </body>
             </body> 
-
-        </body>
-    </worldbody>
+            </body>
+        </worldbody>
     <!-- Defining the actuators -->
     <actuator>
         <position joint="fr_hip" class = "hip_actuator"/>

@@ -29,12 +29,10 @@ class WalterEnv(PipelineEnv):
             filename,
         )
         # Create the mjcf system
-        print(self.filepath)
         sys = mjcf.load(self.filepath)
-        print(sys.nv)
         # Defining time variables
         self._dt = 0.02
-        n_frames = kwargs.pop('n_frames', int(self._dt/self.sys.opt.timestep))
+        n_frames = kwargs.pop('n_frames', int(self._dt/sys.opt.timestep))
         # Super init to pipeline env
         super().__init__(sys, backend='mjx', n_frames = n_frames)
 
@@ -43,19 +41,27 @@ class WalterEnv(PipelineEnv):
         self._default_ctrl = jnp.array(sys.mj_model.keyframe('home').ctrl)
 
 
-    # What does -> do?
-    # Step needs current state because of immutability?
-    # pipeline_state: Optional[base.State]
-    # obs: jax.Array
-    # reward: jax.Array
-    # done: jax.Array
-    # metrics: Dict[str, jax.Array] = struct.field(default_factory=dict)
-    # info: Dict[str, Any] = struct.field(default_factory=dict)
+    def reset(self) -> State:
+        # Grab states, observations, etc. from the pipeline
+        pipeline_state = self.pipeline_init(self._init_q, jnp.zeros(self.sys.qd_size()))
+        observation = self.get_obs(pipeline_state)
+        reward,done = jnp.zeros(2)
+        metrics = {
+            'rewards': reward,
+            'observation': observation,
+        }
 
-    # Could use some clarification on states - when and where each state gets used
-    # What is the difference between pipeline_state and state?
-    # Assumption: environment observation != mujoco state bc you may want more or
-    # less info than mujoco state
+        # Create the reset state object
+        state = State(
+            pipeline_state=pipeline_state,
+            obs=observation,
+            reward=reward,
+            done=done,
+            metrics=metrics,
+        )
+
+        return state
+
 
     # Function to define how a simulation step is done
     def step(self, state: State, action: jax.Array)->State:
@@ -63,24 +69,36 @@ class WalterEnv(PipelineEnv):
         # Perform a forward physics step
         pipeline_state = self.pipeline_step(state.pipeline_state, action)
 
+        rewards = {
+            'vel_target': (0),
+            'ang_vel_target': (0),
+            'ride_height_target': -((0.2-pipeline_state.q[2])**2),
+            'roll_target': (0),
+            'pitch_target': (0),
+        }
+        reward = jnp.sum(jnp.array(list(rewards.values())))
+        
         # Get Observation from new state:
         observation = self.get_obs(pipeline_state)
+        state = state.replace(
+            pipeline_state=pipeline_state,
+            obs=observation,
+            reward=reward,
+        )
+        return state
 
-        # Get reward from new state:
-        print(pipeline_state)
 
-
-    # Function that defines how the environment is reset with each
-    # new episode
-    def reset(self):
-
-        ...
+    # Gets the current observation from the environment
     def get_obs(
             self,
-            mj_data: mujoco.MjData,
-            command: np.ndarray,
-            previous_action: np.ndarray,):
-        ...
+            pipeline_state: State,
+            ) -> jax.Array:
+        
+        obs = jnp.concatenate([
+            pipeline_state.q,
+            pipeline_state.qd,
+        ])
+        return obs
         
         
 envs.register_environment('walter', WalterEnv)
@@ -89,7 +107,8 @@ envs.register_environment('walter', WalterEnv)
 
 def test():
     env = WalterEnv()
-    env.step()
+    state = env.reset()
+    env.step(state, env._default_ctrl)
 
 
 if __name__ == '__main__':
