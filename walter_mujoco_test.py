@@ -1,7 +1,7 @@
 import time
 import mujoco
 import mujoco.viewer
-import numpy as npi
+import numpy as np
 import pygame
 
 # Initializing joystick stuff
@@ -12,7 +12,7 @@ js.init()
 print(js.get_name())
 
 def nearest_pi(current_angle):
-  near_pi = npi.round(current_angle/npi.pi)*npi.pi
+  near_pi = np.round(current_angle/np.pi)*np.pi
   return near_pi
 
 # Joystick control function
@@ -98,11 +98,11 @@ def control(m,d):
   # B button will put robot in standing start position
   elif(b_button):
     # Back knees just off from 90 degrees
-    d.ctrl[9] = closest_br - npi.pi/3
-    d.ctrl[13] = closest_bl + npi.pi/3
+    d.ctrl[9] = closest_br - np.pi/3
+    d.ctrl[13] = closest_bl + np.pi/3
     # Front knees parallel with thigh
-    d.ctrl[1] = closest_fr-npi.pi/2
-    d.ctrl[5] = closest_fl+npi.pi/2
+    d.ctrl[1] = closest_fr-np.pi/2
+    d.ctrl[5] = closest_fl+np.pi/2
     # Hips straight
     d.ctrl[0] = -0.3
     d.ctrl[4] = 0.3
@@ -138,8 +138,10 @@ def control(m,d):
 control.hip_splay = 0
 
 # Load in the model and data from xml file
-m = mujoco.MjModel.from_xml_path('models/walter/scene.xml')
+m = mujoco.MjModel.from_xml_path('models/walter/scene_smalter.xml')
 d = mujoco.MjData(m)
+d.qpos = m.keyframe('home').qpos
+d.ctrl = m.keyframe('home').qpos[8:]
 
 # Main simulation loop
 with mujoco.viewer.launch_passive(m, d) as viewer:
@@ -149,7 +151,7 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     step_start = time.time()
     # mj_step can be replaced with code that also evaluates
     # a policy and applies a control signal before stepping the physics.
-    control(m,d)
+    # control(m,d)
     mujoco.mj_step(m, d)
     # Example modification of a viewer option: toggle contact points every two seconds.
     with viewer.lock():
