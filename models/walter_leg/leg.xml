@@ -24,7 +24,7 @@
                 <geom class="visual" mesh="thigh_mesh" pos="-0.05 0 0" quat="1 0 0 1"/>
                 <body name="shin" pos="0.05 0 0.05" quat="1 0 0 1">
                     <inertial pos="0 0 0" mass="0.843" diaginertia="0.000972 0.005802 0.005651" quat="1 0 0 0"/>
-                    <joint name="knee" type="hinge" pos="0 0 0" armature="0.0070953" damping="0.2"/>
+                    <joint name="knee" type="hinge" pos="0 0 0" armature="0.0070953" damping="0.535"/>
                     <geom class="visual" mesh="shin_mesh"/>
                 </body>
             </body>
@@ -37,4 +37,3 @@
     </actuator>
 
 </mujoco>
-
