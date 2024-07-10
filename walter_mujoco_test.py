@@ -108,6 +108,32 @@ def control(m,d):
     d.ctrl[4] = 0.3
     d.ctrl[8] = 0.5
     d.ctrl[12] = -0.5
+
+  elif(y_button):
+    # Back knees just off from 90 degrees
+    d.ctrl[9] = closest_br
+    d.ctrl[13] = closest_bl
+    # Front knees parallel with thigh
+    d.ctrl[1] = closest_fr-np.pi/2 - np.pi/6
+    d.ctrl[5] = closest_fl+np.pi/2 + np.pi/6
+    # Hips
+    d.ctrl[0] = -0.8
+    d.ctrl[4] = 0.8
+    d.ctrl[8] = -0.8
+    d.ctrl[12] = 0.8
+
+  elif(x_button):
+    # Back knees just off from 90 degrees
+    d.ctrl[9] = closest_br
+    d.ctrl[13] = closest_bl
+    # Front knees parallel with thigh
+    d.ctrl[1] = closest_fr
+    d.ctrl[5] = closest_fl
+    # Hips
+    d.ctrl[0] = 0.0
+    d.ctrl[4] = 0.0
+    d.ctrl[8] = 0.0
+    d.ctrl[12] = 0.0
   # Otherwise, the knees will be controlled by the hat
   # else:
 
@@ -138,10 +164,10 @@ def control(m,d):
 control.hip_splay = 0
 
 # Load in the model and data from xml file
-m = mujoco.MjModel.from_xml_path('models/walter/scene_smalter.xml')
+m = mujoco.MjModel.from_xml_path('models/walter/scene_training.xml')
 d = mujoco.MjData(m)
-d.qpos = m.keyframe('home').qpos
-d.ctrl = m.keyframe('home').qpos[8:]
+# d.qpos = m.keyframe('home').qpos
+# d.ctrl = m.keyframe('home').qpos[8:]
 
 # Main simulation loop
 with mujoco.viewer.launch_passive(m, d) as viewer:
@@ -151,11 +177,9 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     step_start = time.time()
     # mj_step can be replaced with code that also evaluates
     # a policy and applies a control signal before stepping the physics.
-    # control(m,d)
+    control(m,d)
     mujoco.mj_step(m, d)
-    # Example modification of a viewer option: toggle contact points every two seconds.
-    with viewer.lock():
-      viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = int(d.time % 2)
+
 
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
     viewer.sync()

@@ -18,18 +18,29 @@
     <joint armature="0.019764" damping="8"/>
     <!-- Default thigh class -->
     <default class="thigh">
-        <geom type="mesh" mesh="thigh_mesh"/>
+        <geom type="capsule" size = "0.025 0.05" zaxis="0 1 0" pos = "0 -0.05 0.025"/>
     </default> 
 
     <!-- Default shin class -->
     <default class="shin">
-        <geom type="mesh" mesh="shin_mesh"/>
+        <geom type="capsule" size = "0.025 0.07" zaxis = "1 0 0" pos = "0 0 0.025"/>
     </default>
 
     <!-- Default wheel class -->
     <default class="wheel">
-        <geom type="mesh" mesh="wheel_mesh" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+        <geom type="sphere" size = "0.07" zaxis="1 0 0" pos = "0 0 0.015"/>
     </default>
+
+    <!-- Head class -->
+    <default class="head">
+        <geom type="box" size = "0.01 0.01 0.01" pos = "0 0 0.0" mass = "5"/>
+    </default>
+
+        <!-- Body class -->
+    <default class="body">
+        <geom type="box" size = "0.15 0.075 0.075" pos = "-0.15 0.0 0.0" mass = "10"/>
+    </default>
+
 
     <!-- Default actuator class-->
     <default class="knee_actuator">
@@ -53,14 +64,14 @@
         <!-- Rear Body Section -->
         <body name="body" pos="0 0 0.4">
             <joint type="free"/>
-            <geom type="mesh" mesh = "body_mesh" mass="10" />
+            <geom class = "body"/>
             <!-- Add rear legs here -->
 
             <!-- Back left thigh -->
              <body name = "bl_thigh" pos = "-0.274 0.075 -0.0325" quat = "0 0 1 1">
                 <inertial pos = "0 -0.05 0.03" mass = "0.20157" diaginertia="0.0005212 0.000114 0.0005585"/>
                 <joint name="bl_hip" type="hinge" axis = "0 0 1" />
-                <geom class="thigh"/>
+                <geom class="thigh" />
                 <!-- Back left shin -->
                 <body name = "bl_shin" pos = "0 -0.1 0.043" >
                     <joint name="bl_knee" type="hinge" axis = "0 0 1"/>
@@ -104,7 +115,7 @@
             <!-- Front Body Section -->
             <body name="head" pos="0.01 0 0">
                 <joint name="body_joint" type="hinge" axis = "1 0 0" stiffness = "0.05" range = "-0.5 0.5"/>
-                <geom type="mesh" mesh = "head_mesh" mass = "5"/>
+                <geom class = "head"/>
 
                 <!-- Add front legs here -->
                  <!-- Front left thigh -->
@@ -172,14 +183,14 @@
     </actuator>
     <keyframe>
     <key name="home"
-        qpos="0 0 0.3
+        qpos="0 0 0.28
             1 0 0 0
-            0.0 0.0 0.0
-            0.0 0.0 0.0
-            0.0 0.0 0.0
-            0.0 0.0 0.0
-            0.0 0.0 0.0
-            0.0 0.0"
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5 1.0
+            0.0 0.5"
         ctrl="0 0 0 0
              0 0 0 0
              0 0 0 0

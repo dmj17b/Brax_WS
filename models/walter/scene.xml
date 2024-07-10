@@ -1,7 +1,7 @@
 <mujoco model="SMALTER Scene">
 
-    <include file="smalter_v1.xml"/>
-    <include file="stairs.xml"/>
+    <include file="WALTER.xml"/>
+    <include file="jersey_barrier.xml"/>
   
     <statistic center="0 0 0.1" extent="0.8"/>
   
