@@ -67,7 +67,7 @@ def control(m,d):
   bl_knee = 13
   bl_wheel1_joint = 14
   bl_wheel2_joint = 15
-'''
+  '''
   # Get knee angles and figure out the closest multiple of pi
   br_knee_angle = d.joint('br_knee').qpos
   bl_knee_angle = d.joint('bl_knee').qpos
@@ -78,8 +78,11 @@ def control(m,d):
   closest_fr = nearest_pi(fr_knee_angle)
   closest_fl = nearest_pi(fl_knee_angle)
 
+  # Right stick will control wheels
+  left_wheels = 0.05*(left_stick_lr - left_stick_ud)
+  right_wheels = 0.05*(left_stick_lr + left_stick_ud)
 
-  # # Hat will control hip splay if no button is pressed
+  # # # Hat will control hip splay if no button is pressed
   # control.hip_splay += 0.005*hat[1]
   # d.ctrl[0] = control.hip_splay
   # d.ctrl[4] = -control.hip_splay
@@ -121,6 +124,8 @@ def control(m,d):
     d.ctrl[4] = 0.8
     d.ctrl[8] = -0.8
     d.ctrl[12] = 0.8
+    right_wheels = -0.05
+    left_wheels = 0.05
 
   elif(x_button):
     # Back knees just off from 90 degrees
@@ -134,12 +139,21 @@ def control(m,d):
     d.ctrl[4] = 0.0
     d.ctrl[8] = 0.0
     d.ctrl[12] = 0.0
-  # Otherwise, the knees will be controlled by the hat
-  # else:
 
-  # Right stick will control wheels
-  left_wheels = 0.07*(left_stick_lr - left_stick_ud)
-  right_wheels = 0.07*(left_stick_lr + left_stick_ud)
+  if(right_trigger > 0.5):
+    # Back knees just off from 90 degrees
+    d.ctrl[9] = closest_br
+    d.ctrl[13] = closest_bl
+    # Front knees parallel with thigh
+    d.ctrl[1] = closest_fr
+    d.ctrl[5] = closest_fl
+    # Hips
+    d.ctrl[0] = 0.0
+    d.ctrl[4] = 0.0
+    d.ctrl[8] = 0.0
+    d.ctrl[12] = 0.0
+
+  # Apply wheel control
   d.ctrl[2] = d.ctrl[2] + right_wheels
   d.ctrl[3] = d.ctrl[3] + right_wheels
   d.ctrl[6] = d.ctrl[6] + left_wheels
@@ -164,7 +178,7 @@ def control(m,d):
 control.hip_splay = 0
 
 # Load in the model and data from xml file
-m = mujoco.MjModel.from_xml_path('models/walter/scene_training.xml')
+m = mujoco.MjModel.from_xml_path('models/walter/scene.xml')
 d = mujoco.MjData(m)
 # d.qpos = m.keyframe('home').qpos
 # d.ctrl = m.keyframe('home').qpos[8:]
@@ -179,6 +193,9 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     # a policy and applies a control signal before stepping the physics.
     control(m,d)
     mujoco.mj_step(m, d)
+    # print(d.qd[8])
+
+    
 
 
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
