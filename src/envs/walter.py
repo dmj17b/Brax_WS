@@ -205,23 +205,30 @@ def main(argv=None):
     # RNG Key:
     key = jax.random.key(0)
 
-    print(f"Environment Initializing")
     env = Walter()
-    print(f"Environment Initialized")
 
-    print(f"Jitting Reset")
     state = jax.jit(env.reset)(key)
-    print(f"Reset Done")
-    
-    simulation_steps = 100
+    reset_fn = jax.jit(env.reset)
+    step_fn = jax.jit(env.step)
+
+    state = reset_fn(key)
+
+    fwd_ctrl = jnp.array([
+        0.0, 0.0, 0.5, 0.5,
+        0.0, 0.0, 0.5, 0.5,
+        0.0, 0.0, 0.5, 0.5,
+        0.0, 0.0, 0.5, 0.5,
+    ])
+
+    simulation_steps = 500
     state_history = []
     for i in range(simulation_steps):
         print(f"Step: {i}")
-        state = jax.jit(env.step)(state, env._default_ctrl)
+        state = step_fn(state, fwd_ctrl)
         state_history.append(state.pipeline_state)
 
     html_string = html.render(
-        sys=env.sys,
+        sys=env.sys.tree_replace({'opt.timestep': env.step_dt}),
         states=state_history,
         height="100vh",
         colab=False,

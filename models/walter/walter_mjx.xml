@@ -51,7 +51,7 @@
             <position kp="300" kv="1" forcerange="-15 15"/> 
         </default>
         <default class="wheel_actuator">
-            <position kp="400" forcerange="-2.8 2.8"/>
+            <general gear="2" forcerange="-2.8 2.8"/>
         </default>
     </default>
 
@@ -174,20 +174,20 @@
     <actuator>
         <position joint="fr_hip" class="hip_actuator"/>
         <position joint="fr_knee" class="knee_actuator"/>
-        <position joint="fr_wheel_1_joint" class="wheel_actuator"/>
-        <position joint="fr_wheel_2_joint" class="wheel_actuator"/>
+        <general joint="fr_wheel_1_joint" class="wheel_actuator"/>
+        <general joint="fr_wheel_2_joint" class="wheel_actuator"/>
         <position joint="fl_hip" class="hip_actuator"/>
         <position joint="fl_knee" class="knee_actuator"/>
-        <position joint="fl_wheel_1_joint" class="wheel_actuator"/>
-        <position joint="fl_wheel_2_joint" class="wheel_actuator"/>
+        <general joint="fl_wheel_1_joint" class="wheel_actuator"/>
+        <general joint="fl_wheel_2_joint" class="wheel_actuator"/>
         <position joint="br_hip" class="hip_actuator"/>
         <position joint="br_knee" class="knee_actuator"/>
-        <position joint="br_wheel_1_joint" class="wheel_actuator"/>
-        <position joint="br_wheel_2_joint" class="wheel_actuator"/>
+        <general joint="br_wheel_1_joint" class="wheel_actuator"/>
+        <general joint="br_wheel_2_joint" class="wheel_actuator"/>
         <position joint="bl_hip" class="hip_actuator"/>
         <position joint="bl_knee" class="knee_actuator"/>
-        <position joint="bl_wheel_1_joint" class="wheel_actuator"/>
-        <position joint="bl_wheel_2_joint" class="wheel_actuator"/>
+        <general joint="bl_wheel_1_joint" class="wheel_actuator"/>
+        <general joint="bl_wheel_2_joint" class="wheel_actuator"/>
     </actuator>
 
     <keyframe>
