@@ -32,7 +32,7 @@ def control(m,d):
   start_button = js.get_button(7)
   back_button = js.get_button(6)
   home_button = js.get_button(8)
-  hat = js.get_hat(0)
+  # hat = js.get_hat(0)
 
   if(start_button):
     mujoco.mj_resetData(m, d)
@@ -193,7 +193,6 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     # a policy and applies a control signal before stepping the physics.
     control(m,d)
     mujoco.mj_step(m, d)
-    # print(d.qd[8])
 
     
 

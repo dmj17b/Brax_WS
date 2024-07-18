@@ -47,15 +47,15 @@
 
     <!-- Default actuator classes -->
     <default class="knee_actuator">
-        <position kp="100" kv = "10" forcerange="-16 16"/>
+        <motor forcerange="-16 16"/>
     </default>
 
     <default class="hip_actuator">
-        <position kp="300" kv = "1" forcerange="-15 15"/> 
+        <motor forcerange="-15 15"/> 
     </default>
 
     <default class="wheel_actuator">
-        <position kp="400" forcerange="-2.8 2.8"/>
+        <motor  forcerange="-2.8 2.8"/>
     </default>
 
 
@@ -168,22 +168,22 @@
 
     <!-- Defining the actuators -->
     <actuator>
-        <position joint="fr_hip" class = "hip_actuator"/>
-        <position joint="fr_knee" class = "knee_actuator"/>
-        <position joint="fr_wheel1_joint" class = "wheel_actuator"/>
-        <position joint="fr_wheel2_joint" class = "wheel_actuator"/>
-        <position joint="fl_hip" class = "hip_actuator"/>
-        <position joint="fl_knee" class = "knee_actuator"/>
-        <position joint="fl_wheel1_joint" class = "wheel_actuator"/>
-        <position joint="fl_wheel2_joint" class = "wheel_actuator"/>
-        <position joint="br_hip" class = "hip_actuator"/>
-        <position joint="br_knee" class = "knee_actuator"/>
-        <position joint="br_wheel1_joint" class = "wheel_actuator"/>
-        <position joint="br_wheel2_joint" class = "wheel_actuator"/>
-        <position joint="bl_hip" class = "hip_actuator"/>
-        <position joint="bl_knee" class = "knee_actuator"/>
-        <position joint="bl_wheel1_joint" class = "wheel_actuator"/>
-        <position joint="bl_wheel2_joint" class = "wheel_actuator"/>
+        <motor joint="fr_hip" class = "hip_actuator"/>
+        <motor joint="fr_knee" class = "knee_actuator"/>
+        <motor joint="fr_wheel1_joint" class = "wheel_actuator"/>
+        <motor joint="fr_wheel2_joint" class = "wheel_actuator"/>
+        <motor joint="fl_hip" class = "hip_actuator"/>
+        <motor joint="fl_knee" class = "knee_actuator"/>
+        <motor joint="fl_wheel1_joint" class = "wheel_actuator"/>
+        <motor joint="fl_wheel2_joint" class = "wheel_actuator"/>
+        <motor joint="br_hip" class = "hip_actuator"/>
+        <motor joint="br_knee" class = "knee_actuator"/>
+        <motor joint="br_wheel1_joint" class = "wheel_actuator"/>
+        <motor joint="br_wheel2_joint" class = "wheel_actuator"/>
+        <motor joint="bl_hip" class = "hip_actuator"/>
+        <motor joint="bl_knee" class = "knee_actuator"/>
+        <motor joint="bl_wheel1_joint" class = "wheel_actuator"/>
+        <motor joint="bl_wheel2_joint" class = "wheel_actuator"/>
     </actuator>
 
     <keyframe>
