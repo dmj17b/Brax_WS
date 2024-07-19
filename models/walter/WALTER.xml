@@ -37,25 +37,25 @@
 
     <!-- Default wheel class -->
     <default class="wheel">
-        <geom type="mesh" mesh="wheel_mesh" friction = "0.4 0.005 0.005" solref="0.1 1"/>
+        <geom type="mesh" mesh = "wheel_mesh" friction = "0.4 0.005 0.005" solref="0.1 1"/>
     </default>
 
     <!-- Default wheel joint class-->
     <default class = "wheel_joint">
-        <joint type="hinge" axis="0 0 1" damping="0.1"/>
+        <joint type="hinge" axis="0 0 1" damping="0.08"/>
     </default>
 
     <!-- Default actuator classes -->
     <default class="knee_actuator">
-        <motor forcerange="-16 16"/>
+        <motor forcerange="-18 18"/>
     </default>
 
     <default class="hip_actuator">
-        <motor forcerange="-15 15"/> 
+        <motor forcerange="-18 18"/> 
     </default>
 
     <default class="wheel_actuator">
-        <motor  forcerange="-2.8 2.8"/>
+        <motor/>
     </default>
 
 
@@ -185,7 +185,7 @@
         <motor joint="bl_wheel1_joint" class = "wheel_actuator"/>
         <motor joint="bl_wheel2_joint" class = "wheel_actuator"/>
     </actuator>
-
+<!-- 
     <keyframe>
     <key name="home"
         qpos="0 0 0.3
@@ -200,5 +200,5 @@
              0 0 0 0
              0 0 0 0
              0 0 0 0"/>
-    </keyframe>
+    </keyframe> -->
 </mujoco>

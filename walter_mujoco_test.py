@@ -194,9 +194,6 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     control(m,d)
     mujoco.mj_step(m, d)
 
-    
-
-
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
     viewer.sync()
 
