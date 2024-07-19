@@ -61,11 +61,17 @@ class Walter(PipelineEnv):
         self._init_q = jnp.array(sys.mj_model.keyframe('home').qpos)
         self.default_pose = jnp.array(sys.mj_model.keyframe('home').qpos)[7:]
         self._default_ctrl = jnp.array(sys.mj_model.keyframe('home').ctrl)
+        self.limb_idx = jnp.array([0, 1, 4, 5, 8, 9, 12, 13])
+        self.wheel_idx = jnp.array([2, 3, 6, 7, 10, 11, 14, 15])
 
         # Set the reward config and other parameters:
         self.reward_weights = flax.serialization.to_state_dict(config)
         self.history_length = 15
         self.num_observations = 40
+
+        # Control Scales:
+        self._action_scale = 0.3
+        self._torque_scale = 0.3
 
 
     def reset(self, rng: PRNGKey) -> State:
@@ -133,7 +139,15 @@ class Walter(PipelineEnv):
     def step(self, state: State, action: jax.Array) -> State:
         
         # Perform a forward physics step
-        pipeline_state = self.pipeline_step(state.pipeline_state, action)
+        position_targets = self._default_pose[self.limb_idx] + action[self.limb_idx] * self._action_scale
+        torque_targets = action[self.wheel_idx] * self._torque_scale
+        motor_targets = jnp.array([
+            position_targets[0], position_targets[1], torque_targets[0], torque_targets[1],
+            position_targets[2], position_targets[3], torque_targets[2], torque_targets[3],
+            position_targets[4], position_targets[5], torque_targets[4], torque_targets[5],
+            position_targets[6], position_targets[7], torque_targets[6], torque_targets[7],
+        ])
+        pipeline_state = self.pipeline_step(state.pipeline_state, motor_targets)
 
         reward = 0.0
         
