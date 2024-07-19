@@ -79,11 +79,13 @@
                         <geom class="walter/wheel"/>
                         <geom class="walter/collision/wheel"/>
                         <joint name="bl_wheel_1_joint" class="walter/collision/wheel"/>
+                        <site name="bl_wheel_1" type="sphere" size="0.0565" group="5"/>
                     </body>
                     <body name="bl_wheel_2" pos="-0.08 0 0.088">
                         <geom class="walter/wheel"/>
                         <geom class="walter/collision/wheel"/>
                         <joint name="bl_wheel_2_joint" class="walter/collision/wheel"/>
+                        <site name="bl_wheel_2" type="sphere" size="0.0565" group="5"/>
                     </body>
                 </body>
             </body>
@@ -103,11 +105,13 @@
                         <geom class="walter/wheel"/>
                         <geom class="walter/collision/wheel"/>
                         <joint name="br_wheel_1_joint" class="walter/collision/wheel"/>
+                        <site name="br_wheel_1" type="sphere" size="0.0565" group="5"/>
                     </body>
                     <body name="br_wheel_2" pos="-0.08 0 0.088">
                         <geom class="walter/wheel"/>
                         <geom class="walter/collision/wheel"/>
                         <joint name="br_wheel_2_joint" class="walter/collision/wheel"/>
+                        <site name="br_wheel_2" type="sphere" size="0.0565" group="5"/>
                     </body>
                 </body>
             </body>
@@ -135,11 +139,13 @@
                             <geom class="walter/wheel"/>
                             <geom class="walter/collision/wheel"/>
                             <joint name="fl_wheel_1_joint" class="walter/collision/wheel"/>
+                            <site name="fl_wheel_1" type="sphere" size="0.0565" group="5"/>
                         </body>
                         <body name="fl_wheel_2" pos="-0.08 0 0.088">
                             <geom class="walter/wheel"/>
                             <geom class="walter/collision/wheel"/>
                             <joint name="fl_wheel_2_joint" class="walter/collision/wheel"/>
+                            <site name="fl_wheel_2" type="sphere" size="0.0565" group="5"/>
                         </body>
                     </body>
                 </body>
@@ -158,11 +164,13 @@
                             <geom class="walter/wheel"/>
                             <geom class="walter/collision/wheel"/>
                             <joint name="fr_wheel_1_joint" class="walter/collision/wheel"/>
+                            <site name="fr_wheel_1" type="sphere" size="0.0565" group="5"/>
                         </body>
                         <body name="fr_wheel_2" pos="-0.08 0 0.088">
                             <geom class="walter/wheel"/>
                             <geom class="walter/collision/wheel"/>
                             <joint name="fr_wheel_2_joint" class="walter/collision/wheel"/>
+                            <site name="fr_wheel_2" type="sphere" size="0.0565" group="5"/>
                         </body>
                     </body>
                 </body>
