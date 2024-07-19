@@ -63,6 +63,7 @@ class MotorModel:
     self.target_torque = target_torque
     self.limited_torque = self.speed_torque_limit(target_torque)
     self.d.ctrl[self.ctrl_index] = self.limited_torque*self.gear_ratio
+    print(self.limited_torque)
     return self.limited_torque
 
 

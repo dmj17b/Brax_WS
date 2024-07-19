@@ -195,8 +195,8 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
 
     control(m,d)
     mujoco.mj_step(m, d)
-    fr_wheel1_joint.debug()
-    torques.append(abs(fr_wheel1_joint.limited_torque[0]))
+    # fr_wheel1_joint.debug()
+    torques.append(abs(fr_wheel1_joint.limited_torque))
     omegas.append(abs(d.jnt('fr_wheel1_joint').qvel[0])*fr_wheel1_joint.gear_ratio)
 
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
