@@ -113,7 +113,7 @@ def control(m,d):
   bl_knee.pos_control(control.bl_knee_angle_des)
 
   # Control wheel velocities with left stick
-  max_wheel_vel = 3
+  max_wheel_vel = 5
   control.left_wheel_vel_des = max_wheel_vel*(left_stick_lr - left_stick_ud)
   control.right_wheel_vel_des = max_wheel_vel*(left_stick_lr + left_stick_ud)
 
@@ -178,8 +178,8 @@ wheelParams = {
   'Kp': 0.1,
   'Kd': 0.05,
   'gear_ratio': 1,
-  't_stall': 2.16,
-  'w_no_load': 13.6,
+  't_stall': 4.9,
+  'w_no_load': 230*0.1047,
 }
 
 # Load in the model and data from xml file

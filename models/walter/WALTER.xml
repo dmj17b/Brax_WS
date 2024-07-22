@@ -67,7 +67,7 @@
         <!-- Rear Body Section -->
         <body name="body" pos="0 0 0.4">
             <joint type="free"/>
-            <geom type="mesh" mesh = "body_mesh" mass="8" />
+            <geom type="mesh" mesh = "body_mesh" mass="18" />
             <!-- Add rear legs here -->
 
             <!-- Back left thigh -->
@@ -118,7 +118,7 @@
             <!-- Front Body Section -->
             <body name="head" pos="0.01 0 0">
                 <joint name="body_joint" type="hinge" axis = "1 0 0" stiffness = "0.05" range = "-0.5 0.5"/>
-                <geom type="mesh" mesh = "head_mesh" mass = "4"/>
+                <geom type="mesh" mesh = "head_mesh" mass = "5"/>
 
                 <!-- Add front legs here -->
                  <!-- Front left thigh -->
