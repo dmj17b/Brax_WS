@@ -18,7 +18,6 @@ def nearest_pi(current_angle):
   return near_pi
 
 
-
 # Joystick control function
 def control(m,d):
   js_deadzone = 0.1
@@ -68,7 +67,16 @@ def control(m,d):
     control.fl_knee_angle_des = nearest_pi(fl_knee_current)
     control.br_knee_angle_des = nearest_pi(br_knee_current)
     control.bl_knee_angle_des = nearest_pi(bl_knee_current)
-  
+  elif(b_button):
+    control.fr_knee_angle_des = nearest_pi(fr_knee_current)+np.pi/2
+    control.fl_knee_angle_des = nearest_pi(fl_knee_current)+np.pi/2
+    control.br_knee_angle_des = nearest_pi(br_knee_current) - np.pi/4
+    control.bl_knee_angle_des = nearest_pi(bl_knee_current) + np.pi/4
+    
+    control.fr_hip_angle_des = 0
+    control.fl_hip_angle_des = 0
+    control.br_hip_angle_des = 1.2
+    control.bl_hip_angle_des = -1.2
 
   # Apply hip control:
   fr_hip.pos_control(control.fr_hip_angle_des)
@@ -121,7 +129,6 @@ def control(m,d):
 
 
 # Initialize motor model/control parameters
-
 control.fr_knee_angle_des = 0
 control.fl_knee_angle_des = 0
 control.br_knee_angle_des = 0
