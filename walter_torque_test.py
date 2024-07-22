@@ -4,8 +4,7 @@ import mujoco.viewer
 import numpy as np
 import pygame
 import lib.MotorModel as motor
-import matplotlib.pyplot as plt
-import matplotlib
+
 
 # Initializing joystick stuff
 pygame.init()
@@ -43,6 +42,11 @@ def control(m,d):
   if(start_button):
     mujoco.mj_resetData(m, d)
 
+  # Get current joint angles
+  fr_knee_current = d.jnt('fr_knee').qpos[0]
+  fl_knee_current = d.jnt('fl_knee').qpos[0]
+  br_knee_current = d.jnt('br_knee').qpos[0]
+  bl_knee_current = d.jnt('bl_knee').qpos[0]
 
   # Control hip angles with buttons
   if(y_button):
@@ -55,6 +59,16 @@ def control(m,d):
     control.fl_hip_angle_des = 0
     control.br_hip_angle_des = 0
     control.bl_hip_angle_des = 0
+  elif(a_button):
+    control.fr_hip_angle_des = np.pi/2
+    control.fl_hip_angle_des = -np.pi/2
+    control.br_hip_angle_des = -np.pi/2
+    control.bl_hip_angle_des = np.pi/2
+    control.fr_knee_angle_des = nearest_pi(fr_knee_current)
+    control.fl_knee_angle_des = nearest_pi(fl_knee_current)
+    control.br_knee_angle_des = nearest_pi(br_knee_current)
+    control.bl_knee_angle_des = nearest_pi(bl_knee_current)
+  
 
   # Apply hip control:
   fr_hip.pos_control(control.fr_hip_angle_des)
@@ -74,28 +88,24 @@ def control(m,d):
 
   # Control knee angles with right stick
   # Default knee angles:
-  max_knee_vel = 0.2
+  max_knee_vel = 0.01
   left_knee_vel = max_knee_vel*(right_stick_lr - right_stick_ud)
   right_knee_vel = max_knee_vel*(right_stick_lr + right_stick_ud)
 
-  fr_knee_current = d.jnt('fr_knee').qpos[0]
-  fl_knee_current = d.jnt('fl_knee').qpos[0]
-  br_knee_current = d.jnt('br_knee').qpos[0]
-  bl_knee_current = d.jnt('bl_knee').qpos[0]
 
-  fr_knee_angle_des = fr_knee_current + right_knee_vel
-  fl_knee_angle_des = fl_knee_current + left_knee_vel
-  br_knee_angle_des = br_knee_current + right_knee_vel
-  bl_knee_angle_des = bl_knee_current + left_knee_vel
+  control.fr_knee_angle_des += right_knee_vel
+  control.fl_knee_angle_des += left_knee_vel
+  control.br_knee_angle_des += right_knee_vel
+  control.bl_knee_angle_des += left_knee_vel
 
   # Apply knee control:
-  fr_knee.pos_control(fr_knee_angle_des)
-  fl_knee.pos_control(fl_knee_angle_des)
-  br_knee.pos_control(br_knee_angle_des)
-  bl_knee.pos_control(bl_knee_angle_des)
+  fr_knee.pos_control(control.fr_knee_angle_des)
+  fl_knee.pos_control(control.fl_knee_angle_des)
+  br_knee.pos_control(control.br_knee_angle_des)
+  bl_knee.pos_control(control.bl_knee_angle_des)
 
   # Control wheel velocities with left stick
-  max_wheel_vel = 1.4
+  max_wheel_vel = 3
   control.left_wheel_vel_des = max_wheel_vel*(left_stick_lr - left_stick_ud)
   control.right_wheel_vel_des = max_wheel_vel*(left_stick_lr + left_stick_ud)
 
@@ -108,6 +118,14 @@ def control(m,d):
   br_wheel2_joint.torque_control(control.right_wheel_vel_des)
   bl_wheel1_joint.torque_control(control.left_wheel_vel_des)
   bl_wheel2_joint.torque_control(control.left_wheel_vel_des)
+
+
+# Initialize motor model/control parameters
+
+control.fr_knee_angle_des = 0
+control.fl_knee_angle_des = 0
+control.br_knee_angle_des = 0
+control.bl_knee_angle_des = 0
 
 
 control.fr_hip_angle_des = 0
@@ -127,33 +145,34 @@ control.fl_wheel1_angle_des = 0
 control.fr_wheel2_angle_des = 0
 control.fr_wheel1_angle_des = 0
 
+hip_kv = 150
+hip_voltage = 4*12  # 12 cell battery pack
+knee_kv = 230
+knee_voltage = 4*12 # 12 cell battery pack
 
-
-
-# Initialize motor models
 
 hipParams = {
   'Kp': 10,
-  'Kd': 1,
+  'Kd': 3,
   'gear_ratio': 6,
   't_stall': 2.6,
-  'w_no_load': 1400*0.1047,
+  'w_no_load': hip_kv*hip_voltage*0.1047,
 }
 
 kneeParams = {
-  'Kp': 50,
-  'Kd': 10,
+  'Kp': 10,
+  'Kd': 3,
   'gear_ratio': 6*(30/19),
   't_stall': 1.7,
-  'w_no_load': 5000*0.1047,
+  'w_no_load': knee_kv*knee_voltage*0.1047,
 }
 
 wheelParams = {
   'Kp': 0.1,
   'Kd': 0.05,
   'gear_ratio': 1,
-  't_stall': 1.4,
-  'w_no_load': 23,
+  't_stall': 2.16,
+  'w_no_load': 13.6,
 }
 
 # Load in the model and data from xml file
@@ -190,14 +209,15 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
   start = time.time()
   while viewer.is_running():
     step_start = time.time()
+
     # mj_step can be replaced with code that also evaluates
     # a policy and applies a control signal before stepping the physics.
 
     control(m,d)
+    fr_wheel1_joint.log_data()
+    fr_knee.log_data()
+
     mujoco.mj_step(m, d)
-    # fr_wheel1_joint.debug()
-    torques.append(abs(fr_wheel1_joint.limited_torque))
-    omegas.append(abs(d.jnt('fr_wheel1_joint').qvel[0])*fr_wheel1_joint.gear_ratio)
 
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
     viewer.sync()
@@ -208,12 +228,6 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
       time.sleep(time_until_next_step)
 
 
-# Plot the speed torque curve
-w_range = np.linspace(0, wheelParams['w_no_load'], 1000)
-T_line = -wheelParams['t_stall']/wheelParams['w_no_load']*w_range + wheelParams['t_stall']
-matplotlib.use('QtAgg')
-plt.plot(omegas, torques, 'b*')
-plt.xlabel('Angular Velocity (rad/s)')
-plt.ylabel('Torque (Nm)')
-plt.plot(w_range, T_line, 'r--')
-plt.show()
+fr_wheel1_joint.plot_speed_torque_curve()
+fr_knee.plot_speed_torque_curve()
+fr_knee.plot_positions()
