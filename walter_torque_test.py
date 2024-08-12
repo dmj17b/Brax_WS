@@ -17,18 +17,18 @@ knee_kv = 230
 knee_voltage = 4*12 # 12 cell battery pack
 
 hipParams = {
-  'Kp': 40,
-  'Kd': 8,
-  'gear_ratio': 6,
-  't_stall': 10,
+  'Kp': 400,
+  'Kd': 80,
+  'gear_ratio': 1,
+  't_stall': 150,
   'w_no_load': hip_kv*hip_voltage*0.1047,
 }
 
 kneeParams = {
-  'Kp': 10,
-  'Kd': 3,
-  'gear_ratio': 6*(30/19),
-  't_stall': 10,
+  'Kp': 100,
+  'Kd': 30,
+  'gear_ratio': 1,
+  't_stall': 100,
   'w_no_load': knee_kv*knee_voltage*0.1047,
 }
 
@@ -36,7 +36,7 @@ wheelParams = {
   'Kp': 0.1,
   'Kd': 0.05,
   'gear_ratio': 1,
-  't_stall': 10,
+  't_stall': 35,
   'w_no_load': 230*0.1047,
 }
 
@@ -88,5 +88,4 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     if time_until_next_step > 0:
       time.sleep(time_until_next_step)
 
-br_wheel1_joint.plot_speed_torque_curve()
 

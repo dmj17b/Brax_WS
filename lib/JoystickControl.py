@@ -100,10 +100,12 @@ class JoystickController:
             self.bl_hip_des_pos = -np.pi/6
             self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
             self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
+            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
+            self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
+
 
     def update_hip_splay(self):
         self.hip_splay = 0.001*self.d_up
-        print("D pad:" , self.d_up)
         self.fr_hip_des_pos += self.hip_splay
         self.fl_hip_des_pos -= self.hip_splay
         self.br_hip_des_pos -= self.hip_splay
