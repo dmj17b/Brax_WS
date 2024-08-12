@@ -22,7 +22,7 @@ class JoystickController:
         # User control variables:
         self.joystick_deadzone = 0.1
         self.max_wheel_vel = 10
-        self.max_knee_vel = 6
+        self.max_knee_vel = 0.01
 
         # Desired setpoints
         self.fr_knee_des_pos = 0
@@ -48,29 +48,66 @@ class JoystickController:
         self.right_wheel_vel_des = 0
         self.left_wheel_vel_des = 0
 
+        self.d_up = 0
+        self.d_down = 0
+        self.d_left = 0
+        self.d_right = 0
+
+        self.hip_splay = 0
+
+
     # Function that controls the wheels
     def control_wheels(self):
         # Control the wheels with basic joystick control
         self.left_wheel_vel_des = self.max_wheel_vel*(-self.left_stick_ud + self.left_stick_lr)
         self.right_wheel_vel_des = self.max_wheel_vel*(self.left_stick_ud + self.left_stick_lr)
 
+    def control_knees(self):
+        self.left_knee_des_vel = self.max_knee_vel*(-self.right_stick_ud + self.right_stick_lr)
+        self.right_knee_des_vel = self.max_knee_vel*(self.right_stick_ud + self.right_stick_lr)
+        self.fl_knee_des_pos += self.left_knee_des_vel
+        self.bl_knee_des_pos += self.left_knee_des_vel
+        self.fr_knee_des_pos += self.right_knee_des_vel
+        self.br_knee_des_pos += self.right_knee_des_vel
+        
+
+
     # Function that handles button inputs
     def button_controls(self):
         if(self.a_button):
+            print("A button pressed")
             self.fr_hip_des_pos = 0
             self.fl_hip_des_pos = 0
             self.br_hip_des_pos = 0
             self.bl_hip_des_pos = 0
         elif(self.b_button):
+            print("B button pressed")
             self.fr_hip_des_pos = np.pi/2
             self.fl_hip_des_pos = -np.pi/2
             self.br_hip_des_pos = -np.pi/2
             self.bl_hip_des_pos = np.pi/2
+        elif(self.y_button):
+            print("Y button pressed")
+            self.fr_hip_des_pos = np.pi/6
+            self.fl_hip_des_pos = -np.pi/6
+            self.br_hip_des_pos = -np.pi/6
+            self.bl_hip_des_pos = np.pi/6
         elif(self.x_button):
-            self.fr_hip_des_pos = -np.pi/2
-            self.fl_hip_des_pos = np.pi/2
-            self.br_hip_des_pos = np.pi/2
-            self.bl_hip_des_pos = -np.pi/2
+            print("X button pressed")
+            self.fr_hip_des_pos = -np.pi/6
+            self.fl_hip_des_pos = np.pi/6
+            self.br_hip_des_pos = np.pi/6
+            self.bl_hip_des_pos = -np.pi/6
+            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
+            self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
+
+    def update_hip_splay(self):
+        self.hip_splay = 0.001*self.d_up
+        print("D pad:" , self.d_up)
+        self.fr_hip_des_pos += self.hip_splay
+        self.fl_hip_des_pos -= self.hip_splay
+        self.br_hip_des_pos -= self.hip_splay
+        self.bl_hip_des_pos += self.hip_splay
 
 
     # Main control function
@@ -84,9 +121,22 @@ class JoystickController:
         # Reset the simulation if requested
         if(self.start_button):
             mujoco.mj_resetData(m, d)
+            self.fr_knee_des_pos = 0
+            self.fl_knee_des_pos = 0
+            self.br_knee_des_pos = 0
+            self.bl_knee_des_pos = 0
+            self.fr_hip_des_pos = 0
+            self.fl_hip_des_pos = 0
+            self.br_hip_des_pos = 0
+            self.bl_hip_des_pos = 0
+
+        self.update_hip_splay()
 
         # Control the wheels
         self.control_wheels()
+
+        # Control the knees
+        self.control_knees()
 
         # Apply button controls
         self.button_controls()
@@ -140,6 +190,11 @@ class JoystickController:
             self.start_button = self.js.get_button(7)
             self.back_button = self.js.get_button(6)
             self.home_button = self.js.get_button(8)
+            self.d_up = self.js.get_hat(0)[1]
+            self.d_down = self.js.get_hat(0)[1]
+            self.d_left = self.js.get_hat(0)[0]
+            self.d_right = self.js.get_hat(0)[0]
+
         elif(self.controller_type == "ps4"):
             self.left_stick_lr = self.js.get_axis(0)
             self.left_stick_ud = self.js.get_axis(1)

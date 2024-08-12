@@ -20,7 +20,7 @@ hipParams = {
   'Kp': 40,
   'Kd': 8,
   'gear_ratio': 6,
-  't_stall': 2.6,
+  't_stall': 10,
   'w_no_load': hip_kv*hip_voltage*0.1047,
 }
 
@@ -28,7 +28,7 @@ kneeParams = {
   'Kp': 10,
   'Kd': 3,
   'gear_ratio': 6*(30/19),
-  't_stall': 1.7,
+  't_stall': 10,
   'w_no_load': knee_kv*knee_voltage*0.1047,
 }
 
@@ -36,7 +36,7 @@ wheelParams = {
   'Kp': 0.1,
   'Kd': 0.05,
   'gear_ratio': 1,
-  't_stall': 4.9,
+  't_stall': 10,
   'w_no_load': 230*0.1047,
 }
 
@@ -64,7 +64,7 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
           fr_wheel1_joint, fr_wheel2_joint, fl_wheel1_joint, fl_wheel2_joint, br_wheel1_joint, br_wheel2_joint, bl_wheel1_joint, bl_wheel2_joint]
 
 print(motors[0].Kp)
-controller = js_ctrl.JoystickController("ps4", m, d, motors)
+controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 
 # Main simulation loop
@@ -76,7 +76,7 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
 
     # Call joystick controller:
     controller.control(m,d)
-    br_wheel1_joint.log_data()
+    # br_wheel1_joint.log_data()
     # Step the simulation forward
     mujoco.mj_step(m, d)
 
