@@ -17,15 +17,15 @@ knee_kv = 230
 knee_voltage = 4*12 # 12 cell battery pack
 
 hipParams = {
-  'Kp': 400,
+  'Kp': 600,
   'Kd': 80,
   'gear_ratio': 1,
-  't_stall': 150,
+  't_stall': 100,
   'w_no_load': hip_kv*hip_voltage*0.1047,
 }
 
 kneeParams = {
-  'Kp': 100,
+  'Kp': 600,
   'Kd': 30,
   'gear_ratio': 1,
   't_stall': 100,
@@ -36,7 +36,7 @@ wheelParams = {
   'Kp': 0.1,
   'Kd': 0.05,
   'gear_ratio': 1,
-  't_stall': 35,
+  't_stall': 50,
   'w_no_load': 230*0.1047,
 }
 
@@ -63,7 +63,9 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
           fr_knee, fl_knee, br_knee, bl_knee, 
           fr_wheel1_joint, fr_wheel2_joint, fl_wheel1_joint, fl_wheel2_joint, br_wheel1_joint, br_wheel2_joint, bl_wheel1_joint, bl_wheel2_joint]
 
-print(motors[0].Kp)
+
+
+# Initializing joystick controller object
 controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 

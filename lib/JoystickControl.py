@@ -22,7 +22,7 @@ class JoystickController:
         # User control variables:
         self.joystick_deadzone = 0.1
         self.max_wheel_vel = 10
-        self.max_knee_vel = 0.01
+        self.max_knee_vel = 0.005
 
         # Desired setpoints
         self.fr_knee_des_pos = 0
@@ -80,28 +80,36 @@ class JoystickController:
             self.fl_hip_des_pos = 0
             self.br_hip_des_pos = 0
             self.bl_hip_des_pos = 0
+            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
+            self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
+            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
+            self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
         elif(self.b_button):
             print("B button pressed")
             self.fr_hip_des_pos = np.pi/2
             self.fl_hip_des_pos = -np.pi/2
             self.br_hip_des_pos = -np.pi/2
             self.bl_hip_des_pos = np.pi/2
-        elif(self.y_button):
-            print("Y button pressed")
-            self.fr_hip_des_pos = np.pi/6
-            self.fl_hip_des_pos = -np.pi/6
-            self.br_hip_des_pos = -np.pi/6
-            self.bl_hip_des_pos = np.pi/6
-        elif(self.x_button):
-            print("X button pressed")
-            self.fr_hip_des_pos = -np.pi/6
-            self.fl_hip_des_pos = np.pi/6
-            self.br_hip_des_pos = np.pi/6
-            self.bl_hip_des_pos = -np.pi/6
             self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
             self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
             self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
             self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
+        elif(self.y_button):
+            print("Y button pressed")
+            self.fr_hip_des_pos = np.pi/3
+            self.fl_hip_des_pos = -np.pi/3
+            self.br_hip_des_pos = -np.pi/3
+            self.bl_hip_des_pos = np.pi/3
+        elif(self.x_button):
+            print("X button pressed")
+            self.fr_hip_des_pos = -np.pi/12
+            self.fl_hip_des_pos = np.pi/12
+            self.br_hip_des_pos = np.pi/12
+            self.bl_hip_des_pos = -np.pi/12
+            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos) + np.pi/4
+            self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos) - np.pi/4
+            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos) - np.pi/4
+            self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos) + np.pi/4
 
 
     def update_hip_splay(self):
