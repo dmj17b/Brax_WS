@@ -83,7 +83,7 @@ class MotorModel:
     self.tau_max = -(self.t_stall/self.w_no_load)*w_motor + self.t_stall
 
     # If target torque is greater than speed/torque curve allows, limit it
-    if(abs(target_torque) > abs(self.tau_max)):
+    if(abs(target_torque) > abs(self.tau_max) & w_motor < abs(self.w_no_load)):
       return np.sign(target_torque)*self.tau_max
     # If angular velocity is greater than no load speed, limit torque to zero
     elif(w_motor >= abs(self.w_no_load)):
