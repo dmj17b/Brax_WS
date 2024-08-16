@@ -62,14 +62,11 @@ class MotorModel:
   ## DOES NOT WORK YET##
   def vel_control(self, target_vel: float):
     self.target_vel = target_vel
-    q = self.d.jnt(self.motor_name).qpos
     qdot = self.d.jnt(self.motor_name).qvel
-    print(qdot)
-    tau = self.Kp*(self.target_vel - qdot) + self.Kd*(-self.d.jnt(self.motor_name).qacc)
+    tau = self.Kp*(self.target_vel - qdot) #+ self.Kd*(-self.d.jnt(self.motor_name).qacc)
     self.target_torque = tau
     self.limited_torque = self.speed_torque_limit(tau)
-    # print(self.target_vel-qdot)
-    # self.d.ctrl[self.ctrl_index] = tau*self.gear_ratio
+
     self.d.ctrl[self.ctrl_index] = self.limited_torque*self.gear_ratio
     return self.limited_torque
   
@@ -89,7 +86,7 @@ class MotorModel:
     if(abs(target_torque) > abs(self.tau_max)):
       return np.sign(target_torque)*self.tau_max
     # If angular velocity is greater than no load speed, limit torque to zero
-    if(abs(w_motor) > self.w_no_load):
+    elif(w_motor >= abs(self.w_no_load)):
       print("Exceeding no load speed")
       return 0.0
     # Otherwise return the target torque

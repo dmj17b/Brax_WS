@@ -2,7 +2,6 @@ import time
 import mujoco
 import mujoco.viewer
 import numpy as np
-import pygame
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 
@@ -92,5 +91,4 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     if time_until_next_step > 0:
       time.sleep(time_until_next_step)
 
-br_wheel1_joint.plot_speed_torque_curve()
-fr_wheel1_joint.plot_speed_torque_curve()
+

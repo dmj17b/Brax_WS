@@ -2,39 +2,71 @@
   <worldbody>
     <light diffuse=".5 .5 .5" pos="0 2 0.075" dir="0 0 -1"/>
     <body pos="0 2 0">
-      <geom type="box" size=".8 .8 .16" rgba="0.3 0.3 0.3 1"/>
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
     </body>
   </worldbody>
 
     <worldbody>
         <light diffuse=".5 .5 .5" pos="0 3 0.3" dir="0 0 -1"/>
-    <body pos="0 2.2 0.16">
-      <geom type="box" size=".8 .8 0.16" rgba="0.3 0.3 0.3 1"/>
+    <body pos="0 2.3 0.185">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
     </body>
   </worldbody>
 
     <worldbody>
     <light diffuse=".5 .5 .5" pos="0 4 .5" dir="0 0 -1"/>
-    <body pos="0 2.4 .32">
-      <geom type="box" size=".8 .8 0.16" rgba="0.3 0.3 0.3 1"/>
+    <body pos="0 2.6 .37">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
     </body>
   </worldbody>
       <worldbody>
     <light diffuse=".5 .5 .5" pos="0 4 .5" dir="0 0 -1"/>
-    <body pos="0 2.6 .48">
-      <geom type="box" size=".8 .8 0.16" rgba="0.3 0.3 0.3 1"/>
+    <body pos="0 2.9 0.555">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
     </body>
   </worldbody>
         <worldbody>
     <light diffuse=".5 .5 .5" pos="0 4 .5" dir="0 0 -1"/>
-    <body pos="0 2.8 .64">
-      <geom type="box" size=".8 .8 0.16" rgba="0.3 0.3 0.3 1"/>
+    <body pos="0 3.2 0.74">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
     </body>
   </worldbody>
   <worldbody>
     <light diffuse=".5 .5 .5" pos="0 4 5" dir="0 0 -1"/>
-    <body pos="0 3 0.8">
-      <geom type="box" size=".8 .8 0.16" rgba="0.3 0.3 0.3 1"/>
+    <body pos="0 3.5 0.925">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
     </body>
   </worldbody>
+
+<!-- Starting second stair segment -->
+  <worldbody>
+    <body pos="1.6 3.5 0.925">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <body pos="1.6 1.9 1.11">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <body pos="1.6 1.6 1.295">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <body pos="1.6 1.3 1.48">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+    <worldbody>
+    <body pos="1.6 1.0 1.665">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
 </mujoco>

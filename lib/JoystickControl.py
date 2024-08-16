@@ -21,7 +21,7 @@ class JoystickController:
 
         # User control variables:
         self.joystick_deadzone = 0.1
-        self.max_wheel_vel = 10
+        self.max_wheel_vel = 50
         self.max_knee_vel = 0.005
 
         # Desired setpoints
@@ -167,14 +167,14 @@ class JoystickController:
         self.motors[6].pos_control(self.br_knee_des_pos)
         self.motors[7].pos_control(self.bl_knee_des_pos)
 
-        self.motors[8].torque_control(self.right_wheel_vel_des)
-        self.motors[9].torque_control(self.right_wheel_vel_des)
-        self.motors[10].torque_control(self.left_wheel_vel_des)
-        self.motors[11].torque_control(self.left_wheel_vel_des)
-        self.motors[12].torque_control(self.right_wheel_vel_des)
-        self.motors[13].torque_control(self.right_wheel_vel_des)
-        self.motors[14].torque_control(self.left_wheel_vel_des)
-        self.motors[15].torque_control(self.left_wheel_vel_des)
+        self.motors[9].vel_control(self.right_wheel_vel_des)
+        self.motors[8].vel_control(self.right_wheel_vel_des)
+        self.motors[10].vel_control(self.left_wheel_vel_des)
+        self.motors[11].vel_control(self.left_wheel_vel_des)
+        self.motors[12].vel_control(self.right_wheel_vel_des)
+        self.motors[13].vel_control(self.right_wheel_vel_des)
+        self.motors[14].vel_control(self.left_wheel_vel_des)
+        self.motors[15].vel_control(self.left_wheel_vel_des)
 
             
 
