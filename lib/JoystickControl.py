@@ -4,7 +4,7 @@ import mujoco.viewer
 import numpy as np
 import pygame
 import lib.MotorModel as motor
-
+import threading
 
 class JoystickController:
     def __init__(self, controller_type: str, m: mujoco.MjModel, d: mujoco.MjData, motors: motor.MotorModel):
@@ -76,14 +76,8 @@ class JoystickController:
     def button_controls(self):
         if(self.a_button):
             print("A button pressed")
-            self.fr_hip_des_pos = 0
-            self.fl_hip_des_pos = 0
-            self.br_hip_des_pos = 0
-            self.bl_hip_des_pos = 0
-            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
-            self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
-            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
-            self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
+            thread = threading.Thread(target=self.kipup)
+            thread.start()
         elif(self.b_button):
             print("B button pressed")
             self.fr_hip_des_pos = np.pi/2
@@ -276,3 +270,24 @@ class JoystickController:
         print("Index 13: ", self.js.get_button(13))
         print("Index 14: ", self.js.get_button(14))
 
+    def kipup(self):
+        self.fr_hip_des_pos = -np.pi/12
+        self.fl_hip_des_pos = np.pi/12
+        self.br_hip_des_pos = np.pi/12
+        self.bl_hip_des_pos = -np.pi/12
+        self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos) + np.pi/4
+        self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos) - np.pi/4
+        self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos) - np.pi/4
+        self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos) + np.pi/4
+        self.send_commands()
+        time.sleep(0.5)
+        for i in range(100):
+            if(i<500):
+                self.left_wheel_vel_des = 50
+                self.right_wheel_vel_des = -50
+            else:
+                self.left_wheel_vel_des = -50
+                self.right_wheel_vel_des = 50
+            self.send_commands()
+        return
+        

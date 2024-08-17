@@ -3,7 +3,7 @@
     <include file="J7.xml"/>
     <include file="stairs.xml"/>
     <include file="rubble.xml"/>
-  
+    <include file="jerseybarrier.xml"/>
     <statistic center="0 0 0.1" extent="0.8"/>
   
     <visual>

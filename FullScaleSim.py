@@ -20,7 +20,7 @@ hipParams = {
   'Kd': 80,
   'gear_ratio': 1,
   't_stall': 120,
-  'w_no_load': hip_kv*hip_voltage*0.1047,
+  'w_no_load': 230*0.1047,
 }
 
 kneeParams = {
@@ -28,7 +28,7 @@ kneeParams = {
   'Kd': 30,
   'gear_ratio': 1,
   't_stall': 100,
-  'w_no_load': knee_kv*knee_voltage*0.1047,
+  'w_no_load': 230*0.1047,
 }
 
 wheelParams = {
@@ -82,7 +82,9 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
 
     controller.control(m,d)
     br_wheel1_joint.log_data()
-    fr_wheel1_joint.log_data()
+    br_knee.log_data()
+    br_hip.log_data()
+
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
     viewer.sync()
 
@@ -92,3 +94,6 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
       time.sleep(time_until_next_step)
 
 
+br_wheel1_joint.plot_speed_torque_curve()
+br_knee.plot_speed_torque_curve()
+br_hip.plot_speed_torque_curve()
