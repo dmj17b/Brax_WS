@@ -1,6 +1,6 @@
 <mujoco>
     <worldbody>
-        <body pos="-5 0 0">
+        <body pos="-3 0 0">
             <geom type="box" size=".15 .8 0.813" rgba="0.3 0.3 0.3 1"/>
           </body>
     </worldbody>

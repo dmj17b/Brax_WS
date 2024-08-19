@@ -76,8 +76,14 @@ class JoystickController:
     def button_controls(self):
         if(self.a_button):
             print("A button pressed")
-            thread = threading.Thread(target=self.kipup)
-            thread.start()
+            self.fr_hip_des_pos = 0
+            self.fl_hip_des_pos = 0
+            self.br_hip_des_pos = 0
+            self.bl_hip_des_pos = 0
+            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
+            self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
+            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
+            self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
         elif(self.b_button):
             print("B button pressed")
             self.fr_hip_des_pos = np.pi/2
