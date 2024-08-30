@@ -27,7 +27,7 @@
 
     <!-- Default shin class -->
     <default class="shin">
-        <geom type="mesh" mesh="shin_mesh" mass = "2"/>
+        <geom type="cylinder" size = "0.2 0.03" mass = "2" pos = "0 0 0.05"/>
     </default>
     
     <!-- Default knee class -->
@@ -66,7 +66,7 @@
         <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
         <!-- Rear Body Section -->
         <body name="body" pos="0 0 0.9">
-            <joint type="free"/>
+            <!-- <joint type="free"/> -->
             <geom type="mesh" mesh = "body_mesh" mass="35" />
             <!-- Add rear legs here -->
 
@@ -78,15 +78,7 @@
                 <body name = "bl_shin" pos = "0 -0.2 0.076" >
                     <joint name="bl_knee" class = "knee" type="hinge" axis = "0 0 1"/>
                     <geom class="shin"/>
-                    <!-- Back left wheels -->
-                     <body name = "bl_wheel1" pos = "0.125 0 0.058">
-                        <geom class="wheel"/>
-                        <joint name="bl_wheel1_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
-                     </body>
-                     <body name = "bl_wheel2" pos = "-0.125 0 0.058">
-                        <geom class="wheel"/>
-                        <joint name="bl_wheel2_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
-                     </body>
+
                 </body>
              </body>
 
@@ -99,15 +91,7 @@
                 <body name = "br_shin" pos = "0 -0.2 0.076" >
                     <joint name="br_knee" class = "knee" type="hinge" axis = "0 0 1"/>
                     <geom class="shin"/>
-                    <!-- Back right wheels -->
-                     <body name = "br_wheel1" pos = "0.125 0 0.058">
-                        <geom class="wheel"/>
-                        <joint name="br_wheel1_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
-                     </body>
-                     <body name = "br_wheel2" pos = "-0.125 0 0.058">
-                        <geom class="wheel"/>
-                        <joint name="br_wheel2_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
-                     </body>
+
                 </body>
              </body>
 
@@ -127,15 +111,7 @@
                     <body name = "fl_shin" pos = "0 -0.2 0.076" >
                         <joint name="fl_knee" class = "knee" type="hinge" axis = "0 0 1"/>
                         <geom class="shin"/>
-                        <!-- Back left wheels -->
-                         <body name = "fl_wheel1" pos = "0.125 0 0.058">
-                            <geom class="wheel"/>
-                            <joint name="fl_wheel1_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
-                         </body>
-                         <body name = "fl_wheel2" pos = "-0.125 0 0.058">
-                            <geom class="wheel"/>
-                            <joint name="fl_wheel2_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
-                         </body>
+
                     </body>
                  </body>
 
@@ -147,15 +123,7 @@
                     <body name = "fr_shin" pos = "0 -0.2 0.076" >
                         <joint name="fr_knee" class = "knee" type="hinge" axis = "0 0 1"/>
                         <geom class="shin"/>
-                        <!-- Back left wheels -->
-                            <body name = "fr_wheel1" pos = "0.125 0 0.058">
-                                <geom class="wheel"/>
-                                <joint name="fr_wheel1_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
-                            </body>
-                            <body name = "fr_wheel2" pos = "-0.125 0 0.058">
-                                <geom class="wheel"/>
-                                <joint name="fr_wheel2_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
-                            </body>
+
                     </body>
                 </body>
             </body> 
@@ -166,20 +134,12 @@
     <actuator>
         <motor joint="fr_hip" class = "hip_actuator"/>
         <motor joint="fr_knee" class = "knee_actuator"/>
-        <motor joint="fr_wheel1_joint" class = "wheel_actuator"/>
-        <motor joint="fr_wheel2_joint" class = "wheel_actuator"/>
         <motor joint="fl_hip" class = "hip_actuator"/>
         <motor joint="fl_knee" class = "knee_actuator"/>
-        <motor joint="fl_wheel1_joint" class = "wheel_actuator"/>
-        <motor joint="fl_wheel2_joint" class = "wheel_actuator"/>
         <motor joint="br_hip" class = "hip_actuator"/>
         <motor joint="br_knee" class = "knee_actuator"/>
-        <motor joint="br_wheel1_joint" class = "wheel_actuator"/>
-        <motor joint="br_wheel2_joint" class = "wheel_actuator"/>
         <motor joint="bl_hip" class = "hip_actuator"/>
         <motor joint="bl_knee" class = "knee_actuator"/>
-        <motor joint="bl_wheel1_joint" class = "wheel_actuator"/>
-        <motor joint="bl_wheel2_joint" class = "wheel_actuator"/>
     </actuator>
 <!-- 
     <keyframe>

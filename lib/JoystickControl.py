@@ -143,7 +143,7 @@ class JoystickController:
         self.update_hip_splay()
 
         # Control the wheels
-        self.control_wheels()
+        # self.control_wheels()
 
         # Control the knees
         self.control_knees()

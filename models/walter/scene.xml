@@ -1,6 +1,6 @@
 <mujoco model="SMALTER Scene">
 
-    <include file="J7.xml"/>
+    <include file="BigWheel.xml"/>
     <include file="stairs.xml"/>
     <include file="rubble.xml"/>
     <include file="jerseybarrier.xml"/>
