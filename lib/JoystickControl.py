@@ -22,7 +22,7 @@ class JoystickController:
         # User control variables:
         self.joystick_deadzone = 0.1
         self.max_wheel_vel = 50
-        self.max_knee_vel = 0.005
+        self.max_knee_vel = 0.05
 
         # Desired setpoints
         self.fr_knee_des_pos = 0
@@ -167,14 +167,14 @@ class JoystickController:
         self.motors[6].pos_control(self.br_knee_des_pos)
         self.motors[7].pos_control(self.bl_knee_des_pos)
 
-        self.motors[9].vel_control(self.right_wheel_vel_des)
-        self.motors[8].vel_control(self.right_wheel_vel_des)
-        self.motors[10].vel_control(self.left_wheel_vel_des)
-        self.motors[11].vel_control(self.left_wheel_vel_des)
-        self.motors[12].vel_control(self.right_wheel_vel_des)
-        self.motors[13].vel_control(self.right_wheel_vel_des)
-        self.motors[14].vel_control(self.left_wheel_vel_des)
-        self.motors[15].vel_control(self.left_wheel_vel_des)
+        # self.motors[9].vel_control(self.right_wheel_vel_des)
+        # self.motors[8].vel_control(self.right_wheel_vel_des)
+        # self.motors[10].vel_control(self.left_wheel_vel_des)
+        # self.motors[11].vel_control(self.left_wheel_vel_des)
+        # self.motors[12].vel_control(self.right_wheel_vel_des)
+        # self.motors[13].vel_control(self.right_wheel_vel_des)
+        # self.motors[14].vel_control(self.left_wheel_vel_des)
+        # self.motors[15].vel_control(self.left_wheel_vel_des)
 
             
 
@@ -204,7 +204,6 @@ class JoystickController:
             self.d_down = self.js.get_hat(0)[1]
             self.d_left = self.js.get_hat(0)[0]
             self.d_right = self.js.get_hat(0)[0]
-
         elif(self.controller_type == "ps4"):
             self.left_stick_lr = self.js.get_axis(0)
             self.left_stick_ud = self.js.get_axis(1)

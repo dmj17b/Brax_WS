@@ -66,7 +66,7 @@
         <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
         <!-- Rear Body Section -->
         <body name="body" pos="0 0 0.9">
-            <!-- <joint type="free"/> -->
+            <joint type="free"/>
             <geom type="mesh" mesh = "body_mesh" mass="35" />
             <!-- Add rear legs here -->
 
