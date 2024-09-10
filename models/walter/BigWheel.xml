@@ -27,7 +27,7 @@
 
     <!-- Default shin class -->
     <default class="shin">
-        <geom type="cylinder" size = "0.2 0.03" mass = "2" pos = "0 0 0.05"/>
+        <geom type="cylinder" size = "0.2 0.03" mass = "6" pos = "0 0 0.05"/>
     </default>
     
     <!-- Default knee class -->
@@ -63,7 +63,6 @@
 
   <!-- WALTER MODEL -->
     <worldbody>
-        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
         <!-- Rear Body Section -->
         <body name="body" pos="0 0 0.9">
             <joint type="free"/>

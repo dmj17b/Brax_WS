@@ -55,6 +55,39 @@ class JoystickController:
 
         self.hip_splay = 0
 
+    # Main control function
+    def control(self,m,d):
+        # Get current joint angles
+        self.get_mujoco_state(m,d)
+
+        # Get joystick state
+        self.get_joystick_state()
+
+        # Reset the simulation if requested
+        if(self.start_button):
+            mujoco.mj_resetData(m, d)
+            self.fr_knee_des_pos = 0
+            self.fl_knee_des_pos = 0
+            self.br_knee_des_pos = 0
+            self.bl_knee_des_pos = 0
+            self.fr_hip_des_pos = 0
+            self.fl_hip_des_pos = 0
+            self.br_hip_des_pos = 0
+            self.bl_hip_des_pos = 0
+
+        self.update_hip_splay()
+
+        # Control the wheels
+        # self.control_wheels()
+
+        # Control the knees
+        self.control_knees()
+
+        # Apply button controls
+        self.button_controls()
+
+        # Finally send the commands to the motors
+        self.send_commands()
 
     # Function that controls the wheels
     def control_wheels(self):
@@ -118,41 +151,6 @@ class JoystickController:
         self.fl_hip_des_pos -= self.hip_splay
         self.br_hip_des_pos -= self.hip_splay
         self.bl_hip_des_pos += self.hip_splay
-
-
-    # Main control function
-    def control(self,m,d):
-        # Get current joint angles
-        self.get_mujoco_state(m,d)
-
-        # Get joystick state
-        self.get_joystick_state()
-
-        # Reset the simulation if requested
-        if(self.start_button):
-            mujoco.mj_resetData(m, d)
-            self.fr_knee_des_pos = 0
-            self.fl_knee_des_pos = 0
-            self.br_knee_des_pos = 0
-            self.bl_knee_des_pos = 0
-            self.fr_hip_des_pos = 0
-            self.fl_hip_des_pos = 0
-            self.br_hip_des_pos = 0
-            self.bl_hip_des_pos = 0
-
-        self.update_hip_splay()
-
-        # Control the wheels
-        # self.control_wheels()
-
-        # Control the knees
-        self.control_knees()
-
-        # Apply button controls
-        self.button_controls()
-
-        # Finally send the commands to the motors
-        self.send_commands()
 
 
     # Function that sends the commands to the motors

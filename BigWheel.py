@@ -24,8 +24,8 @@ hipParams = {
 }
 
 kneeParams = {
-  'Kp': 600,
-  'Kd': 30,
+  'Kp': 5,
+  'Kd': 0.3,
   'gear_ratio': 1,
   't_stall': 100,
   'w_no_load': 230*0.1047,
@@ -57,9 +57,9 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 # Initializing joystick controller object
-controller = js_ctrl.JoystickController("ps4", m, d, motors)
+controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
-
+torques = []
 # Main simulation loop
 with mujoco.viewer.launch_passive(m, d) as viewer:
   # Close the viewer automatically after 30 wall-seconds.
@@ -76,14 +76,27 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     br_knee.log_data()
     br_hip.log_data()
 
+    torques.append(d.qfrc_actuator[:])
+
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
     viewer.sync()
+
+    
 
     # Rudimentary time keeping, will drift relative to wall clock.
     time_until_next_step = m.opt.timestep - (time.time() - step_start)
     if time_until_next_step > 0:
       time.sleep(time_until_next_step)
 
+    if(d.qpos[0]>10):
+      break
 
-br_knee.plot_speed_torque_curve()
-br_hip.plot_speed_torque_curve()
+
+# Calculate COT:
+torques = np.array(torques)
+energy = np.sum(np.trapezoid(torques ** 2, dx=m.opt.timestep, axis=0), axis=-1)
+print(sum(m.body_mass[0:11]))
+print(d.qpos[0])
+cot = energy / (sum(m.body_mass[0:11]) * -m.opt.gravity[2] * d.qpos[0])
+print(cot)
+
