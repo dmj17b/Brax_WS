@@ -5,6 +5,7 @@ import numpy as np
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 import lib.TestControl as test_ctrl
+import keyboard
 
 # Load in the model and data from xml file
 m = mujoco.MjModel.from_xml_path('models/walter/scene.xml')
@@ -17,26 +18,26 @@ knee_kv = 230
 knee_voltage = 4*12 # 12 cell battery pack
 
 hipParams = {
-  'Kp': 600,
+  'Kp': 800,
   'Kd': 80,
   'gear_ratio': 1,
-  't_stall': 120,
+  't_stall': 150,
   'w_no_load': 230*0.1047,
 }
 
 kneeParams = {
-  'Kp': 600,
+  'Kp': 800,
   'Kd': 80,
   'gear_ratio': 1,
-  't_stall': 100,
+  't_stall': 150,
   'w_no_load': 230*0.1047,
 }
 
 wheelParams = {
-  'Kp': 0.5,
-  'Kd': 0.3,
+  'Kp': 10,
+  'Kd': 5,
   'gear_ratio': 1,
-  't_stall': 25,
+  't_stall': 250,
   'w_no_load': 230*0.1047,
 }
 
@@ -69,21 +70,26 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 controller = test_ctrl.TestController(m, d, motors)
 
 torques = []
+vels = []
+begin = False
 # Main simulation loop
 with mujoco.viewer.launch_passive(m, d) as viewer:
-  # Close the viewer automatically after 30 wall-seconds.
   start = time.time()
   while viewer.is_running():
     step_start = time.time()
 
     # Step the simulation forward
     mujoco.mj_step(m, d)
-
     # Call joystick controller:
+    if(keyboard.is_pressed('b')):
+      begin = True
 
-    controller.control(m,d)
-
-    torques.append(d.qfrc_actuator[:])
+    if(begin):
+        controller.control(m,d)
+        torques.append(d.qfrc_actuator[:])
+        vels.append(d.qvel[:])
+    else:
+        controller.start_pos()
 
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
     viewer.sync()
@@ -95,9 +101,6 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     if time_until_next_step > 0:
       time.sleep(time_until_next_step)
 
-    if(d.qpos[0]>10):
-      break
-
 
 # Calculate COT:
 torques = np.array(torques)
@@ -107,4 +110,3 @@ print(sum(m.body_mass[0:19]))
 print(d.qpos[0])
 cot = energy / (sum(m.body_mass[0:11]) * -m.opt.gravity[2] * d.qpos[0])
 print(cot)
-

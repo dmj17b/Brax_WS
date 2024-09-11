@@ -37,7 +37,7 @@
 
     <!-- Default wheel class -->
     <default class="wheel">
-        <geom type="mesh" mesh = "wheel_mesh" friction = "0.4 0.005 0.005" solref="0.1 1" mass = "3"/>
+        <geom type="mesh" mesh = "wheel_mesh" friction = "1.5 0.005 0.005" solref="0.1 0.5" mass = "3"/>
     </default>
 
     <!-- Default wheel joint class-->
@@ -115,7 +115,7 @@
 
             <!-- Front Body Section -->
             <body name="head" pos="0.01 0 0">
-                <joint name="body_joint" type="hinge" axis = "1 0 0" stiffness = "0.05" range = "-0.5 0.5"/>
+                <joint name="body_joint" type="hinge" axis = "1 0 0" stiffness = "0.05" range = "0.5 0.5"/>
                 <geom type="mesh" mesh = "head_mesh" mass = "17"/>
 
                 <!-- Add front legs here -->

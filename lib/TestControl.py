@@ -54,6 +54,13 @@ class TestController:
 
         self.hip_splay = 0
 
+        self.front_hip_splay = np.pi/4
+        self.back_hip_splay = np.pi/4
+
+        self.knee_vel = 0.00
+
+        self.wheel_vel = 10
+
     # Main control function
     def control(self,m,d):
         # Get current joint angles
@@ -85,13 +92,25 @@ class TestController:
         # Apply button controls
         # self.button_controls()
 
-        self.left_knee_des_vel = 0.01;
-        self.right_knee_des_vel = 0.01;
+        self.left_knee_des_vel = self.knee_vel;
+        self.right_knee_des_vel = self.knee_vel;
 
         self.fr_knee_des_pos -= self.right_knee_des_vel
         self.fl_knee_des_pos += self.left_knee_des_vel
         self.br_knee_des_pos -= self.right_knee_des_vel
         self.bl_knee_des_pos += self.left_knee_des_vel
+
+        # Set desired hip position:
+
+        self.fr_hip_des_pos = self.front_hip_splay
+        self.fl_hip_des_pos = -self.front_hip_splay
+        self.br_hip_des_pos = -self.back_hip_splay
+        self.bl_hip_des_pos = self.back_hip_splay
+
+        self.right_wheel_vel_des = -self.wheel_vel
+        self.left_wheel_vel_des = self.wheel_vel
+
+
 
         # Finally send the commands to the motors
         self.send_commands()
@@ -109,7 +128,19 @@ class TestController:
         self.bl_knee_des_pos += self.left_knee_des_vel
         self.fr_knee_des_pos += self.right_knee_des_vel
         self.br_knee_des_pos += self.right_knee_des_vel
-        
+
+    def start_pos(self):
+
+        self.fr_hip_des_pos = self.front_hip_splay
+        self.fl_hip_des_pos = -self.front_hip_splay
+        self.br_hip_des_pos = -self.back_hip_splay
+        self.bl_hip_des_pos = self.back_hip_splay
+
+        self.fr_knee_des_pos = 0
+        self.fl_knee_des_pos = 0
+        self.br_knee_des_pos = 0
+        self.bl_knee_des_pos = 0
+        self.send_commands()
 
 
     # Function that handles button inputs
