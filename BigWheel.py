@@ -4,6 +4,7 @@ import mujoco.viewer
 import numpy as np
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
+import keyboard 
 
 # Load in the model and data from xml file
 m = mujoco.MjModel.from_xml_path('models/walter/scene.xml')
@@ -16,28 +17,21 @@ knee_kv = 230
 knee_voltage = 4*12 # 12 cell battery pack
 
 hipParams = {
-  'Kp': 600,
+  'Kp': 800,
   'Kd': 80,
   'gear_ratio': 1,
-  't_stall': 120,
+  't_stall': 150,
   'w_no_load': 230*0.1047,
 }
 
 kneeParams = {
-  'Kp': 5,
-  'Kd': 0.3,
+  'Kp': 800,
+  'Kd': 80,
   'gear_ratio': 1,
-  't_stall': 100,
+  't_stall': 150,
   'w_no_load': 230*0.1047,
 }
 
-wheelParams = {
-  'Kp': 0.5,
-  'Kd': 0.3,
-  'gear_ratio': 1,
-  't_stall': 25,
-  'w_no_load': 230*0.1047,
-}
 
 # Initializing motor models
 fr_hip = motor.MotorModel(m, d, 'fr_hip', hipParams, 0)
@@ -57,39 +51,42 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 # Initializing joystick controller object
-controller = js_ctrl.JoystickController("logitech", m, d, motors)
+# controller = js_ctrl.JoystickController("logitech", m, d, motors)
+controller = 
 
 torques = []
 # Main simulation loop
 with mujoco.viewer.launch_passive(m, d) as viewer:
-  # Close the viewer automatically after 30 wall-seconds.
-  start = time.time()
-  while viewer.is_running():
-    step_start = time.time()
+    viewer.cam.lookat[:] = [d.qpos[0], -2, 1]  # Set the camera's look-at point (center of view)
+    viewer.cam.azimuth = 60  # Set the azimuth (horizontal angle)
+    viewer.cam.elevation = -20  # Set the elevation (vertical angle)
+    viewer.cam.distance = 5 # Set the distance from the camera to the object  start = time.time()
+    while viewer.is_running():
+      step_start = time.time()
 
-    # Step the simulation forward
-    mujoco.mj_step(m, d)
+      # Step the simulation forward
+      mujoco.mj_step(m, d)
 
-    # Call joystick controller:
+      # Call joystick controller:
 
-    controller.control(m,d)
-    br_knee.log_data()
-    br_hip.log_data()
+      controller.control(m,d)
+      br_knee.log_data()
+      br_hip.log_data()
 
-    torques.append(d.qfrc_actuator[:])
+      torques.append(d.qfrc_actuator[:])
 
-    # Pick up changes to the physics state, apply perturbations, update options from GUI.
-    viewer.sync()
+      # Pick up changes to the physics state, apply perturbations, update options from GUI.
+      viewer.sync()
 
-    
+      
 
-    # Rudimentary time keeping, will drift relative to wall clock.
-    time_until_next_step = m.opt.timestep - (time.time() - step_start)
-    if time_until_next_step > 0:
-      time.sleep(time_until_next_step)
+      # Rudimentary time keeping, will drift relative to wall clock.
+      time_until_next_step = m.opt.timestep - (time.time() - step_start)
+      if time_until_next_step > 0:
+        time.sleep(time_until_next_step)
 
-    if(d.qpos[0]>10):
-      break
+      if(d.qpos[0]>10):
+        break
 
 
 # Calculate COT:
