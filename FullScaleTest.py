@@ -84,7 +84,7 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
 
 
         step_start = time.time()
-        viewer.cam.lookat[:] = [d.qpos[0], -3, 1]  # Set the camera's look-at point (center of view)
+        # viewer.cam.lookat[:] = [d.qpos[0], -3, 1]  # Set the camera's look-at point (center of view)
 
         # Step the simulation forward
         mujoco.mj_step(m, d)
