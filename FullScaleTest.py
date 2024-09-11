@@ -74,39 +74,54 @@ vels = []
 begin = False
 # Main simulation loop
 with mujoco.viewer.launch_passive(m, d) as viewer:
-  start = time.time()
-  while viewer.is_running():
-    step_start = time.time()
+    viewer.cam.lookat[:] = [d.qpos[0], -2, 1]  # Set the camera's look-at point (center of view)
+    viewer.cam.azimuth = 60  # Set the azimuth (horizontal angle)
+    viewer.cam.elevation = -20  # Set the elevation (vertical angle)
+    viewer.cam.distance = 5 # Set the distance from the camera to the object
 
-    # Step the simulation forward
-    mujoco.mj_step(m, d)
-    # Call joystick controller:
-    if(keyboard.is_pressed('b')):
-      begin = True
+    start = time.time()
+    while viewer.is_running():
 
-    if(begin):
-        controller.control(m,d)
-        torques.append(d.qfrc_actuator[:])
-        vels.append(d.qvel[:])
-    else:
-        controller.start_pos()
 
-    # Pick up changes to the physics state, apply perturbations, update options from GUI.
-    viewer.sync()
+        step_start = time.time()
+        viewer.cam.lookat[:] = [d.qpos[0], -3, 1]  # Set the camera's look-at point (center of view)
 
-    
+        # Step the simulation forward
+        mujoco.mj_step(m, d)
+        # Call joystick controller:
+        if(keyboard.is_pressed(' ')):
+            begin = True
+        if(keyboard.is_pressed('esc')):
+            break
 
-    # Rudimentary time keeping, will drift relative to wall clock.
-    time_until_next_step = m.opt.timestep - (time.time() - step_start)
-    if time_until_next_step > 0:
-      time.sleep(time_until_next_step)
+        if(begin):
+            controller.control(m,d)
+            torques.append(d.qfrc_actuator[:])
+            vels.append(d.qvel[:])
+        else:
+            controller.start_pos()
+
+        # Pick up changes to the physics state, apply perturbations, update options from GUI.
+        viewer.sync()
+
+        
+
+        # Rudimentary time keeping, will drift relative to wall clock.
+        time_until_next_step = m.opt.timestep - (time.time() - step_start)
+        if time_until_next_step > 0:
+            time.sleep(time_until_next_step)
 
 
 # Calculate COT:
 torques = np.array(torques)
-energy = np.sum(np.trapezoid(torques ** 2, dx=m.opt.timestep, axis=0), axis=-1)
+energy_elec = np.sum(np.trapezoid(torques ** 2, dx=m.opt.timestep, axis=0), axis=-1)
+energy_mech = np.sum(np.trapezoid(np.maximum(torques * vels,0), dx=m.opt.timestep, axis=0), axis=-1)
 print(m.body_mass)
 print(sum(m.body_mass[0:19]))
 print(d.qpos[0])
-cot = energy / (sum(m.body_mass[0:11]) * -m.opt.gravity[2] * d.qpos[0])
-print(cot)
+cot_elec = energy_elec / (sum(m.body_mass[0:19]) * -m.opt.gravity[2] * d.qpos[0])
+cot_mech = energy_mech / (sum(m.body_mass[0:19]) * -m.opt.gravity[2] * d.qpos[0])
+print("Electrical COT: ", cot_elec)
+print("Mechanical COT: ", cot_mech)
+
+
