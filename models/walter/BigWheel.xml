@@ -27,7 +27,7 @@
 
     <!-- Default shin class -->
     <default class="shin">
-        <geom type="cylinder" size = "0.2 0.03" mass = "6" pos = "0 0 0.05"/>
+        <geom type="cylinder" size = "0.2 0.03" mass = "6" pos = "0 0 0.05" friction = "1 0.005 0.005" solref="0.1 0.5"/>
     </default>
     
     <!-- Default knee class -->

@@ -4,6 +4,7 @@ import mujoco.viewer
 import numpy as np
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
+import lib.TestControl as test_ctrl
 import keyboard 
 
 # Load in the model and data from xml file
@@ -52,9 +53,10 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 # Initializing joystick controller object
 # controller = js_ctrl.JoystickController("logitech", m, d, motors)
-controller = 
-
+controller = test_ctrl.TestController(m, d, motors)
 torques = []
+vels = []
+begin = False
 # Main simulation loop
 with mujoco.viewer.launch_passive(m, d) as viewer:
     viewer.cam.lookat[:] = [d.qpos[0], -2, 1]  # Set the camera's look-at point (center of view)
@@ -68,10 +70,18 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
       mujoco.mj_step(m, d)
 
       # Call joystick controller:
+      viewer.cam.lookat[:] = [d.qpos[0], -3, 1]  # Set the camera's look-at point (center of view)
 
-      controller.control(m,d)
-      br_knee.log_data()
-      br_hip.log_data()
+      if(keyboard.is_pressed(' ')):
+          begin = True
+      if(keyboard.is_pressed('esc')):
+          break
+      if(begin):
+          controller.control(m,d)
+          torques.append(d.qfrc_actuator[:])
+          vels.append(d.qvel[:])
+      else:
+          controller.start_pos()
 
       torques.append(d.qfrc_actuator[:])
 
@@ -85,8 +95,6 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
       if time_until_next_step > 0:
         time.sleep(time_until_next_step)
 
-      if(d.qpos[0]>10):
-        break
 
 
 # Calculate COT:

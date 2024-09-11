@@ -6,19 +6,13 @@ import pygame
 import lib.MotorModel as motor
 import threading
 
-class JoystickController:
-    def __init__(self, controller_type: str, m: mujoco.MjModel, d: mujoco.MjData, motors: motor.MotorModel):
-        self.controller_type = controller_type
+class TestController:
+    def __init__(self,  m: mujoco.MjModel, d: mujoco.MjData, motors: motor.MotorModel):
         self.m = m
         self.d = d
         self.motors = motors
 
-        # Initializing joystick with pygame
-        pygame.init()
-        self.js = pygame.joystick.Joystick(0)
-        self.js.init()
-        print(self.js.get_name())
-
+ 
         # User control variables:
         self.joystick_deadzone = 0.1
         self.max_wheel_vel = 50
@@ -55,36 +49,34 @@ class JoystickController:
 
         self.hip_splay = 0
 
+        self.front_hip_splay = np.pi/4
+        self.back_hip_splay = np.pi/4
+
+        self.knee_vel = 0.008
+
+        self.wheel_vel = 0
+
+
     # Main control function
     def control(self,m,d):
         # Get current joint angles
         self.get_mujoco_state(m,d)
 
-        # Get joystick state
-        self.get_joystick_state()
+        self.left_knee_des_vel = self.knee_vel;
+        self.right_knee_des_vel = self.knee_vel;
 
-        # Reset the simulation if requested
-        if(self.start_button):
-            mujoco.mj_resetData(m, d)
-            self.fr_knee_des_pos = 0
-            self.fl_knee_des_pos = 0
-            self.br_knee_des_pos = 0
-            self.bl_knee_des_pos = 0
-            self.fr_hip_des_pos = 0
-            self.fl_hip_des_pos = 0
-            self.br_hip_des_pos = 0
-            self.bl_hip_des_pos = 0
+        self.fr_knee_des_pos -= self.right_knee_des_vel
+        self.fl_knee_des_pos += self.left_knee_des_vel
+        self.br_knee_des_pos -= self.right_knee_des_vel
+        self.bl_knee_des_pos += self.left_knee_des_vel
 
-        self.update_hip_splay()
+        # Set desired hip position:
 
-        # Control the wheels
-        # self.control_wheels()
+        self.fr_hip_des_pos = self.front_hip_splay
+        self.fl_hip_des_pos = -self.front_hip_splay
+        self.br_hip_des_pos = -self.back_hip_splay
+        self.bl_hip_des_pos = self.back_hip_splay
 
-        # Control the knees
-        self.control_knees()
-
-        # Apply button controls
-        self.button_controls()
 
         # Finally send the commands to the motors
         self.send_commands()
@@ -102,6 +94,19 @@ class JoystickController:
         self.bl_knee_des_pos += self.left_knee_des_vel
         self.fr_knee_des_pos += self.right_knee_des_vel
         self.br_knee_des_pos += self.right_knee_des_vel
+
+    def start_pos(self):
+
+        self.fr_hip_des_pos = self.front_hip_splay
+        self.fl_hip_des_pos = -self.front_hip_splay
+        self.br_hip_des_pos = -self.back_hip_splay
+        self.bl_hip_des_pos = self.back_hip_splay
+
+        self.fr_knee_des_pos = 0
+        self.fl_knee_des_pos = 0
+        self.br_knee_des_pos = 0
+        self.bl_knee_des_pos = 0
+        self.send_commands()
         
 
 
