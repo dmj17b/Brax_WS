@@ -57,9 +57,9 @@ class TestController:
         self.front_hip_splay = np.pi/4
         self.back_hip_splay = np.pi/4
 
-        self.knee_vel = 0.008
+        self.knee_vel = 0.006
 
-        self.wheel_vel = 2
+        self.wheel_vel = 0
 
     # Main control function
     def control(self,m,d):
@@ -136,10 +136,6 @@ class TestController:
         self.br_hip_des_pos = -self.back_hip_splay
         self.bl_hip_des_pos = self.back_hip_splay
 
-        self.fr_knee_des_pos = 0
-        self.fl_knee_des_pos = 0
-        self.br_knee_des_pos = 0
-        self.bl_knee_des_pos = 0
         self.send_commands()
 
 
