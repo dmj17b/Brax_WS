@@ -1,9 +1,8 @@
 <mujoco>
     <worldbody>
         <light diffuse=".5 .5 .5" pos="0 2 0.075" dir="0 0 -1"/>
-        <body pos="0 0 0.25" axisangle="0 0 1 -60" >
-            <joint type="free"/>
-            <geom type="box" size=".8 2.5 .25" rgba="0.3 0.3 0.3 1" />
+        <body pos="0 0 0.23" axisangle="0 0 1 -55" >
+            <geom type="box" size=".8 2.5 .23" rgba="0.3 0.3 0.3 1" />
         </body>
         </worldbody>
 </mujoco>

@@ -57,9 +57,9 @@ class TestController:
         self.front_hip_splay = np.pi/4
         self.back_hip_splay = np.pi/4
 
-        self.knee_vel = 0.005
+        self.knee_vel = 0.003
 
-        self.wheel_vel = 5
+        self.wheel_vel = 3
 
     # Main control function
     def control(self,m,d):
