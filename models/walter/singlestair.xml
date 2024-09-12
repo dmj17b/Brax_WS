@@ -1,0 +1,43 @@
+<mujoco>
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="2 0 0.075" dir="0 0 -1"/>
+    <body pos="2 0 0">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="3 0 0.3" dir="0 0 -1"/>
+    <body pos="2.3 0 0.185">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="4 0 0.5" dir="0 0 -1"/>
+    <body pos="2.6 0 0.37">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="5 0 0.5" dir="0 0 -1"/>
+    <body pos="2.9 0 0.555">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="6 0 0.5" dir="0 0 -1"/>
+    <body pos="3.2 0 0.74">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="7 0 5" dir="0 0 -1"/>
+    <body pos="3.5 0 0.925">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+</mujoco>
