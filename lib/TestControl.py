@@ -59,7 +59,7 @@ class TestController:
 
         self.knee_vel = 0.008
 
-        self.wheel_vel = 0
+        self.wheel_vel = 2
 
     # Main control function
     def control(self,m,d):

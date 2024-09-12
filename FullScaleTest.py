@@ -72,6 +72,8 @@ controller = test_ctrl.TestController(m, d, motors)
 torques = []
 vels = []
 begin = False
+
+joint_idx = [6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21, 22]
 # Main simulation loop
 with mujoco.viewer.launch_passive(m, d) as viewer:
     viewer.cam.lookat[:] = [d.qpos[0], -2, 1]  # Set the camera's look-at point (center of view)
@@ -96,31 +98,31 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
 
         if(begin):
             controller.control(m,d)
-            torques.append(d.qfrc_actuator[:])
-            vels.append(d.qvel[:])
+            torques.append(d.qfrc_actuator[joint_idx])
+            vels.append(d.qvel[joint_idx])
+            body_vel = d.qvel[0:2]
         else:
             controller.start_pos()
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
 
-        
-
         # Rudimentary time keeping, will drift relative to wall clock.
         time_until_next_step = m.opt.timestep - (time.time() - step_start)
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
+        if(d.qpos[0]>5.4):
+            break
 
 
 # Calculate COT:
 torques = np.array(torques)
 energy_elec = np.sum(np.trapezoid(torques ** 2, dx=m.opt.timestep, axis=0), axis=-1)
 energy_mech = np.sum(np.trapezoid(np.maximum(torques * vels,0), dx=m.opt.timestep, axis=0), axis=-1)
-print(m.body_mass)
-print(sum(m.body_mass[0:19]))
-print(d.qpos[0])
-cot_elec = energy_elec / (sum(m.body_mass[0:19]) * -m.opt.gravity[2] * d.qpos[0])
-cot_mech = energy_mech / (sum(m.body_mass[0:19]) * -m.opt.gravity[2] * d.qpos[0])
+d = np.sqrt(d.qpos[0]**2 + d.qpos[2]**2)
+print("Distance travelled: ", d)
+cot_elec = energy_elec / (sum(m.body_mass[0:19]) * -m.opt.gravity[2] * d)
+cot_mech = energy_mech / (sum(m.body_mass[0:19]) * -m.opt.gravity[2] * d)
 print("Electrical COT: ", cot_elec)
 print("Mechanical COT: ", cot_mech)
 

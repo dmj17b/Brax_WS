@@ -40,4 +40,48 @@
       <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
     </body>
   </worldbody>
+
+  <!-- Continuing the pattern to double the number of steps -->
+  
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="8 0 5" dir="0 0 -1"/>
+    <body pos="3.8 0 1.11">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="9 0 5" dir="0 0 -1"/>
+    <body pos="4.1 0 1.295">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="10 0 5" dir="0 0 -1"/>
+    <body pos="4.4 0 1.48">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="11 0 5" dir="0 0 -1"/>
+    <body pos="4.7 0 1.665">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="12 0 5" dir="0 0 -1"/>
+    <body pos="5 0 1.85">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <worldbody>
+    <light diffuse=".5 .5 .5" pos="13 0 5" dir="0 0 -1"/>
+    <body pos="5.3 0 2.035">
+      <geom type="box" size=".8 .8 0.185" rgba="0.3 0.3 0.3 1"/>
+    </body>
+  </worldbody>
 </mujoco>
