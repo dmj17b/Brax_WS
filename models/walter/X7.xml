@@ -115,7 +115,7 @@
 
             <!-- Front Body Section -->
             <body name="head" pos="0.01 0 0">
-                <joint name="body_joint" type="hinge" axis = "1 0 0" stiffness = "0.05" range = "0.5 0.5"/>
+                <joint name="body_joint" type="hinge" axis = "1 0 0" stiffness = "0.2" range = "-30 30" solreflimit="1000 1" solimplimit=".95 .99 1e-3" damping = "20"/>
                 <geom type="mesh" mesh = "head_mesh" mass = "17"/>
 
                 <!-- Add front legs here -->

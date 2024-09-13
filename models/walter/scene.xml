@@ -2,6 +2,8 @@
 
     <include file="X7.xml"/>
     <include file="singlestair.xml"/>
+    <!-- <include file="ledge_test.xml"/> -->
+    <!-- <include file="rubble.xml"/> -->
     <statistic center="0 0 0.1" extent="0.8"/>
   
     <visual>
@@ -18,6 +20,8 @@
     </asset>
   
     <worldbody>
+        <light diffuse="1 1 1" pos="0 0 10" dir="0 0 -1" directional="true"/>
+
       <light pos="0 0 5" dir="0 0 -1" directional="true"/>
       <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" friction="1 0.005 0.0001"/>
     </worldbody>
