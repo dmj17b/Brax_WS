@@ -45,6 +45,16 @@
         <joint type="hinge" axis="0 0 1" damping="0.08"/>
     </default>
 
+    <!-- Body Class -->
+    <default class="body">
+        <geom type="mesh" mesh = "body_mesh" mass="35" />
+    </default>
+
+    <!-- Head Class -->
+    <default class="head">
+        <geom type="mesh" mesh = "head_mesh" mass = "17"/>
+    </default>
+
     <!-- Default actuator classes -->
     <default class="knee_actuator">
         <motor />
@@ -67,7 +77,7 @@
         <!-- Rear Body Section -->
         <body name="body" pos="0 0 0.9">
             <joint type="free"/>
-            <geom type="mesh" mesh = "body_mesh" mass="35" />
+            <geom class="body" />
             <!-- Add rear legs here -->
 
             <!-- Back left thigh -->
@@ -116,7 +126,7 @@
             <!-- Front Body Section -->
             <body name="head" pos="0.01 0 0">
                 <joint name="body_joint" type="hinge" axis = "1 0 0" stiffness = "0.2" range = "-30 30" solreflimit="1000 1" solimplimit=".95 .99 1e-3" damping = "20"/>
-                <geom type="mesh" mesh = "head_mesh" mass = "17"/>
+                <geom class = "head"/>
 
                 <!-- Add front legs here -->
                  <!-- Front left thigh -->

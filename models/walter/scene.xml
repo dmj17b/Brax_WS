@@ -1,6 +1,6 @@
 <mujoco model="SMALTER Scene">
 
-    <include file="X7.xml"/>
+    <include file="FullScale.xml"/>
     <include file="singlestair.xml"/>
     <!-- <include file="ledge_test.xml"/> -->
     <!-- <include file="rubble.xml"/> -->

@@ -9,11 +9,13 @@ import lib.JoystickControl as js_ctrl
 m = mujoco.MjModel.from_xml_path('models/walter/scene.xml')
 d = mujoco.MjData(m)
 
-# Initializing motor model parameters:
-hip_kv = 150
-hip_voltage = 4*12  # 12 cell battery pack
-knee_kv = 230
-knee_voltage = 4*12 # 12 cell battery pack
+
+# Here is where you can adjust all of the actuator parameters
+# Kp and Kd are the proportional and derivative gains of the motor controller (position control for hip and knee, velocity control for wheels)
+# For the wheels, only Kp is used to track a desired velocity
+# gear_ratio is the gear ratio of the motor, IT DOES NOT PROPERLY AFFECT REFLECTED INERTIA YET
+# t_stall is the stall torque of the motor in Nm
+# w_no_load is the no load speed of the motor in rad/s
 
 hipParams = {
   'Kp': 600,
@@ -39,7 +41,9 @@ wheelParams = {
   'w_no_load': 230*0.1047,
 }
 
-# Initializing motor models
+
+
+# Initializing motor models (ignore this part for now)
 fr_hip = motor.MotorModel(m, d, 'fr_hip', hipParams, 0)
 fl_hip = motor.MotorModel(m, d,'fl_hip', hipParams, 4)
 br_hip = motor.MotorModel(m, d,'br_hip', hipParams, 8)
@@ -64,7 +68,7 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 
-# Initializing joystick controller object
+# Initializing joystick controller object (ignore this part unless controller axes are changed)
 controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 
@@ -81,9 +85,12 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
     # Call joystick controller:
 
     controller.control(m,d)
-    br_wheel1_joint.log_data()
-    br_knee.log_data()
-    br_hip.log_data()
+
+    # Log motor data to plot later:
+
+    # br_wheel1_joint.log_data()
+    # br_knee.log_data()
+    # br_hip.log_data()
 
     # Pick up changes to the physics state, apply perturbations, update options from GUI.
     viewer.sync()
@@ -94,6 +101,8 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
       time.sleep(time_until_next_step)
 
 
-br_wheel1_joint.plot_speed_torque_curve()
-br_knee.plot_speed_torque_curve()
-br_hip.plot_speed_torque_curve()
+# Plot desired speed-torque curves
+
+# br_wheel1_joint.plot_speed_torque_curve()
+# br_knee.plot_speed_torque_curve()
+# br_hip.plot_speed_torque_curve()
