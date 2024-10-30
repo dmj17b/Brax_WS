@@ -4,7 +4,6 @@ import mujoco.viewer
 import numpy as np
 import pygame
 import lib.MotorModel as motor
-import threading
 
 class JoystickController:
     def __init__(self, controller_type: str, m: mujoco.MjModel, d: mujoco.MjData, motors: motor.MotorModel):
@@ -20,7 +19,7 @@ class JoystickController:
         print(self.js.get_name())
 
         # User control variables:
-        self.joystick_deadzone = 0.1
+        self.joystick_deadzone = 0.2
         self.max_wheel_vel = 50
         self.max_knee_vel = 0.005
 
@@ -205,6 +204,26 @@ class JoystickController:
             self.d_left = self.js.get_hat(0)[0]
             self.d_right = self.js.get_hat(0)[0]
 
+        elif(self.controller_type == "logitech2"):
+            self.left_stick_lr = self.js.get_axis(0)
+            self.left_stick_ud = self.js.get_axis(1)
+            # self.left_trigger = self.js.get_axis(2)
+            self.right_stick_lr = self.js.get_axis(2)
+            self.right_stick_ud = self.js.get_axis(3)+0.16
+            # self.right_trigger = self.js.get_axis(5)
+            self.a_button = self.js.get_button(0)
+            self.b_button = self.js.get_button(1)
+            self.x_button = self.js.get_button(2)
+            self.y_button = self.js.get_button(3)
+            self.start_button = self.js.get_button(7)
+            self.back_button = self.js.get_button(6)
+            self.home_button = self.js.get_button(8)
+            self.d_up = self.js.get_hat(0)[1]
+            self.d_down = self.js.get_hat(0)[1]
+            self.d_left = self.js.get_hat(0)[0]
+            self.d_right = self.js.get_hat(0)[0]
+            print(self.right_stick_lr, self.right_stick_ud)
+
         elif(self.controller_type == "ps4"):
             self.left_stick_lr = self.js.get_axis(0)
             self.left_stick_ud = self.js.get_axis(1)
@@ -222,8 +241,8 @@ class JoystickController:
 
             self.d_up = self.js.get_button(11)
             self.d_down = self.js.get_button(12)
-            self.d_left = self.js.get_button(13)
-            self.d_right = self.js.get_button(14)
+            # self.d_left = self.js.get_button(13)
+            # self.d_right = self.js.get_button(14)
 
             self.left_bumper = self.js.get_button(9)
             self.right_bumper = self.js.get_button(10)

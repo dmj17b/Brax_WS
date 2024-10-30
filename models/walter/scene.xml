@@ -1,4 +1,4 @@
-<mujoco model="SMALTER Scene">
+<mujoco model="Scene">
 
     <include file="FullScale.xml"/>
     <include file="singlestair.xml"/>

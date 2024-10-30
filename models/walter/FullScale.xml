@@ -1,5 +1,3 @@
-
-
 <mujoco model="walter">
 
     <!--Defining the assets for the model-->
