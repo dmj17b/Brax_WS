@@ -1,0 +1,78 @@
+<mujoco model="MuJoCo Model">
+  <compiler angle="radian"/>
+
+  <worldbody>
+    <body name="torso">
+      <joint name="torso_joint" type="free" limited="false" actuatorfrclimited="false"/>
+      <geom size="0.2 0.1 0.1" type="box" mass="0.5"/>
+      <body name="torso_left_thigh" pos="0 0.1 0">
+        <joint name="torso_left_thigh_joint" pos="0 0 0" axis="0 1 0"/>
+        <geom name="torso_left_thigh_geom" size="0.025 0.125" pos="0 0.025 -0.125" type="capsule" mass="0.5"/>
+        <body name="torso_left_shin" pos="0 0.025 -0.25">
+          <joint name="torso_left_thigh_shin_joint" pos="0 0 0" axis="0 1 0"/>
+          <geom name="torso_left_shin_geom" size="0.025 0.075" quat="0.707107 0 0.707107 0" type="capsule" mass="0.5"/>
+          <body name="torso_left_front_wheel" pos="0.075 0.025 0">
+            <joint name="torso_left_shin_front_wheel_joint" pos="0 0 0" axis="0 1 0"/>
+            <geom name="torso_left_front_wheel_geom" size="0.05 0.05 0.05" quat="0.707107 0.707107 0 0" type="ellipsoid" mass="0.5"/>
+          </body>
+          <body name="torso_left_rear_wheel" pos="-0.075 0.025 0">
+            <joint name="torso_left_shin_rear_wheel_joint" pos="0 0 0" axis="0 1 0"/>
+            <geom name="torso_left_rear_wheel_geom" size="0.05 0.05 0.05" quat="0.707107 0.707107 0 0" type="ellipsoid" mass="0.5"/>
+          </body>
+        </body>
+      </body>
+      <body name="torso_right_thigh" pos="0 -0.1 0">
+        <joint name="torso_right_thigh_joint" pos="0 0 0" axis="0 1 0"/>
+        <geom name="torso_right_thigh_geom" size="0.025 0.125" pos="0 -0.025 -0.125" type="capsule" mass="0.5"/>
+        <body name="torso_right_shin" pos="0 -0.025 -0.25">
+          <joint name="torso_right_thigh_shin_joint" pos="0 0 0" axis="0 1 0"/>
+          <geom name="torso_right_shin_geom" size="0.025 0.075" quat="0.707107 0 0.707107 0" type="capsule" mass="0.5"/>
+          <body name="torso_right_front_wheel" pos="0.075 -0.025 0">
+            <joint name="torso_right_shin_front_wheel_joint" pos="0 0 0" axis="0 1 0"/>
+            <geom name="torso_right_front_wheel_geom" size="0.05 0.05 0.05" quat="0.707107 0.707107 0 0" type="ellipsoid" mass="0.5"/>
+          </body>
+          <body name="torso_right_rear_wheel" pos="-0.075 -0.025 0">
+            <joint name="torso_right_shin_rear_wheel_joint" pos="0 0 0" axis="0 1 0"/>
+            <geom name="torso_right_rear_wheel_geom" size="0.05 0.05 0.05" quat="0.707107 0.707107 0 0" type="ellipsoid" mass="0.5"/>
+          </body>
+        </body>
+      </body>
+      <body name="head" pos="0.375 0 0">
+        <joint name="head_joint" pos="-0.175 0 0" axis="1 0 0"/>
+        <geom size="0.175 0.1 0.1" type="box" mass="0.5"/>
+        <body name="head_left_thigh" pos="0 0.1 0">
+          <joint name="head_left_thigh_joint" pos="0 0 0" axis="0 1 0"/>
+          <geom name="head_left_thigh_geom" size="0.025 0.125" pos="0 0.025 -0.125" type="capsule" mass="0.5"/>
+          <body name="head_left_shin" pos="0 0.025 -0.25">
+            <joint name="head_left_thigh_shin_joint" pos="0 0 0" axis="0 1 0"/>
+            <geom name="head_left_shin_geom" size="0.025 0.075" quat="0.707107 0 0.707107 0" type="capsule" mass="0.5"/>
+            <body name="head_left_front_wheel" pos="0.075 0.025 0">
+              <joint name="head_left_shin_front_wheel_joint" pos="0 0 0" axis="0 1 0"/>
+              <geom name="head_left_front_wheel_geom" size="0.05 0.05 0.05" quat="0.707107 0.707107 0 0" type="ellipsoid" mass="0.5"/>
+            </body>
+            <body name="head_left_rear_wheel" pos="-0.075 0.025 0">
+              <joint name="head_left_shin_rear_wheel_joint" pos="0 0 0" axis="0 1 0"/>
+              <geom name="head_left_rear_wheel_geom" size="0.05 0.05 0.05" quat="0.707107 0.707107 0 0" type="ellipsoid" mass="0.5"/>
+            </body>
+          </body>
+        </body>
+        <body name="head_right_thigh" pos="0 -0.1 0">
+          <joint name="head_right_thigh_joint" pos="0 0 0" axis="0 1 0"/>
+          <geom name="head_right_thigh_geom" size="0.025 0.125" pos="0 -0.025 -0.125" type="capsule" mass="0.5"/>
+          <body name="head_right_shin" pos="0 -0.025 -0.25">
+            <joint name="head_right_thigh_shin_joint" pos="0 0 0" axis="0 1 0"/>
+            <geom name="head_right_shin_geom" size="0.025 0.075" quat="0.707107 0 0.707107 0" type="capsule" mass="0.5"/>
+            <body name="head_right_front_wheel" pos="0.075 -0.025 0">
+              <joint name="head_right_shin_front_wheel_joint" pos="0 0 0" axis="0 1 0"/>
+              <geom name="head_right_front_wheel_geom" size="0.05 0.05 0.05" quat="0.707107 0.707107 0 0" type="ellipsoid" mass="0.5"/>
+            </body>
+            <body name="head_right_rear_wheel" pos="-0.075 -0.025 0">
+              <joint name="head_right_shin_rear_wheel_joint" pos="0 0 0" axis="0 1 0"/>
+              <geom name="head_right_rear_wheel_geom" size="0.05 0.05 0.05" quat="0.707107 0.707107 0 0" type="ellipsoid" mass="0.5"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

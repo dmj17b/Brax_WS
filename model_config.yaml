@@ -1,0 +1,27 @@
+torso_params: 
+  length: 0.4
+  width: 0.2
+  height: 0.2
+  mass: 0.5
+head_params:
+  length: 0.35
+  width: 0.2
+  height: 0.2
+  mass: 0.5
+  offset: [0, 0, 0]
+thigh_params: 
+  length: 0.25
+  width: 0.05
+  mass: 0.5
+  torso_offset: [0, 0, 0]
+  head_offset: [0, 0, 0]
+shin_params: 
+  length: 0.15
+  width: 0.05
+  mass: 0.5
+  offset: [0, 0, 0]
+wheel_params:
+  radius: 0.05
+  width: 0.05
+  mass: 0.5
+  offset: [0, 0, 0]
