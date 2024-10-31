@@ -59,7 +59,6 @@ class MotorModel:
     return self.limited_torque
   
   # Velocity control function that limits torque according to speed torque curve
-  ## DOES NOT WORK YET##
   def vel_control(self, target_vel: float):
     self.target_vel = target_vel
     qdot = self.d.jnt(self.motor_name).qvel
@@ -87,7 +86,6 @@ class MotorModel:
       return np.sign(target_torque)*self.tau_max
     # If angular velocity is greater than no load speed, limit torque to zero
     elif(w_motor >= abs(self.w_no_load)):
-      print("Exceeding no load speed")
       return 0.0
     # Otherwise return the target torque
     else:

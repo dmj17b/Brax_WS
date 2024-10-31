@@ -12,21 +12,23 @@ spec = mujoco.MjSpec.from_file('models/walter/scene.xml')
 
 # Here is where you can adjust SOME of the model parameters for the robot
 modelParams = {
-  'head_mass': 1,
-  'body_mass': 1,
-  'thigh_mass': 100,
-  'shin_mass': 0.5,
-  'wheel_mass': 0.5,
+  'head_mass': 15,
+  'body_mass': 36,
+  'thigh_mass': 3,
+  'shin_mass': 2,
+  'wheel_mass': 3,
 }
 
 
 # Here is where you can adjust all of the actuator parameters
 # Kp and Kd are the proportional and derivative gains of the motor controller (position control for hip and knee, velocity control for wheels)
 # For the wheels, only Kp is used to track a desired velocity
-# gear_ratio is the gear ratio of the motor, IT DOES NOT PROPERLY AFFECT REFLECTED INERTIA YET
-# t_stall is the stall torque of the motor in Nm
-# w_no_load is the no load speed of the motor in rad/s
+# gear_ratio is the ENTIRE reduction in the system, including the gear ratio of the motor and the gear ratio of the belt drive
+# t_stall is the stall torque of the motor in Nm (BEFORE GEAR REDUCTION!!)
+# w_no_load is the no load speed of the motor in rad/s (BEFORE GEAR REDUCTION!!)
 
+# Emphasizing that the motor specs are BEFORE gear reduction. Any all-in-one actuator solutions will need to be converted to these specs
+# in order for the reflected inertia to be calculated properly
 
 hipParams = {
   'Kp': 600,
@@ -52,7 +54,7 @@ wheelParams = {
   'gear_ratio': 1,
   't_stall': 25,
   'w_no_load': 230*0.1047,
-  'rotor_inertia': 10000,
+  'rotor_inertia': 0.0001,
 }
 
 
@@ -76,17 +78,29 @@ spec.geoms[16].mass = modelParams['shin_mass']
 spec.geoms[17].mass = modelParams['wheel_mass']
 spec.geoms[18].mass = modelParams['wheel_mass']
 
+spec.joints[1].armature = hipParams['rotor_inertia']*hipParams['gear_ratio']**2
+spec.joints[2].armature = kneeParams['rotor_inertia']*kneeParams['gear_ratio']**2
+spec.joints[4].armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
+spec.joints[3].armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
+spec.joints[5].armature = hipParams['rotor_inertia']*hipParams['gear_ratio']**2
+spec.joints[6].armature = kneeParams['rotor_inertia']*kneeParams['gear_ratio']**2
+spec.joints[7].armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
+spec.joints[8].armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
+# Joint 9 is the body pivot joint
+spec.joints[10].armature = hipParams['rotor_inertia']*hipParams['gear_ratio']**2
+spec.joints[11].armature = kneeParams['rotor_inertia']*kneeParams['gear_ratio']**2
+spec.joints[12].armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
+spec.joints[13].armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
+spec.joints[14].armature = hipParams['rotor_inertia']*hipParams['gear_ratio']**2
+spec.joints[15].armature = kneeParams['rotor_inertia']*kneeParams['gear_ratio']**2
+spec.joints[16].armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
+spec.joints[17].armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
+
 
 
 # Adjusting armatures:
-spec.find_default('hip').joint.armature = hipParams['rotor_inertia']*hipParams['gear_ratio']**2
-spec.find_default('knee').joint.armature = kneeParams['rotor_inertia']*kneeParams['gear_ratio']**2
-spec.find_default('wheel_joint').joint.armature = wheelParams['rotor_inertia']*wheelParams['gear_ratio']**2
-
 m = spec.compile()
 d = mujoco.MjData(m)
-
-
 
 
 # Initializing motor models (ignore this part for now)
