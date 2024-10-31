@@ -69,7 +69,7 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 # Initializing joystick controller object (ignore this part unless controller axes are changed)
-controller = js_ctrl.JoystickController("logitech", m, d, motors)
+controller = js_ctrl.JoystickController("logitech2", m, d, motors)
 
 
 # Main simulation loop
