@@ -13,8 +13,8 @@ class MotorModel:
     self.Kp = motor_params['Kp']
     self.Kd = motor_params['Kd']
     self.gear_ratio = motor_params['gear_ratio']
-    self.t_stall = motor_params['t_stall']
-    self.w_no_load = motor_params['w_no_load']
+    self.t_stall = motor_params['stall_torque']
+    self.w_no_load = motor_params['no_load_speed']
     self.ctrl_index = ctrl_index
     self.target_pos = 0
     self.target_vel = 0

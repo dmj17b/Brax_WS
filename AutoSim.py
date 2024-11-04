@@ -1,12 +1,9 @@
 from typing import Any
-
 from absl import app
 import os
 from pathlib import Path
 import yaml
-
 import numpy as np
-
 import mujoco
 
 
@@ -21,6 +18,7 @@ class GenerateModel():
 
         # Parse Configs:
         model_config = yaml.safe_load(Path(model_config_path).read_text())
+
 
         # Torso Params:
         torso_length = model_config['torso_params']['length']
@@ -54,6 +52,38 @@ class GenerateModel():
         wheel_mass = model_config['wheel_params']['mass']
         wheel_offset = np.asarray(model_config['wheel_params']['offset'])
 
+        motor_config = yaml.safe_load(Path(motor_config_path).read_text())
+        
+
+        hip_kp = motor_config['hip_params']['Kp']
+        hip_kd = motor_config['hip_params']['Kd']
+        hip_gear_ratio = motor_config['hip_params']['gear_ratio']
+        hip_stall_torque = motor_config['hip_params']['stall_torque']
+        hip_no_load_speed = motor_config['hip_params']['no_load_speed']
+        hip_rotor_inertia = motor_config['hip_params']['rotor_inertia']
+
+        hip_armature = hip_rotor_inertia*hip_gear_ratio**2
+
+        knee_kp = motor_config['knee_params']['Kp']
+        knee_kd = motor_config['knee_params']['Kd']
+        knee_gear_ratio = motor_config['knee_params']['gear_ratio']
+        knee_stall_torque = motor_config['knee_params']['stall_torque']
+        knee_no_load_speed = motor_config['knee_params']['no_load_speed']
+        knee_rotor_inertia = motor_config['knee_params']['rotor_inertia']
+
+        knee_armature = knee_rotor_inertia*knee_gear_ratio**2
+
+
+        wheel_kp = motor_config['wheel_params']['Kp']
+        wheel_kd = motor_config['wheel_params']['Kd']
+        wheel_gear_ratio = motor_config['wheel_params']['gear_ratio']
+        wheel_stall_torque = motor_config['wheel_params']['stall_torque']
+        wheel_no_load_speed = motor_config['wheel_params']['no_load_speed']
+        wheel_rotor_inertia = motor_config['wheel_params']['rotor_inertia']
+ 
+        wheel_armature = wheel_rotor_inertia*wheel_gear_ratio**2
+
+
         # Add Torso to World Body:
         torso_body = spec.worldbody.add_body(
             name='torso',
@@ -86,6 +116,7 @@ class GenerateModel():
                 'geom_pos': np.array([0, thigh_width / 2, -thigh_length / 2]),
                 'geom_quat': np.array([1, 0, 0, 0]),
                 'mass': thigh_mass,
+                'armature': hip_armature,
             },
             'shin': {
                 'body_pos': np.array([0, shin_width / 2, -thigh_length]) + shin_offset,
@@ -95,6 +126,7 @@ class GenerateModel():
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 0, 1, 0]),
                 'mass': shin_mass,
+                'armature': knee_armature,
             },
             'front_wheel': {
                 'body_pos': np.array([shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
@@ -104,6 +136,7 @@ class GenerateModel():
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
+                'armature': wheel_armature,
             },
             'rear_wheel': {
                 'body_pos': np.array([-shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
@@ -113,6 +146,7 @@ class GenerateModel():
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
+                'armature': wheel_armature,
             },
         }
 
@@ -138,6 +172,7 @@ class GenerateModel():
                     type=mujoco.mjtJoint.mjJNT_HINGE,
                     name=joint_name,
                     axis=[0, 1, 0],
+                    armature = torso_children_params[child]['armature'],
                 )
                 body.add_geom(
                     name=geom_name,
@@ -188,6 +223,7 @@ class GenerateModel():
                 'geom_pos': np.array([0, thigh_width / 2, -thigh_length / 2]),
                 'geom_quat': np.array([1, 0, 0, 0]),
                 'mass': thigh_mass,
+                'armature': hip_armature,
             },
             'shin': {
                 'body_pos': np.array([0, shin_width / 2, -thigh_length]) + shin_offset,
@@ -197,6 +233,7 @@ class GenerateModel():
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 0, 1, 0]),
                 'mass': shin_mass,
+                'armature': knee_armature,
             },
             'front_wheel': {
                 'body_pos': np.array([shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
@@ -206,6 +243,7 @@ class GenerateModel():
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
+                'armature': wheel_armature,
             },
             'rear_wheel': {
                 'body_pos': np.array([-shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
@@ -215,6 +253,7 @@ class GenerateModel():
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
+                'armature': wheel_armature,
             },
         }
 
@@ -240,6 +279,7 @@ class GenerateModel():
                     type=mujoco.mjtJoint.mjJNT_HINGE,
                     name=joint_name,
                     axis=[0, 1, 0],
+                    armature = head_children_params[child]['armature'],
                 )
                 body.add_geom(
                     name=geom_name,
@@ -250,14 +290,108 @@ class GenerateModel():
                     mass=head_children_params[child]['mass'],
                 )
 
+
+# Adding Actuators:
+        # Back left leg
+        spec.add_actuator(
+            name='bl_hip',
+            target='torso_left_thigh_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='bl_knee',
+            target='torso_left_thigh_shin_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='bl_wheel1_joint',
+            target='torso_left_shin_front_wheel_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='bl_wheel2_joint',
+            target='torso_left_shin_rear_wheel_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+
+        # Back right leg
+        spec.add_actuator(
+            name='br_hip',
+            target='torso_right_thigh_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='br_knee',
+            target='torso_right_thigh_shin_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='br_wheel1_joint',
+            target='torso_right_shin_front_wheel_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='br_wheel2_joint',
+            target='torso_right_shin_rear_wheel_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+
+        # Front left leg
+        spec.add_actuator(
+            name='fl_hip',
+            target='torso_left_thigh_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='fl_knee',
+            target='torso_left_thigh_shin_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='fl_wheel1_joint',
+            target='torso_left_shin_front_wheel_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='fl_wheel2_joint',
+            target='torso_left_shin_rear_wheel_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+
+        # Front right leg
+        spec.add_actuator(
+            name='fr_hip',
+            target='torso_right_thigh_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='fr_knee',
+            target='torso_right_thigh_shin_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='fr_wheel1_joint',
+            target='torso_right_shin_front_wheel_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+        spec.add_actuator(
+            name='fr_wheel2_joint',
+            target='torso_right_shin_rear_wheel_joint',
+            trntype = mujoco.mjtTrn.mjTRN_JOINT,
+        )
+
+
+
         # Compile:
         self.mj_model = spec.compile()
         self.model_xml = spec.to_xml()
+        self.spec = spec
 
 
 def main(argv=None):
     model_config_path = 'model_config.yaml'
-    model_class = GenerateModel(model_config_path, None)
+    motor_config_path = 'motor_config.yaml'
+    model_class = GenerateModel(model_config_path, motor_config_path)
 
     xml_path = os.path.join(
         os.path.dirname(__file__),

@@ -260,15 +260,15 @@ class JoystickController:
     # Get current joint angles
     def get_mujoco_state(self,m,d):
         # Get current joint angles
-        self.fr_knee_pos = self.d.jnt('fr_knee').qpos[0]
-        self.fl_knee_pos = self.d.jnt('fl_knee').qpos[0]
-        self.br_knee_pos = self.d.jnt('br_knee').qpos[0]
-        self.bl_knee_pos = self.d.jnt('bl_knee').qpos[0]
+        self.fr_knee_pos = self.d.jnt('head_right_thigh_joint').qpos[0]
+        self.fl_knee_pos = self.d.jnt('head_left_thigh_joint').qpos[0]
+        self.br_knee_pos = self.d.jnt('torso_right_thigh_joint').qpos[0]
+        self.bl_knee_pos = self.d.jnt('torso_right_thigh_joint').qpos[0]
 
-        self.fr_hip_pos = self.d.jnt('fr_hip').qpos[0]
-        self.fl_hip_pos = self.d.jnt('fl_hip').qpos[0]
-        self.br_hip_pos = self.d.jnt('br_hip').qpos[0]
-        self.bl_hip_pos = self.d.jnt('bl_hip').qpos[0]
+        self.fr_hip_pos = self.d.jnt('head_right_thigh_shin_joint').qpos[0]
+        self.fl_hip_pos = self.d.jnt('head_left_thigh_shin_joint').qpos[0]
+        self.br_hip_pos = self.d.jnt('torso_right_thigh_shin_joint').qpos[0]
+        self.bl_hip_pos = self.d.jnt('torso_left_thigh_shin_joint').qpos[0]
 
 
     def print_all_joystick_states(self):
