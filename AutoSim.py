@@ -90,10 +90,10 @@ class GenerateModel():
             pos=[0, 0, 0],
             quat=[1, 0, 0, 0],
         )
-        torso_body.add_joint(
-            type=mujoco.mjtJoint.mjJNT_FREE,
-            name='torso_joint',
-        )
+        # torso_body.add_joint(
+        #     type=mujoco.mjtJoint.mjJNT_FREE,
+        #     name='torso_joint',
+        # )
         torso_body.add_geom(
             type=mujoco.mjtGeom.mjGEOM_BOX,
             size=[
@@ -339,44 +339,44 @@ class GenerateModel():
         # Front left leg
         spec.add_actuator(
             name='fl_hip',
-            target='torso_left_thigh_joint',
+            target='head_left_thigh_joint',
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
         spec.add_actuator(
             name='fl_knee',
-            target='torso_left_thigh_shin_joint',
+            target='head_left_thigh_shin_joint',
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
         spec.add_actuator(
             name='fl_wheel1_joint',
-            target='torso_left_shin_front_wheel_joint',
+            target='head_left_shin_front_wheel_joint',
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
         spec.add_actuator(
             name='fl_wheel2_joint',
-            target='torso_left_shin_rear_wheel_joint',
+            target='head_left_shin_rear_wheel_joint',
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
 
         # Front right leg
         spec.add_actuator(
             name='fr_hip',
-            target='torso_right_thigh_joint',
+            target='head_right_thigh_joint',
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
         spec.add_actuator(
             name='fr_knee',
-            target='torso_right_thigh_shin_joint',
+            target='head_right_thigh_shin_joint',
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
         spec.add_actuator(
             name='fr_wheel1_joint',
-            target='torso_right_shin_front_wheel_joint',
+            target='head_right_shin_front_wheel_joint',
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
         spec.add_actuator(
             name='fr_wheel2_joint',
-            target='torso_right_shin_rear_wheel_joint',
+            target='head_right_shin_rear_wheel_joint',
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
 

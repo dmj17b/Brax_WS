@@ -2,26 +2,26 @@ torso_params:
   length: 0.4
   width: 0.2
   height: 0.2
-  mass: 0.5
+  mass: 36
 head_params:
-  length: 0.35
+  length: 0.2
   width: 0.2
   height: 0.2
-  mass: 0.5
-  offset: [0, 0, 0]
+  mass: 15
+  offset: [0.1, 0, 0]
 thigh_params: 
-  length: 0.25
+  length: 0.2
   width: 0.05
-  mass: 0.5
-  torso_offset: [0, 0, 0]
-  head_offset: [0, 0, 0]
+  mass: 3
+  torso_offset: [-0.1, 0.1, 0]
+  head_offset: [0, 0.1, 0]
 shin_params: 
   length: 0.15
   width: 0.05
-  mass: 0.5
-  offset: [0, 0, 0]
+  mass: 2
+  offset: [0, 0.1, 0]
 wheel_params:
   radius: 0.05
   width: 0.05
-  mass: 0.5
-  offset: [0, 0, 0]
+  mass: 2
+  offset: [0, 0.1, 0]
