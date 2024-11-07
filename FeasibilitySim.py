@@ -13,12 +13,17 @@ import AutoSim
 model_config_path = 'model_config.yaml'
 motor_config_path = 'motor_config.yaml'
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
+
+# Generate the new robot spec:
 walter = AutoSim.GenerateModel(model_config_path=model_config_path, motor_config_path=motor_config_path)
 
-scene_spec = mujoco.MjSpec.from_file('models/walter/scene.xml')
+# Generate the scene around the robot (groundplane and sky)
+walter.gen_scene()
 
-walter.add_ground()
+# Add some obstacles:
+walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
 
+# Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)
 
@@ -48,7 +53,6 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 # Initialize joystick controller
-
 controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 # Main simulation loop:

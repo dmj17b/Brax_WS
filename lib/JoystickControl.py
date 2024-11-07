@@ -59,11 +59,11 @@ class JoystickController:
     def control_wheels(self):
         # Control the wheels with basic joystick control
         self.left_wheel_vel_des = self.max_wheel_vel*(-self.left_stick_ud + self.left_stick_lr)
-        self.right_wheel_vel_des = self.max_wheel_vel*(self.left_stick_ud + self.left_stick_lr)
+        self.right_wheel_vel_des = self.max_wheel_vel*(-self.left_stick_ud - self.left_stick_lr)
 
     def control_knees(self):
         self.left_knee_des_vel = self.max_knee_vel*(-self.right_stick_ud + self.right_stick_lr)
-        self.right_knee_des_vel = self.max_knee_vel*(self.right_stick_ud + self.right_stick_lr)
+        self.right_knee_des_vel = self.max_knee_vel*(-self.right_stick_ud - self.right_stick_lr)
         self.fl_knee_des_pos += self.left_knee_des_vel
         self.bl_knee_des_pos += self.left_knee_des_vel
         self.fr_knee_des_pos += self.right_knee_des_vel
@@ -85,9 +85,9 @@ class JoystickController:
             self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
         elif(self.b_button):
             print("B button pressed")
-            self.fr_hip_des_pos = np.pi/2
+            self.fr_hip_des_pos = -np.pi/2
             self.fl_hip_des_pos = -np.pi/2
-            self.br_hip_des_pos = -np.pi/2
+            self.br_hip_des_pos = np.pi/2
             self.bl_hip_des_pos = np.pi/2
             self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
             self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
@@ -95,27 +95,27 @@ class JoystickController:
             self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
         elif(self.y_button):
             print("Y button pressed")
-            self.fr_hip_des_pos = np.pi/3
+            self.fr_hip_des_pos = -np.pi/3
             self.fl_hip_des_pos = -np.pi/3
-            self.br_hip_des_pos = -np.pi/3
+            self.br_hip_des_pos = np.pi/3
             self.bl_hip_des_pos = np.pi/3
         elif(self.x_button):
             print("X button pressed")
             self.fr_hip_des_pos = -np.pi/12
-            self.fl_hip_des_pos = np.pi/12
+            self.fl_hip_des_pos = -np.pi/12
             self.br_hip_des_pos = np.pi/12
-            self.bl_hip_des_pos = -np.pi/12
-            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos) + np.pi/4
+            self.bl_hip_des_pos = np.pi/12
+            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos) - np.pi/4
             self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos) - np.pi/4
-            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos) - np.pi/4
+            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos) + np.pi/4
             self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos) + np.pi/4
 
 
     def update_hip_splay(self):
         self.hip_splay = 0.001*self.d_up
-        self.fr_hip_des_pos += self.hip_splay
+        self.fr_hip_des_pos -= self.hip_splay
         self.fl_hip_des_pos -= self.hip_splay
-        self.br_hip_des_pos -= self.hip_splay
+        self.br_hip_des_pos += self.hip_splay
         self.bl_hip_des_pos += self.hip_splay
 
 
@@ -126,7 +126,6 @@ class JoystickController:
 
         # Get joystick state
         self.get_joystick_state()
-
         # Reset the simulation if requested
         if(self.start_button):
             mujoco.mj_resetData(m, d)
@@ -222,7 +221,6 @@ class JoystickController:
             self.d_down = self.js.get_hat(0)[1]
             self.d_left = self.js.get_hat(0)[0]
             self.d_right = self.js.get_hat(0)[0]
-            print(self.right_stick_lr, self.right_stick_ud)
 
         elif(self.controller_type == "ps4"):
             self.left_stick_lr = self.js.get_axis(0)
@@ -260,6 +258,7 @@ class JoystickController:
     # Get current joint angles
     def get_mujoco_state(self,m,d):
         # Get current joint angles
+        print(self.d.jnt('head_right_thigh_joint').qpos)
         self.fr_knee_pos = self.d.jnt('head_right_thigh_joint').qpos[0]
         self.fl_knee_pos = self.d.jnt('head_left_thigh_joint').qpos[0]
         self.br_knee_pos = self.d.jnt('torso_right_thigh_joint').qpos[0]
@@ -295,24 +294,3 @@ class JoystickController:
         print("Index 13: ", self.js.get_button(13))
         print("Index 14: ", self.js.get_button(14))
 
-    def kipup(self):
-        self.fr_hip_des_pos = -np.pi/12
-        self.fl_hip_des_pos = np.pi/12
-        self.br_hip_des_pos = np.pi/12
-        self.bl_hip_des_pos = -np.pi/12
-        self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos) + np.pi/4
-        self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos) - np.pi/4
-        self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos) - np.pi/4
-        self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos) + np.pi/4
-        self.send_commands()
-        time.sleep(0.5)
-        for i in range(100):
-            if(i<500):
-                self.left_wheel_vel_des = 50
-                self.right_wheel_vel_des = -50
-            else:
-                self.left_wheel_vel_des = -50
-                self.right_wheel_vel_des = 50
-            self.send_commands()
-        return
-        

@@ -52,9 +52,13 @@ class GenerateModel():
         wheel_width = model_config['wheel_params']['width']
         wheel_mass = model_config['wheel_params']['mass']
         wheel_offset = np.asarray(model_config['wheel_params']['offset'])
+        wheel_friction = np.asarray(model_config['wheel_params']['friction'])
 
         motor_config = yaml.safe_load(Path(motor_config_path).read_text())
-        
+
+        waist_spring_stiffness = motor_config['waist_params']['spring_stiffness']
+        waist_damping = motor_config['waist_params']['damping']
+        waist_limits = motor_config['waist_params']['limits']
 
         hip_kp = motor_config['hip_params']['Kp']
         hip_kd = motor_config['hip_params']['Kd']
@@ -62,6 +66,7 @@ class GenerateModel():
         hip_stall_torque = motor_config['hip_params']['stall_torque']
         hip_no_load_speed = motor_config['hip_params']['no_load_speed']
         hip_rotor_inertia = motor_config['hip_params']['rotor_inertia']
+        hip_damping = motor_config['hip_params']['damping']
 
         hip_armature = hip_rotor_inertia*hip_gear_ratio**2
 
@@ -71,6 +76,7 @@ class GenerateModel():
         knee_stall_torque = motor_config['knee_params']['stall_torque']
         knee_no_load_speed = motor_config['knee_params']['no_load_speed']
         knee_rotor_inertia = motor_config['knee_params']['rotor_inertia']
+        knee_damping = motor_config['knee_params']['damping']
 
         knee_armature = knee_rotor_inertia*knee_gear_ratio**2
 
@@ -81,7 +87,8 @@ class GenerateModel():
         wheel_stall_torque = motor_config['wheel_params']['stall_torque']
         wheel_no_load_speed = motor_config['wheel_params']['no_load_speed']
         wheel_rotor_inertia = motor_config['wheel_params']['rotor_inertia']
- 
+        wheel_damping = motor_config['wheel_params']['damping']
+
         wheel_armature = wheel_rotor_inertia*wheel_gear_ratio**2
 
 
@@ -91,10 +98,10 @@ class GenerateModel():
             pos=torso_start_pos,
             quat=[1, 0, 0, 0],
         )
-        # torso_body.add_joint(
-        #     type=mujoco.mjtJoint.mjJNT_FREE,
-        #     name='torso_joint',
-        # )
+        torso_body.add_joint(
+            type=mujoco.mjtJoint.mjJNT_FREE,
+            name='torso_joint',
+        )
         torso_body.add_geom(
             type=mujoco.mjtGeom.mjGEOM_BOX,
             size=[
@@ -118,6 +125,7 @@ class GenerateModel():
                 'geom_quat': np.array([1, 0, 0, 0]),
                 'mass': thigh_mass,
                 'armature': hip_armature,
+                'damping': hip_damping,
             },
             'shin': {
                 'body_pos': np.array([0, shin_width / 2, -thigh_length]) + shin_offset,
@@ -128,6 +136,7 @@ class GenerateModel():
                 'geom_quat': np.array([1, 0, 1, 0]),
                 'mass': shin_mass,
                 'armature': knee_armature,
+                'damping': knee_damping,
             },
             'front_wheel': {
                 'body_pos': np.array([shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
@@ -138,6 +147,7 @@ class GenerateModel():
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
                 'armature': wheel_armature,
+                'damping': wheel_damping,
             },
             'rear_wheel': {
                 'body_pos': np.array([-shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
@@ -148,6 +158,7 @@ class GenerateModel():
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
                 'armature': wheel_armature,
+                'damping': wheel_damping,
             },
         }
 
@@ -174,15 +185,28 @@ class GenerateModel():
                     name=joint_name,
                     axis=[0, 1, 0],
                     armature = torso_children_params[child]['armature'],
+                    damping = torso_children_params[child]['damping'],
                 )
-                body.add_geom(
-                    name=geom_name,
-                    type=torso_children_params[child]['geom_type'],
-                    size=torso_children_params[child]['geom_size'],
-                    pos=mirror * torso_children_params[child]['geom_pos'],
-                    quat=torso_children_params[child]['geom_quat'],
-                    mass=torso_children_params[child]['mass'],
-                )
+                if(body == 'front_wheel' or body == 'rear_wheel'):
+                    body.add_geom(
+                        name=geom_name,
+                        type=torso_children_params[child]['geom_type'],
+                        size=torso_children_params[child]['geom_size'],
+                        pos=mirror * torso_children_params[child]['geom_pos'],
+                        quat=torso_children_params[child]['geom_quat'],
+                        mass=torso_children_params[child]['mass'],
+                        friction = wheel_friction,
+                    )
+                else:
+                    body.add_geom(
+                        name=geom_name,
+                        type=torso_children_params[child]['geom_type'],
+                        size=torso_children_params[child]['geom_size'],
+                        pos=mirror * torso_children_params[child]['geom_pos'],
+                        quat=torso_children_params[child]['geom_quat'],
+                        mass=torso_children_params[child]['mass'],
+                    )
+
 
         # Add Head to Torso:
         head_position = np.asarray([
@@ -201,6 +225,7 @@ class GenerateModel():
             name='head_joint',
             pos=joint_position,
             axis=[1, 0, 0],
+            springdamper = [waist_spring_stiffness, waist_damping],
         )
         head_body.add_geom(
             type=mujoco.mjtGeom.mjGEOM_BOX,
@@ -225,6 +250,7 @@ class GenerateModel():
                 'geom_quat': np.array([1, 0, 0, 0]),
                 'mass': thigh_mass,
                 'armature': hip_armature,
+                'damping': hip_damping,
             },
             'shin': {
                 'body_pos': np.array([0, shin_width / 2, -thigh_length]) + shin_offset,
@@ -235,6 +261,7 @@ class GenerateModel():
                 'geom_quat': np.array([1, 0, 1, 0]),
                 'mass': shin_mass,
                 'armature': knee_armature,
+                'damping': knee_damping,
             },
             'front_wheel': {
                 'body_pos': np.array([shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
@@ -245,6 +272,7 @@ class GenerateModel():
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
                 'armature': wheel_armature,
+                'damping': wheel_damping,
             },
             'rear_wheel': {
                 'body_pos': np.array([-shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
@@ -255,6 +283,7 @@ class GenerateModel():
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
                 'armature': wheel_armature,
+                'damping': wheel_damping,
             },
         }
 
@@ -281,16 +310,35 @@ class GenerateModel():
                     name=joint_name,
                     axis=[0, 1, 0],
                     armature = head_children_params[child]['armature'],
+                    damping = head_children_params[child]['damping'],
                 )
-                body.add_geom(
-                    name=geom_name,
-                    type=head_children_params[child]['geom_type'],
-                    size=head_children_params[child]['geom_size'],
-                    pos=mirror * head_children_params[child]['geom_pos'],
-                    quat=head_children_params[child]['geom_quat'],
-                    mass=head_children_params[child]['mass'],
-                )
-
+                # body.add_geom(
+                #     name=geom_name,
+                #     type=head_children_params[child]['geom_type'],
+                #     size=head_children_params[child]['geom_size'],
+                #     pos=mirror * head_children_params[child]['geom_pos'],
+                #     quat=head_children_params[child]['geom_quat'],
+                #     mass=head_children_params[child]['mass'],
+                # )
+                if(body == 'front_wheel' or body == 'rear_wheel'):
+                    body.add_geom(
+                        name=geom_name,
+                        type=head_children_params[child]['geom_type'],
+                        size=head_children_params[child]['geom_size'],
+                        pos=mirror * head_children_params[child]['geom_pos'],
+                        quat=head_children_params[child]['geom_quat'],
+                        mass=head_children_params[child]['mass'],
+                        friction = wheel_friction,
+                    )
+                else:
+                    body.add_geom(
+                        name=geom_name,
+                        type=head_children_params[child]['geom_type'],
+                        size=head_children_params[child]['geom_size'],
+                        pos=mirror * head_children_params[child]['geom_pos'],
+                        quat=head_children_params[child]['geom_quat'],
+                        mass=head_children_params[child]['mass'],
+                    )
 
 # Adding Actuators:
         # Back left leg
@@ -388,13 +436,59 @@ class GenerateModel():
         self.model_xml = spec.to_xml()
         self.spec = spec
 
-    def add_ground(self):
-        scene_spec = mujoco.MjSpec.from_file('models/walter/scene.xml')
-        floor = scene_spec.find_body('floor')
-        self.spec.worldbody.add_body(floor)
 
-    def add_stairs(self):
-        pass
+    def gen_scene(self):
+        # Create ground plane texture/material
+        ground = self.spec.add_texture(type = mujoco.mjtTexture.mjTEXTURE_2D,
+                              name="ground_texture",
+                              builtin=mujoco.mjtBuiltin.mjBUILTIN_CHECKER, 
+                              width=300, 
+                              height=300, 
+                              rgb1=[0.5, 0.8, 0.9], 
+                              rgb2=[0.5, 0.9, 0.8],
+                              markrgb=[0.8, 0.8, 0.8])
+        
+        self.spec.add_material(name="groundplane",
+                              texrepeat=[5, 5],
+                              reflectance=0., 
+                              ).textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = 'ground_texture'
+        
+        self.spec.worldbody.add_geom(
+            type=mujoco.mjtGeom.mjGEOM_PLANE,
+            size=[0, 0, 0.05],
+            material="groundplane",
+        )
+
+
+        # Create skybox so background isn't just black
+        self.spec.add_texture(type = mujoco.mjtTexture.mjTEXTURE_SKYBOX,
+                              builtin = mujoco.mjtBuiltin.mjBUILTIN_GRADIENT,
+                                width = 300,
+                                height = 300,
+                                name="skybox")
+
+        # Add an array of lights to the scene:
+        for i in range(5):
+            for j in range(5):
+                self.spec.worldbody.add_light(
+                    pos=[2*i, 2*j, 15],
+                    dir=[0, 0, -1],
+                    diffuse=[0.1, 0.1, 0.1],
+                    specular=[0., 0., 0.],
+                    directional=True,
+                )
+        
+
+    def add_box(self, pos:list, size:list):
+        self.spec.worldbody.add_body(pos=pos).add_geom(type=mujoco.mjtGeom.mjGEOM_BOX, size=size)
+
+
+    def add_stairs(self, pos: list = [2,0,0], rise: float = 0.1, run: float = 0.1, width: float=1.2, num_steps: int=5):
+        for i in range(num_steps):
+            self.add_box(
+                pos=[pos[0]+i*run, pos[1], pos[2] + i*rise],
+                size=[run, width, rise],
+            )
 
 def main(argv=None):
     model_config_path = 'model_config.yaml'
