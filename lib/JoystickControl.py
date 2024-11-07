@@ -89,10 +89,11 @@ class JoystickController:
             self.fl_hip_des_pos = -np.pi/2
             self.br_hip_des_pos = np.pi/2
             self.bl_hip_des_pos = np.pi/2
-            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
-            self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
-            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
-            self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
+            self.fr_knee_des_pos = 0#self.nearest_pi(self.fr_knee_pos)
+            self.fl_knee_des_pos = 0#self.nearest_pi(self.fl_knee_pos)
+            self.br_knee_des_pos = 0#self.nearest_pi(self.br_knee_pos)
+            self.bl_knee_des_pos = 0#self.nearest_pi(self.bl_knee_pos)
+            print(self.fr_knee_pos)
         elif(self.y_button):
             print("Y button pressed")
             self.fr_hip_des_pos = -np.pi/3
@@ -258,7 +259,6 @@ class JoystickController:
     # Get current joint angles
     def get_mujoco_state(self,m,d):
         # Get current joint angles
-        print(self.d.jnt('head_right_thigh_joint').qpos)
         self.fr_knee_pos = self.d.jnt('head_right_thigh_joint').qpos[0]
         self.fl_knee_pos = self.d.jnt('head_left_thigh_joint').qpos[0]
         self.br_knee_pos = self.d.jnt('torso_right_thigh_joint').qpos[0]
@@ -268,6 +268,8 @@ class JoystickController:
         self.fl_hip_pos = self.d.jnt('head_left_thigh_shin_joint').qpos[0]
         self.br_hip_pos = self.d.jnt('torso_right_thigh_shin_joint').qpos[0]
         self.bl_hip_pos = self.d.jnt('torso_left_thigh_shin_joint').qpos[0]
+        print(self.fr_knee_pos)
+
 
 
     def print_all_joystick_states(self):

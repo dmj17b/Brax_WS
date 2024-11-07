@@ -58,7 +58,7 @@ class GenerateModel():
 
         waist_spring_stiffness = motor_config['waist_params']['spring_stiffness']
         waist_damping = motor_config['waist_params']['damping']
-        waist_limits = motor_config['waist_params']['limits']
+        waist_range = motor_config['waist_params']['range']
 
         hip_kp = motor_config['hip_params']['Kp']
         hip_kd = motor_config['hip_params']['Kd']
@@ -226,6 +226,7 @@ class GenerateModel():
             pos=joint_position,
             axis=[1, 0, 0],
             springdamper = [waist_spring_stiffness, waist_damping],
+            range = waist_range,
         )
         head_body.add_geom(
             type=mujoco.mjtGeom.mjGEOM_BOX,
