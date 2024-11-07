@@ -2,7 +2,7 @@
   <compiler angle="radian"/>
 
   <worldbody>
-    <body name="torso">
+    <body name="torso" pos="0 0 0.5">
       <geom size="0.2 0.1 0.1" type="box" mass="36"/>
       <body name="torso_left_thigh" pos="-0.1 0.2 0">
         <joint name="torso_left_thigh_joint" pos="0 0 0" axis="0 1 0" armature="0.01"/>
@@ -84,13 +84,13 @@
     <general name="br_knee" joint="torso_right_thigh_shin_joint"/>
     <general name="br_wheel1_joint" joint="torso_right_shin_front_wheel_joint"/>
     <general name="br_wheel2_joint" joint="torso_right_shin_rear_wheel_joint"/>
-    <general name="fl_hip" joint="torso_left_thigh_joint"/>
-    <general name="fl_knee" joint="torso_left_thigh_shin_joint"/>
-    <general name="fl_wheel1_joint" joint="torso_left_shin_front_wheel_joint"/>
-    <general name="fl_wheel2_joint" joint="torso_left_shin_rear_wheel_joint"/>
-    <general name="fr_hip" joint="torso_right_thigh_joint"/>
-    <general name="fr_knee" joint="torso_right_thigh_shin_joint"/>
-    <general name="fr_wheel1_joint" joint="torso_right_shin_front_wheel_joint"/>
-    <general name="fr_wheel2_joint" joint="torso_right_shin_rear_wheel_joint"/>
+    <general name="fl_hip" joint="head_left_thigh_joint"/>
+    <general name="fl_knee" joint="head_left_thigh_shin_joint"/>
+    <general name="fl_wheel1_joint" joint="head_left_shin_front_wheel_joint"/>
+    <general name="fl_wheel2_joint" joint="head_left_shin_rear_wheel_joint"/>
+    <general name="fr_hip" joint="head_right_thigh_joint"/>
+    <general name="fr_knee" joint="head_right_thigh_shin_joint"/>
+    <general name="fr_wheel1_joint" joint="head_right_shin_front_wheel_joint"/>
+    <general name="fr_wheel2_joint" joint="head_right_shin_rear_wheel_joint"/>
   </actuator>
 </mujoco>

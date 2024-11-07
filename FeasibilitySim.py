@@ -17,11 +17,13 @@ walter = AutoSim.GenerateModel(model_config_path=model_config_path, motor_config
 
 scene_spec = mujoco.MjSpec.from_file('models/walter/scene.xml')
 
+walter.add_ground()
+
 m = walter.spec.compile()
 d = mujoco.MjData(m)
 
 # Initializing motor models (ignore this part)
-fr_hip = motor.MotorModel(m, d, 'head_right_thigh_joint', motor_config['hip_params'], 13)
+fr_hip = motor.MotorModel(m, d, 'head_right_thigh_joint', motor_config['hip_params'], 12)
 fl_hip = motor.MotorModel(m, d,'head_left_thigh_joint',  motor_config['hip_params'], 8)
 br_hip = motor.MotorModel(m, d,'torso_right_thigh_joint',  motor_config['hip_params'], 4)
 bl_hip = motor.MotorModel(m, d,'torso_left_thigh_joint',  motor_config['hip_params'], 0)
@@ -47,7 +49,7 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 # Initialize joystick controller
 
-controller = js_ctrl.JoystickController("logitech2", m, d, motors)
+controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d) as viewer:

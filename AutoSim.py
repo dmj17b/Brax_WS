@@ -25,6 +25,7 @@ class GenerateModel():
         torso_width = model_config['torso_params']['width']
         torso_height = model_config['torso_params']['height']
         torso_mass = model_config['torso_params']['mass']
+        torso_start_pos = model_config['torso_params']['start_pos']
 
         # Head Params:
         head_length = model_config['head_params']['length']
@@ -87,7 +88,7 @@ class GenerateModel():
         # Add Torso to World Body:
         torso_body = spec.worldbody.add_body(
             name='torso',
-            pos=[0, 0, 0],
+            pos=torso_start_pos,
             quat=[1, 0, 0, 0],
         )
         # torso_body.add_joint(
@@ -387,6 +388,13 @@ class GenerateModel():
         self.model_xml = spec.to_xml()
         self.spec = spec
 
+    def add_ground(self):
+        scene_spec = mujoco.MjSpec.from_file('models/walter/scene.xml')
+        floor = scene_spec.find_body('floor')
+        self.spec.worldbody.add_body(floor)
+
+    def add_stairs(self):
+        pass
 
 def main(argv=None):
     model_config_path = 'model_config.yaml'
