@@ -53,6 +53,7 @@ class GenerateModel():
         wheel_mass = model_config['wheel_params']['mass']
         wheel_offset = np.asarray(model_config['wheel_params']['offset'])
         wheel_friction = np.asarray(model_config['wheel_params']['friction'])
+        wheel_solref = np.asarray(model_config['wheel_params']['solref'])
 
         motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
@@ -88,6 +89,7 @@ class GenerateModel():
         wheel_no_load_speed = motor_config['wheel_params']['no_load_speed']
         wheel_rotor_inertia = motor_config['wheel_params']['rotor_inertia']
         wheel_damping = motor_config['wheel_params']['damping']
+
 
         wheel_armature = wheel_rotor_inertia*wheel_gear_ratio**2
 
@@ -187,7 +189,7 @@ class GenerateModel():
                     armature = torso_children_params[child]['armature'],
                     damping = torso_children_params[child]['damping'],
                 )
-                if(body == 'front_wheel' or body == 'rear_wheel'):
+                if(child == 'front_wheel' or child == 'rear_wheel'):
                     body.add_geom(
                         name=geom_name,
                         type=torso_children_params[child]['geom_type'],
@@ -196,6 +198,7 @@ class GenerateModel():
                         quat=torso_children_params[child]['geom_quat'],
                         mass=torso_children_params[child]['mass'],
                         friction = wheel_friction,
+                        solref = wheel_solref,
                     )
                 else:
                     body.add_geom(
@@ -313,15 +316,7 @@ class GenerateModel():
                     armature = head_children_params[child]['armature'],
                     damping = head_children_params[child]['damping'],
                 )
-                # body.add_geom(
-                #     name=geom_name,
-                #     type=head_children_params[child]['geom_type'],
-                #     size=head_children_params[child]['geom_size'],
-                #     pos=mirror * head_children_params[child]['geom_pos'],
-                #     quat=head_children_params[child]['geom_quat'],
-                #     mass=head_children_params[child]['mass'],
-                # )
-                if(body == 'front_wheel' or body == 'rear_wheel'):
+                if(child == 'front_wheel' or child == 'rear_wheel'):
                     body.add_geom(
                         name=geom_name,
                         type=head_children_params[child]['geom_type'],
@@ -330,6 +325,7 @@ class GenerateModel():
                         quat=head_children_params[child]['geom_quat'],
                         mass=head_children_params[child]['mass'],
                         friction = wheel_friction,
+                        solref = wheel_solref,
                     )
                 else:
                     body.add_geom(

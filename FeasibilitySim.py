@@ -65,8 +65,8 @@ with mujoco.viewer.launch_passive(m,d) as viewer:
         mujoco.mj_step(m, d)
 
         # Call joystick controller:
-
         controller.control(m,d)
+
 
         # Log motor data to plot later:
 
