@@ -56,6 +56,8 @@ Model parameters like sizes, masses, and frictions can be edited in "model_confi
 
 To help understand how the model is generated, it is important to know that everything builds off of the rear body segment, which will be referred to as the "torso." The torso is aligned with its length along the x-axis, width along the y-axis, and height along the z-axis.
 
+![](Docs/Sim_Coordinate_Systems.png)
+
 The head is defined similarly to the torso, but includes an `offset` term to define its position relative to the torso. The offset term is 3-dimensional but we'll likely only be adjusting the x-offset to play with head-torso spacing. To facilitate size variation, the torso and head both use MuJoCo "box" primitives.
 
 The thigh and shin linkages use MuJoCo's "capsule" primitive which uses a length and width parameter to create a pill-shaped geometry. 
