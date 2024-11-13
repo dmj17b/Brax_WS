@@ -1,0 +1,208 @@
+<mujoco model="walter">
+
+    <!--Defining the assets for the model-->
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2=".63 .8 1" width="256" height="256"/>
+    <mesh name = "thigh_mesh" file = "assets/Thigh.stl"/>
+    <mesh name = "shin_mesh" file = "assets/Shin.stl"/>
+    <mesh name = "wheel_mesh" file = "assets/Wheel.stl"/>
+    <mesh name = "body_mesh" file = "assets/Body.stl"/>
+    <mesh name = "head_mesh" file = "assets/Head.stl"/>
+  </asset>
+
+  <!--Defining default classes for components-->
+  <default>
+    <geom rgba="0.73 0.7 0.48 1"/>
+    <!-- Default thigh class -->
+    <default class="thigh">
+        <geom type="mesh" mesh="thigh_mesh" mass = "3" />
+    </default> 
+
+    <!-- Default hip class -->
+    <default class = "hip">
+        <joint armature = "0.02" damping = "2"/>
+    </default>
+
+    <!-- Default shin class -->
+    <default class="shin">
+        <geom type="mesh" mesh="shin_mesh" mass = "2"/>
+    </default>
+    
+    <!-- Default knee class -->
+    <default class = "knee">
+        <joint armature = "0.02" damping = "2"/>
+    </default>
+
+    <!-- Default wheel class -->
+    <default class="wheel">
+        <geom type="mesh" mesh = "wheel_mesh" friction = "1.5 0.005 0.005" solref="0.1 0.5" mass = "3"/>
+    </default>
+
+    <!-- Default wheel joint class-->
+    <default class = "wheel_joint">
+        <joint type="hinge" axis="0 0 1" damping="0.08"/>
+    </default>
+
+    <!-- Body Class -->
+    <default class="body">
+        <geom type="mesh" mesh = "body_mesh" mass="35" />
+    </default>
+
+    <!-- Head Class -->
+    <default class="head">
+        <geom type="mesh" mesh = "head_mesh" mass = "17"/>
+    </default>
+
+    <!-- Default actuator classes -->
+    <default class="knee_actuator">
+        <motor />
+    </default>
+
+    <default class="hip_actuator">
+        <motor /> 
+    </default>
+
+    <default class="wheel_actuator">
+        <motor/>
+    </default>
+
+
+  </default>
+
+  <!-- WALTER MODEL -->
+    <worldbody>
+        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
+        <!-- Rear Body Section -->
+        <body name="body" pos="0 0 0.9">
+            <joint type="free"/>
+            <geom class="body" />
+            <!-- Add rear legs here -->
+
+            <!-- Back left thigh -->
+             <body name = "bl_thigh" pos = "-0.47 0.125 -0.055" quat = "0 0 1 1">
+                <joint name="bl_hip" class = "hip" type="hinge" axis = "0 0 1" />
+                <geom class="thigh"/>
+                <!-- Back left shin -->
+                <body name = "bl_shin" pos = "0 -0.2 0.076" >
+                    <joint name="bl_knee" class = "knee" type="hinge" axis = "0 0 1"/>
+                    <geom class="shin"/>
+                    <!-- Back left wheels -->
+                     <body name = "bl_wheel1" pos = "0.125 0 0.058">
+                        <geom class="wheel"/>
+                        <joint name="bl_wheel1_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
+                     </body>
+                     <body name = "bl_wheel2" pos = "-0.125 0 0.058">
+                        <geom class="wheel"/>
+                        <joint name="bl_wheel2_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
+                     </body>
+                </body>
+             </body>
+
+            
+            <!-- Back right thigh -->
+            <body name = "br_thigh" pos = "-0.47 -0.125 -0.055" quat = "1 1 0 0">
+                <joint name="br_hip" class = "hip" type="hinge" axis = "0 0 1" />
+                <geom class="thigh"/>
+                <!-- Back right shin -->
+                <body name = "br_shin" pos = "0 -0.2 0.076" >
+                    <joint name="br_knee" class = "knee" type="hinge" axis = "0 0 1"/>
+                    <geom class="shin"/>
+                    <!-- Back right wheels -->
+                     <body name = "br_wheel1" pos = "0.125 0 0.058">
+                        <geom class="wheel"/>
+                        <joint name="br_wheel1_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
+                     </body>
+                     <body name = "br_wheel2" pos = "-0.125 0 0.058">
+                        <geom class="wheel"/>
+                        <joint name="br_wheel2_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
+                     </body>
+                </body>
+             </body>
+
+
+
+            <!-- Front Body Section -->
+            <body name="head" pos="0.01 0 0">
+                <joint name="body_joint" type="hinge" axis = "1 0 0" stiffness = "0.2" range = "-30 30" solreflimit="1000 1" solimplimit=".95 .99 1e-3" damping = "20"/>
+                <geom class = "head"/>
+
+                <!-- Add front legs here -->
+                 <!-- Front left thigh -->
+                 <body name = "fl_thigh" pos = "0.085 0.125 -0.055" quat = "0 0 1 1">
+                    <joint name="fl_hip" class = "hip" type="hinge" axis = "0 0 1" />
+                    <geom class="thigh"/>
+                    <!-- Back left shin -->
+                    <body name = "fl_shin" pos = "0 -0.2 0.076" >
+                        <joint name="fl_knee" class = "knee" type="hinge" axis = "0 0 1"/>
+                        <geom class="shin"/>
+                        <!-- Back left wheels -->
+                         <body name = "fl_wheel1" pos = "0.125 0 0.058">
+                            <geom class="wheel"/>
+                            <joint name="fl_wheel1_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
+                         </body>
+                         <body name = "fl_wheel2" pos = "-0.125 0 0.058">
+                            <geom class="wheel"/>
+                            <joint name="fl_wheel2_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
+                         </body>
+                    </body>
+                 </body>
+
+                <!-- Front right thigh -->
+                <body name = "fr_thigh" pos = "0.085 -0.125 -0.055" quat = "1 1 0 0">
+                    <joint name="fr_hip" class = "hip" type="hinge" axis = "0 0 1" />
+                    <geom class="thigh"/>
+                    <!-- Back left shin -->
+                    <body name = "fr_shin" pos = "0 -0.2 0.076" >
+                        <joint name="fr_knee" class = "knee" type="hinge" axis = "0 0 1"/>
+                        <geom class="shin"/>
+                        <!-- Back left wheels -->
+                            <body name = "fr_wheel1" pos = "0.125 0 0.058">
+                                <geom class="wheel"/>
+                                <joint name="fr_wheel1_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
+                            </body>
+                            <body name = "fr_wheel2" pos = "-0.125 0 0.058">
+                                <geom class="wheel"/>
+                                <joint name="fr_wheel2_joint" class = "wheel_joint" type="hinge" axis="0 0 1"/>
+                            </body>
+                    </body>
+                </body>
+            </body> 
+            </body>
+        </worldbody>
+
+    <!-- Defining the actuators -->
+    <actuator>
+        <motor joint="fr_hip" class = "hip_actuator"/>
+        <motor joint="fr_knee" class = "knee_actuator"/>
+        <motor joint="fr_wheel1_joint" class = "wheel_actuator"/>
+        <motor joint="fr_wheel2_joint" class = "wheel_actuator"/>
+        <motor joint="fl_hip" class = "hip_actuator"/>
+        <motor joint="fl_knee" class = "knee_actuator"/>
+        <motor joint="fl_wheel1_joint" class = "wheel_actuator"/>
+        <motor joint="fl_wheel2_joint" class = "wheel_actuator"/>
+        <motor joint="br_hip" class = "hip_actuator"/>
+        <motor joint="br_knee" class = "knee_actuator"/>
+        <motor joint="br_wheel1_joint" class = "wheel_actuator"/>
+        <motor joint="br_wheel2_joint" class = "wheel_actuator"/>
+        <motor joint="bl_hip" class = "hip_actuator"/>
+        <motor joint="bl_knee" class = "knee_actuator"/>
+        <motor joint="bl_wheel1_joint" class = "wheel_actuator"/>
+        <motor joint="bl_wheel2_joint" class = "wheel_actuator"/>
+    </actuator>
+<!-- 
+    <keyframe>
+    <key name="home"
+        qpos="0 0 0.3
+            1 0 0 0
+            0.0 0.0 0.0
+            0.0 0.0 0.0
+            0.0 0.0 0.0
+            0.0 0.0 0.0
+            0.0 0.0 0.0
+            0.0 0.0"
+        ctrl="0 0 0 0
+             0 0 0 0
+             0 0 0 0
+             0 0 0 0"/>
+    </keyframe> -->
+</mujoco>

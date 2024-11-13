@@ -1,0 +1,34 @@
+torso_params: 
+  length: 0.4
+  width: 0.2
+  height: 0.2
+  mass: 36
+  start_pos: [0, 0, 0.5]
+
+head_params:
+  length: 0.2
+  width: 0.2
+  height: 0.2
+  mass: 15
+  offset: [0.1, 0, 0]
+
+thigh_params: 
+  length: 0.25
+  width: 0.05
+  mass: 3
+  torso_offset: [-0.1, 0.05, 0]
+  head_offset: [0, 0.05, 0]
+
+shin_params: 
+  length: 0.25
+  width: 0.05
+  mass: 2
+  offset: [0, 0.05, 0]
+
+wheel_params:
+  radius: 0.1
+  width: 0.05
+  mass: 2
+  offset: [0, 0.05, 0]
+  friction: [1, 0.005, 0.005]
+  solref: [0.2, 0.5]

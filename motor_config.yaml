@@ -1,0 +1,31 @@
+waist_params:
+  spring_stiffness: 10
+  damping: 1
+  range: [-25, 25]
+
+hip_params:
+  Kp: 200
+  Kd: 50
+  stall_torque: 100
+  no_load_speed: 100
+  gear_ratio: 1
+  rotor_inertia: 0.02
+  damping: 2
+
+knee_params:
+  Kp: 200
+  Kd: 50
+  stall_torque: 100
+  no_load_speed: 100
+  gear_ratio: 1
+  rotor_inertia: 0.02
+  damping: 2
+
+wheel_params:
+  Kp: 5
+  Kd: 1
+  stall_torque: 60
+  no_load_speed: 100
+  gear_ratio: 2
+  rotor_inertia: 0.001
+  damping: 2
