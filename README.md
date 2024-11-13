@@ -54,6 +54,8 @@ This should open a MuJoCo window where you can pan, zoom, and orbit with your mo
 ## Adjusting Model Parameters:
 Model parameters like sizes, masses, and frictions can be edited in "model_config.yaml"
 
+The programatic model generation occurs in "AutoSim.py". If you need to add additional parameters that aren't considered in the yaml file, this is where you would do so. 
+
 To help understand how the model is generated, it is important to know that everything builds off of the rear body segment, which will be referred to as the "torso." The torso is aligned with its length along the x-axis, width along the y-axis, and height along the z-axis.
 
 ![](Docs/Sim_Coordinate_Systems.png)
@@ -62,7 +64,7 @@ The head is defined similarly to the torso, but includes an `offset` term to def
 
 The thigh and shin linkages use MuJoCo's "capsule" primitive which uses a length and width parameter to create a pill-shaped geometry. 
 
-The thigh parameters include an offset term so users can adjust the positioning of the hip joint relative to the head/torso. The `torso_offset` and `head_offset` are 3-dimensional vectors relative to the torso and head, respectively. 
+The thigh parameters include an offset term so users can adjust the positioning of the hip joint relative to the head/torso. The `torso_offset` and `head_offset` are 3-dimensional vectors relative to the torso and head origins. In the programatic model generation, a minimum y-offset is added to each of these offset to account for body and linkage thicknesses. Any offset added in the yaml file will add to this base offset.
 
 The shin/thigh joint is always assumed to be at the bottom of the thigh and middle of the shin. An additional, 3D offset vector is included, but we recommend only varying the y-component of the shin offset to add more/less tolerance between the linkages.
 
@@ -71,6 +73,11 @@ The wheels of this system are approximated using MuJoCo "ellipsoid" primitives. 
 Given the importance of contact modeling between the wheels of the robot and other surfaces, the wheels include two additional modeling parameters in the yaml file:
 1. `friction`: The friction parameter of the wheels includes 3 terms, representing planar friction, torsional friction, and rolling friction in that order. For more information, visit: [MuJoCo XML Reference: friction](https://mujoco.readthedocs.io/en/stable/XMLreference.html#body-geom-friction) 
 2. `solref`: This parameter is used in MuJoCo to adjust the contact dynamics between geometries. The two values in the solref array are [time_constant, damping_ratio]. These values allow us to model "squishy" wheels that absorb impacts. For more information, visit: [MuJoCo XML Reference: solref](https://mujoco.readthedocs.io/en/stable/modeling.html#reference)
+
+### Important Notes for Model Parameters:
+- ALL inertias are approximated by the assigned mass and associated geometry. It is possible to assign a full inertial matrix, but this is left out for now.
+- Any unassigned parameters are set to MuJoCo defaults.
+- 
 
 
 ## Adjusting Motor Models and Joint Parameters:
@@ -115,6 +122,12 @@ Waist:
 >3. Damping is the only parameter that is applied to the joint as a whole. Since it is difficult to know this value without physical testing, we choose to leave this parameter as a lumped term for any damping/losses in the transmission.
 
 >4. Waist parameters are included in this config file, but the waist DOES NOT use any actuator. The waist parameters are strictly for simulating a torsional spring-damper system with a limited joint range. In the future we may experiment with actuating this joint, but that functionality is not included yet.
+
+## Joystick Control Scheme:
+For reference, here is the current joystick control layout I use. The buttons can be pre-programmed for any specific configuration by editing lib/JoystickControl.py
+Still working on a better way to make this program automatically detect different joysticks and use the appropriate controls.
+![](Docs/JoystickDiagram.png)
+
 
 ## Implementing Custom Control Schemes:
 To use the existing speed-torque motor model, you can comment out any lines relating to joystick control, and send joint commands in the main loop with the following schema:

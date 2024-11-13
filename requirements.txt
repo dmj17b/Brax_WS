@@ -2,3 +2,5 @@ mujoco
 pygame
 numpy
 matplotlib
+pyyaml
+PyQt6
