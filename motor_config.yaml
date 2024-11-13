@@ -4,20 +4,20 @@ waist_params:
   range: [-25, 25]
 
 hip_params:
-  Kp: 200
+  Kp: 300
   Kd: 50
-  stall_torque: 100
+  stall_torque: 50
   no_load_speed: 100
-  gear_ratio: 1
+  gear_ratio: 2
   rotor_inertia: 0.02
   damping: 2
 
 knee_params:
-  Kp: 200
+  Kp: 300
   Kd: 50
-  stall_torque: 100
+  stall_torque: 50
   no_load_speed: 100
-  gear_ratio: 1
+  gear_ratio: 2
   rotor_inertia: 0.02
   damping: 2
 

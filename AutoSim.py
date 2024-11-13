@@ -130,7 +130,7 @@ class GenerateModel():
                 'damping': hip_damping,
             },
             'shin': {
-                'body_pos': np.array([0, shin_width / 2, -thigh_length]) + shin_offset,
+                'body_pos': np.array([0, shin_width / 2 + thigh_width, -thigh_length]) + shin_offset,
                 'body_quat': np.array([1, 0, 0, 0]),
                 'geom_type': mujoco.mjtGeom.mjGEOM_CAPSULE,
                 'geom_size': np.array([shin_width / 2, shin_length / 2, 0]),
@@ -141,10 +141,10 @@ class GenerateModel():
                 'damping': knee_damping,
             },
             'front_wheel': {
-                'body_pos': np.array([shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
+                'body_pos': np.array([shin_length / 2, wheel_width / 2 + shin_width/2, 0]) + wheel_offset,
                 'body_quat': np.array([1, 0, 0, 0]),
                 'geom_type': mujoco.mjtGeom.mjGEOM_ELLIPSOID,
-                'geom_size': np.array([wheel_radius, wheel_radius, wheel_width]),
+                'geom_size': np.array([wheel_radius, wheel_radius, wheel_width/2]),
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
@@ -152,10 +152,10 @@ class GenerateModel():
                 'damping': wheel_damping,
             },
             'rear_wheel': {
-                'body_pos': np.array([-shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
+                'body_pos': np.array([-shin_length / 2, wheel_width / 2 + shin_width/2, 0]) + wheel_offset,
                 'body_quat': np.array([1, 0, 0, 0]),
                 'geom_type': mujoco.mjtGeom.mjGEOM_ELLIPSOID,
-                'geom_size': np.array([wheel_radius, wheel_radius, wheel_width]),
+                'geom_size': np.array([wheel_radius, wheel_radius, wheel_width/2]),
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
@@ -257,7 +257,7 @@ class GenerateModel():
                 'damping': hip_damping,
             },
             'shin': {
-                'body_pos': np.array([0, shin_width / 2, -thigh_length]) + shin_offset,
+                'body_pos': np.array([0, shin_width / 2 + thigh_width, -thigh_length]) + shin_offset,
                 'body_quat': np.array([1, 0, 0, 0]),
                 'geom_type': mujoco.mjtGeom.mjGEOM_CAPSULE,
                 'geom_size': np.array([shin_width / 2, shin_length / 2, 0]),
@@ -268,10 +268,10 @@ class GenerateModel():
                 'damping': knee_damping,
             },
             'front_wheel': {
-                'body_pos': np.array([shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
+                'body_pos': np.array([shin_length / 2, wheel_width / 2 + shin_width/2, 0]) + wheel_offset,
                 'body_quat': np.array([1, 0, 0, 0]),
                 'geom_type': mujoco.mjtGeom.mjGEOM_ELLIPSOID,
-                'geom_size': np.array([wheel_radius, wheel_radius, wheel_width]),
+                'geom_size': np.array([wheel_radius, wheel_radius, wheel_width/2]),
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
@@ -279,10 +279,10 @@ class GenerateModel():
                 'damping': wheel_damping,
             },
             'rear_wheel': {
-                'body_pos': np.array([-shin_length / 2, wheel_width / 2, 0]) + wheel_offset,
+                'body_pos': np.array([-shin_length / 2, wheel_width / 2 + shin_width/2, 0]) + wheel_offset,
                 'body_quat': np.array([1, 0, 0, 0]),
                 'geom_type': mujoco.mjtGeom.mjGEOM_ELLIPSOID,
-                'geom_size': np.array([wheel_radius, wheel_radius, wheel_width]),
+                'geom_size': np.array([wheel_radius, wheel_radius, wheel_width/2]),
                 'geom_pos': np.array([0, 0, 0]),
                 'geom_quat': np.array([1, 1, 0, 0]),
                 'mass': wheel_mass,
@@ -439,14 +439,14 @@ class GenerateModel():
         ground = self.spec.add_texture(type = mujoco.mjtTexture.mjTEXTURE_2D,
                               name="ground_texture",
                               builtin=mujoco.mjtBuiltin.mjBUILTIN_CHECKER, 
-                              width=300, 
-                              height=300, 
+                              width=200, 
+                              height=200, 
                               rgb1=[0.5, 0.8, 0.9], 
                               rgb2=[0.5, 0.9, 0.8],
                               markrgb=[0.8, 0.8, 0.8])
         
         self.spec.add_material(name="groundplane",
-                              texrepeat=[5, 5],
+                              texrepeat=[2, 2],
                               reflectance=0., 
                               ).textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = 'ground_texture'
         
