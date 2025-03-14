@@ -203,7 +203,7 @@ class JoystickController:
             self.d_down = self.js.get_hat(0)[1]
             self.d_left = self.js.get_hat(0)[0]
             self.d_right = self.js.get_hat(0)[0]
-
+            
         elif(self.controller_type == "logitech2"):
             self.left_stick_lr = self.js.get_axis(0)
             self.left_stick_ud = self.js.get_axis(1)

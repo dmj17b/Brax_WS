@@ -23,6 +23,8 @@ walter.gen_scene()
 # Add some obstacles:
 walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
 
+
+
 # Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)

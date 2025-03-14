@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 import numpy as np
 import mujoco
+import scipy
 
 
 class GenerateModel():
@@ -15,6 +16,8 @@ class GenerateModel():
     ) -> None:
         # Build model using Mujoco Spec:
         spec = mujoco.MjSpec()
+
+        color = np.array([177/255, 166/255, 136/255, 1])
 
         # Parse Configs:
         model_config = yaml.safe_load(Path(model_config_path).read_text())
@@ -110,6 +113,7 @@ class GenerateModel():
                 torso_length / 2, torso_width / 2, torso_height / 2,
             ],
             mass=torso_mass,
+            rgba = color,
         )
 
         # Torso Kinematic Chain:
@@ -176,7 +180,7 @@ class GenerateModel():
                     body_name = f'torso_{side}_{child}'
                     joint_name = f'{parent}_{side}_{child}_joint'
                 geom_name = f'{body_name}_geom'
-                parent_body = spec.find_body(parent_name)
+                parent_body = spec.worldbody.find_child(parent_name)
                 body = parent_body.add_body(
                     name=body_name,
                     pos=mirror * torso_children_params[child]['body_pos'],
@@ -199,6 +203,7 @@ class GenerateModel():
                         mass=torso_children_params[child]['mass'],
                         friction = wheel_friction,
                         solref = wheel_solref,
+                        rgba = color,
                     )
                 else:
                     body.add_geom(
@@ -208,6 +213,7 @@ class GenerateModel():
                         pos=mirror * torso_children_params[child]['geom_pos'],
                         quat=torso_children_params[child]['geom_quat'],
                         mass=torso_children_params[child]['mass'],
+                        rgba = color,
                     )
 
 
@@ -237,6 +243,7 @@ class GenerateModel():
             pos=[0, 0, 0],
             quat=[1, 0, 0, 0],
             mass=head_mass,
+            rgba = color,
         )
 
         # Head Kinematic Chain:
@@ -303,7 +310,7 @@ class GenerateModel():
                     body_name = f'head_{side}_{child}'
                     joint_name = f'{parent}_{side}_{child}_joint'
                 geom_name = f'{body_name}_geom'
-                parent_body = spec.find_body(parent_name)
+                parent_body = spec.worldbody.find_child(parent_name)
                 body = parent_body.add_body(
                     name=body_name,
                     pos=mirror * head_children_params[child]['body_pos'],
@@ -326,6 +333,7 @@ class GenerateModel():
                         mass=head_children_params[child]['mass'],
                         friction = wheel_friction,
                         solref = wheel_solref,
+                        rgba = color,
                     )
                 else:
                     body.add_geom(
@@ -335,6 +343,7 @@ class GenerateModel():
                         pos=mirror * head_children_params[child]['geom_pos'],
                         quat=head_children_params[child]['geom_quat'],
                         mass=head_children_params[child]['mass'],
+                        rgba = color,
                     )
 
 # Adding Actuators:
@@ -434,6 +443,7 @@ class GenerateModel():
         self.spec = spec
 
 
+
     def gen_scene(self):
         # Create ground plane texture/material
         ground = self.spec.add_texture(type = mujoco.mjtTexture.mjTEXTURE_2D,
@@ -476,9 +486,59 @@ class GenerateModel():
                 )
         
 
+
     def add_box(self, pos:list, size:list):
         self.spec.worldbody.add_body(pos=pos).add_geom(type=mujoco.mjtGeom.mjGEOM_BOX, size=size)
 
+    def randomize_test_scene(self,rng):
+        # Min/Max random values:
+        xi_max = 1.25
+        yi_max = 1.25
+        ledge_height_min = 0.25
+        ledge_height_max = 0.8
+        min_heading = -np.pi/2
+        max_heading = np.pi/2
+        max_knee_vel = 0.05
+        max_wheel_vel = 0.1
+        
+        # Random initial position and heading: 
+        xi = rng.uniform(-1,1)*xi_max
+        yi = rng.uniform(-1,1)*yi_max
+        heading_i = rng.uniform(min_heading, max_heading)
+
+
+        # Random ledge height:
+        ledge_height = rng.uniform(ledge_height_min,ledge_height_max)
+        self.add_box([0,0, ledge_height/2], [xi_max*1.5, yi_max*1.5, ledge_height/2])
+        self.spec.bodies[1].pos = [xi, yi, ledge_height+0.4]        
+        self.spec.bodies[1].quat = [np.cos(heading_i/2), 0, 0, np.sin(heading_i/2)]
+        # Random initial joint positions:
+        
+    def randomize_pose(self,rng,m,d):
+        # Min/max joint positions to randomize:
+        hip_min = np.pi/6
+        hip_max = np.pi/2
+        knee_min = -np.pi/2
+        knee_max = np.pi/2
+
+        # Hip positions:
+        rand_hip_splay = rng.uniform(hip_min, hip_max)
+        d.jnt('head_left_thigh_joint').qpos[0] = -rand_hip_splay
+        d.jnt('head_right_thigh_joint').qpos[0] = -rand_hip_splay
+        d.jnt('torso_left_thigh_joint').qpos[0] = rand_hip_splay
+        d.jnt('torso_right_thigh_joint').qpos[0] = rand_hip_splay
+
+        # Knee positions: 
+        rand_left_knees = rng.uniform(knee_min, knee_max)
+        rand_right_knees = rng.uniform(knee_min, knee_max)
+        d.jnt('head_left_thigh_shin_joint').qpos[0] = rng.uniform(knee_min, knee_max)
+        d.jnt('torso_left_thigh_shin_joint').qpos[0] = rng.uniform(knee_min, knee_max)
+        d.jnt('head_right_thigh_shin_joint').qpos[0] = rng.uniform(knee_min, knee_max)
+        d.jnt('torso_right_thigh_shin_joint').qpos[0] = rng.uniform(knee_min, knee_max)
+
+
+
+        return d
 
     def add_stairs(self, pos: list = [2,0,0], rise: float = 0.1, run: float = 0.1, width: float=1.2, num_steps: int=5):
         for i in range(num_steps):
@@ -494,7 +554,7 @@ def main(argv=None):
 
     xml_path = os.path.join(
         os.path.dirname(__file__),
-        "autogen.xml",
+        "WaLTER.xml",
     )
 
     with open(xml_path, "w") as f:
