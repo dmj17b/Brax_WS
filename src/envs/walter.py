@@ -68,7 +68,7 @@ class Walter(PipelineEnv):
         self.num_observations = 40
 
 
-    def reset(self, rng: PRNGKey) -> State:
+    def reset(self, rng: jax.PRNGKey) -> State:
         # Generate new rng keys:
         key, cmd_key, q_key, qd_key = jax.random.split(rng, 4)
 

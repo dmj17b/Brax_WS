@@ -59,6 +59,8 @@ class GenerateModel():
         wheel_solref = np.asarray(model_config['wheel_params']['solref'])
 
         motor_config = yaml.safe_load(Path(motor_config_path).read_text())
+        if(motor_config['waist_params']['range'][0] == 0):
+            print ('waist jnt off')
 
         waist_spring_stiffness = motor_config['waist_params']['spring_stiffness']
         waist_damping = motor_config['waist_params']['damping']

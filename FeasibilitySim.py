@@ -10,8 +10,8 @@ import AutoSim
 
 
 # Call AutoSim to generate the new robot spec:
-model_config_path = 'model_config.yaml'
-motor_config_path = 'motor_config.yaml'
+model_config_path = 'model_configs/WS_Scale/model_config.yaml'
+motor_config_path = 'model_configs/WS_Scale/motor_config.yaml'
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
 # Generate the new robot spec:
