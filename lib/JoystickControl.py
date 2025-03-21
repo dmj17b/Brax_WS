@@ -89,10 +89,10 @@ class JoystickController:
             self.fl_hip_des_pos = -np.pi/2
             self.br_hip_des_pos = np.pi/2
             self.bl_hip_des_pos = np.pi/2
-            self.fr_knee_des_pos = 0#self.nearest_pi(self.fr_knee_pos)
-            self.fl_knee_des_pos = 0#self.nearest_pi(self.fl_knee_pos)
-            self.br_knee_des_pos = 0#self.nearest_pi(self.br_knee_pos)
-            self.bl_knee_des_pos = 0#self.nearest_pi(self.bl_knee_pos)
+            self.fr_knee_des_pos = self.nearest_pi(self.fr_knee_pos)
+            self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
+            self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
+            self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
             print(self.fr_knee_pos)
         elif(self.y_button):
             print("Y button pressed")

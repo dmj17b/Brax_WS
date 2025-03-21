@@ -10,7 +10,7 @@ head_params:
   width: 0.25
   height: 0.2
   mass: 15
-  offset: [0.05, 0, 0]
+  offset: [0.0254, 0, 0]  
 
 thigh_params: 
   length: 0.2
