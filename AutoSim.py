@@ -548,7 +548,25 @@ class GenerateModel():
                 pos=[pos[0]+i*run, pos[1], pos[2] + i*rise],
                 size=[run, width, rise],
             )
-
+            
+    def add_payload(self, mass: float = 32.0, body_loc: list = [0,0,0.2], size = [0.1, 0.1, 0.1]):
+        payload = self.spec.bodies[1].add_body(
+            name='payload',
+            pos=body_loc,
+            quat=[1, 0, 0, 0],
+        )
+        payload.add_geom(
+            type = mujoco.mjtGeom.mjGEOM_BOX,
+            size = size,
+            mass = mass
+        )
+    def add_log(self, d: float = 0.3, length: float = 5.0, pos: list = [0,-3,0.15]):
+        self.spec.worldbody.add_geom(
+            type = mujoco.mjtGeom.mjGEOM_CAPSULE,
+            size = [d/2, length/2, d],
+            pos = pos,
+            quat = [1, 0, 1, 0],
+        )
 def main(argv=None):
     model_config_path = 'model_config.yaml'
     motor_config_path = 'motor_config.yaml'
