@@ -53,6 +53,7 @@ class JoystickController:
         self.d_right = 0
 
         self.hip_splay = 0
+        self.dt = m.opt.timestep
 
 
     # Function that controls the wheels
@@ -114,8 +115,9 @@ class JoystickController:
 
     def update_hip_splay(self):
         self.hip_splay = 0.001*self.d_up
-        self.fr_hip_des_pos -= self.hip_splay
-        self.fl_hip_des_pos -= self.hip_splay
+        self.front_splay = -0.001*self.left_bumper
+        self.fr_hip_des_pos -= self.hip_splay + self.front_splay
+        self.fl_hip_des_pos -= self.hip_splay + self.front_splay
         self.br_hip_des_pos += self.hip_splay
         self.bl_hip_des_pos += self.hip_splay
 
@@ -222,6 +224,8 @@ class JoystickController:
             self.d_down = self.js.get_hat(0)[1]
             self.d_left = self.js.get_hat(0)[0]
             self.d_right = self.js.get_hat(0)[0]
+            self.left_bumper = self.js.get_button(4)
+            self.right_bumper = self.js.get_button(5)
 
         elif(self.controller_type == "ps4"):
             self.left_stick_lr = self.js.get_axis(0)
@@ -280,9 +284,13 @@ class JoystickController:
         print("X Button:", self.x_button)
         print("Y Button:", self.y_button)
 
-        print("Left Bumper:", self.left_bumper)
-        print("Right Bumper:", self.right_bumper)
-
+        # print("Left Bumper:", self.left_bumper)
+        # print("Right Bumper:", self.right_bumper)
+        print("Index 1: ", self.js.get_button(1))
+        print("Index 2: ", self.js.get_button(2))
+        print("Index 3: ", self.js.get_button(3))
+        
+        
         print("Index 4: ", self.js.get_button(4))
         print("Index 5: ", self.js.get_button(5))
         print("Index 6: ", self.js.get_button(6))
@@ -290,8 +298,8 @@ class JoystickController:
         print("Index 8: ", self.js.get_button(8))
         print("Index 9: ", self.js.get_button(9))
         print("Index 10: ", self.js.get_button(10))
-        print("Index 11: ", self.js.get_button(11))
-        print("Index 12: ", self.js.get_button(12))
-        print("Index 13: ", self.js.get_button(13))
-        print("Index 14: ", self.js.get_button(14))
+        # print("Index 11: ", self.js.get_button(11))
+        # print("Index 12: ", self.js.get_button(12))
+        # print("Index 13: ", self.js.get_button(13))
+        # print("Index 14: ", self.js.get_button(14))
 

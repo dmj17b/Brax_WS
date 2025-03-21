@@ -236,7 +236,8 @@ class GenerateModel():
             name='head_joint',
             pos=joint_position,
             axis=[1, 0, 0],
-            springdamper = [waist_spring_stiffness, waist_damping],
+            stiffness = waist_spring_stiffness,
+            damping = waist_damping,
             range = waist_range,
         )
         head_body.add_geom(
@@ -564,9 +565,20 @@ class GenerateModel():
         self.spec.worldbody.add_geom(
             type = mujoco.mjtGeom.mjGEOM_CAPSULE,
             size = [d/2, length/2, d],
-            pos = pos,
+            pos = [pos[0], pos[1], d/2],
             quat = [1, 0, 1, 0],
         )
+        
+    def add_incline(self, angle_deg: float = 30, length: float = 5.0, pos: list = [0,3,2], width: float = 2):
+        angle_rad = np.deg2rad(angle_deg)
+        height = length/2*np.sin(angle_rad)
+        self.spec.worldbody.add_geom(
+            type = mujoco.mjtGeom.mjGEOM_BOX,
+            size = [length/2, width, 0.1],
+            pos = [pos[0], pos[1], height-0.1],
+            quat = [ 0, np.cos(angle_rad/2), 0, np.sin(angle_rad/2)],
+        )
+        
 def main(argv=None):
     model_config_path = 'model_config.yaml'
     motor_config_path = 'motor_config.yaml'
