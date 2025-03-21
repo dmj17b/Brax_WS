@@ -22,7 +22,7 @@ motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 walter = AutoSim.GenerateModel(model_config_path=model_config_path, motor_config_path=motor_config_path)
 
 #Add payload to walter body
-walter.add_payload(body_loc = [0,0,0.2],size = [0.2, 0.1, 0.1])
+walter.add_payload(mass = 32,body_loc = [0,0,0.2],size = [0.2, 0.1, 0.1])
 
 # Generate the scene around the robot (groundplane and sky)
 walter.gen_scene()
