@@ -22,8 +22,8 @@ class MotorModel:
     self.limited_torque = 0
     self.target_vel = 0
     self.tau_max = 0
-    self.torques = []
-    self.omegas = []
+    self.torques = np.array([])
+    self.omegas = np.array([])
     self.target_positions = []
     self.positions = []
     self.velocities = []
@@ -93,19 +93,44 @@ class MotorModel:
 
 
   def log_data(self):
-    self.torques.append(float(abs(self.limited_torque)))
-    self.omegas.append(float(abs(self.d.jnt(self.motor_name).qvel[0])*self.gear_ratio))
-    self.target_positions.append(self.target_pos)
-    self.positions.append(self.d.jnt(self.motor_name).qpos[0])
-    self.velocities.append(self.d.jnt(self.motor_name).qvel[0]*self.gear_ratio)
+    self.torques = np.append(self.torques,float(abs(self.limited_torque)))
+    self.omegas = np.append(self.omegas,float(abs(self.d.jnt(self.motor_name).qvel[0])*self.gear_ratio))
 
-  def plot_speed_torque_curve(self):
+
+  def plot_data_input(self):
     w_range = np.linspace(0, self.w_no_load, 1000)
     T_line = -self.t_stall/self.w_no_load*w_range + self.t_stall
-    plt.title(f"{self.motor_name} Speed Torque Curve")
+    plt.title(f"{self.motor_name} Input Shaft Speed Torque Curve")
     plt.plot(self.omegas, self.torques, 'b*')
     plt.plot(w_range, T_line, 'r--')
     plt.xlabel('Angular Velocity (rad/s)')
+    plt.ylabel('Torque (Nm)')
+    plt.plot(w_range, T_line, 'r--')
+    plt.show()
+    
+  def plot_data_output(self):
+    w_range = np.linspace(0, self.w_no_load/self.gear_ratio, 1000)
+    stall_torque = self.t_stall*self.gear_ratio
+    T_line = -stall_torque/(self.w_no_load/self.gear_ratio)*w_range + stall_torque
+    # T_line = -self.t_stall*self.gear_ratio/(self.w_no_load)*w_range + (self.t_stall*self.gear_ratio)
+    plt.title(f"{self.motor_name} Input Shaft Speed Torque Curve")
+    plt.plot(self.omegas/self.gear_ratio, self.torques*self.gear_ratio, 'b*')
+    plt.plot(w_range, T_line, 'r--')
+    plt.xlabel('Angular Velocity (rad/s)')
+    plt.ylabel('Torque (Nm)')
+    plt.plot(w_range, T_line, 'r--')
+    plt.show()
+    
+  def plot_data_output_rpms(self):
+    rad_to_rpm = 9.5493
+    w_range = np.linspace(0, self.w_no_load*rad_to_rpm/self.gear_ratio, 1000)
+    stall_torque = self.t_stall*self.gear_ratio
+    T_line = -stall_torque/(self.w_no_load*rad_to_rpm/self.gear_ratio)*w_range + stall_torque
+    # T_line = -self.t_stall*self.gear_ratio/(self.w_no_load)*w_range + (self.t_stall*self.gear_ratio)
+    plt.title(f"{self.motor_name} Input Shaft Speed Torque Curve")
+    plt.plot(self.omegas*rad_to_rpm/self.gear_ratio, self.torques*self.gear_ratio, 'b*')
+    plt.plot(w_range, T_line, 'r--')
+    plt.xlabel('Angular Velocity (rpm)')
     plt.ylabel('Torque (Nm)')
     plt.plot(w_range, T_line, 'r--')
     plt.show()

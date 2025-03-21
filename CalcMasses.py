@@ -23,6 +23,7 @@ def CalcMasses(total_mass):
     print("Wheel mass: ", wheel)
     
     check_sum = body+head+n_legs*(thigh+shin)+n_wheels*wheel
+    print(check_sum)
 
     return masses
 
@@ -32,7 +33,7 @@ def CalcTotal(masses):
     return check_sum
 
 def main():
-    total_mass = 75
+    total_mass = 90
     print("Total mass: ", total_mass)
     CalcMasses(total_mass)
     masses = {
