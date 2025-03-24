@@ -28,8 +28,13 @@ walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
 walter.gen_scene()
 
 # Add some obstacles:
+# walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
+# walter.add_log(d=0.3,length = 2)
 walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
-walter.add_log(d=0.3,length = 2)
+walter.add_log(d=0.4,length = 2)
+walter.add_incline(angle_deg=40, pos = [3, 5, 0], width = 1.5, length = 4 )
+walter.add_box(pos = [5.5, 5, 2.5], size = [1, 2, 0.1])
+walter.add_incline(angle_deg=-40, pos = [8, 5, 0], width = 1.5, length = 4 )
 # Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)
@@ -60,7 +65,7 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 # Initialize joystick controller
-controller = js_ctrl.JoystickController("logitech2", m, d, motors)
+controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:

@@ -198,6 +198,8 @@ class JoystickController:
             self.b_button = self.js.get_button(1)
             self.x_button = self.js.get_button(2)
             self.y_button = self.js.get_button(3)
+            self.left_bumper = self.js.get_button(4)
+            self.right_bumper = self.js.get_button(5)
             self.start_button = self.js.get_button(7)
             self.back_button = self.js.get_button(6)
             self.home_button = self.js.get_button(8)

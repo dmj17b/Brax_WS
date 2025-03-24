@@ -571,7 +571,7 @@ class GenerateModel():
         
     def add_incline(self, angle_deg: float = 30, length: float = 5.0, pos: list = [0,3,2], width: float = 2):
         angle_rad = np.deg2rad(angle_deg)
-        height = length/2*np.sin(angle_rad)
+        height = length/2*np.sin(abs(angle_rad))
         self.spec.worldbody.add_geom(
             type = mujoco.mjtGeom.mjGEOM_BOX,
             size = [length/2, width, 0.1],
