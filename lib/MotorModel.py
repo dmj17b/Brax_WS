@@ -9,6 +9,7 @@ class MotorModel:
   def __init__(self, m: mujoco.MjModel, d: mujoco.MjData, motor_name: str, motor_params: dict, ctrl_index: int):
     self.m = m
     self.d = d
+    self.motor_params = motor_params
     self.motor_name = motor_name
     self.Kp = motor_params['Kp']
     self.Kd = motor_params['Kd']
@@ -122,6 +123,14 @@ class MotorModel:
     plt.show()
     
   def plot_data_output_rpms(self):
+    rads_to_rpm = 9.5493
+    self.rated_speed = self.motor_params['rated_speed']*rads_to_rpm/self.gear_ratio
+    self.rated_torque = self.motor_params['rated_torque']*self.gear_ratio
+
+    #Plot lines for rated continuous speed/torque:
+    plt.axhline(y=self.rated_torque, color='g', linestyle='--')
+    plt.axvline(x=self.rated_speed, color='g', linestyle='--')
+    # plt.text(self.rated_speed*1.1, self.rated_torque*0.9, 'Rated Speed/Torque', color='g')
     rad_to_rpm = 9.5493
     w_range = np.linspace(0, self.w_no_load*rad_to_rpm/self.gear_ratio, 1000)
     stall_torque = self.t_stall*self.gear_ratio

@@ -28,8 +28,7 @@ walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
 walter.gen_scene()
 
 # Add some obstacles:
-# walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
-# walter.add_log(d=0.3,length = 2)
+
 walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
 walter.add_log(d=0.4,length = 2)
 walter.add_incline(angle_deg=40, pos = [3, 5, 0], width = 1.5, length = 4 )
@@ -81,7 +80,6 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
 
         # Log motor data to plot later:
-
         br_wheel1_joint.log_data() 
         br_knee.log_data()
         br_hip.log_data()

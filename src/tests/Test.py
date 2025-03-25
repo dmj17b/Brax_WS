@@ -15,7 +15,7 @@ import AutoSim
 
 # Call AutoSim to generate the new robot spec:
 model_config_path = os.getcwd() + '/model_configs/Test/model_config.yaml'
-motor_config_path = os.getcwd() + '/model_configs/Test/motor_config.yaml'
+motor_config_path = os.getcwd() + '/motor_configs/myactuator.yaml'
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
 # Generate the new robot spec:
@@ -79,6 +79,10 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         controller.control(m,d)
         # controller.print_all_joystick_states()
 
+        vel = d.qvel[0:2]
+        abs_vel = np.linalg.norm(vel)
+        print("Velocity: ", abs_vel)
+
 
         # Log motor data to plot later:
 
@@ -95,6 +99,6 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
 
-# br_wheel1_joint.plot_data_output_rpms()
-# br_knee.plot_data_output_rpms()
-# br_hip.plot_data_output_rpms()
+br_knee.plot_data_output_rpms()
+br_hip.plot_data_output_rpms()
+br_wheel1_joint.plot_data_output_rpms()
