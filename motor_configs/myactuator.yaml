@@ -1,7 +1,7 @@
 waist_params:
   spring_stiffness: 0.1
   damping: 1
-  range: [-50, 50]
+  range: [-30, 30]
 
 # MyActuator RMD-X12-P20-320
 # REMINDER: ALL SPEEDS IN RAD/S ON MOTOR SIDE 

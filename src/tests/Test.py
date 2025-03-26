@@ -15,7 +15,7 @@ import AutoSim
 
 # Call AutoSim to generate the new robot spec:
 model_config_path = os.getcwd() + '/model_configs/Test/model_config.yaml'
-motor_config_path = os.getcwd() + '/motor_configs/myactuator.yaml'
+motor_config_path = os.getcwd() + '/motor_configs/frameless.yaml'
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
 # Generate the new robot spec:

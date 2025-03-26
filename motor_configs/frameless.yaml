@@ -6,10 +6,10 @@ waist_params:
 hip_params:
   Kp: 20
   Kd: 10
-  rated_torque: 5
+  rated_torque: 0.675
   stall_torque: 1.8
-  rated_speed: 210
-  no_load_speed: 8000
+  rated_speed: 366
+  no_load_speed: 840
   gear_ratio: 160
   rotor_inertia: 0.0002
   damping: 2
@@ -17,10 +17,10 @@ hip_params:
 knee_params:
   Kp: 20
   Kd: 10
-  rated_torque: 5
+  rated_torque: 0.9
   stall_torque: 1.8
-  rated_speed: 210
-  no_load_speed: 8000
+  rated_speed: 366
+  no_load_speed: 840
   gear_ratio: 120
   rotor_inertia: 0.0002
   damping: 2
@@ -30,8 +30,8 @@ wheel_params:
   Kd: 0
   rated_torque: 1.2
   stall_torque: 1.8
-  rated_speed: 2000
-  no_load_speed: 8000
+  rated_speed: 587
+  no_load_speed: 840
   gear_ratio: 30
   rotor_inertia: 0.0002
   damping: 2
