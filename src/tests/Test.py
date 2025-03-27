@@ -14,6 +14,8 @@ import AutoSim
 import threading
 import time
 import multiprocessing as mp
+import matplotlib
+import matplotlib.pyplot as plt
 
 
 # Call AutoSim to generate the new robot spec:
@@ -69,27 +71,49 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 # Initialize joystick controller
 controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
-# Create logging thread:
-def plot_motor_data(motors_to_plot):
+
+# Select motors to plot (you can modify this list as needed)
+motors_to_plot = [br_wheel1_joint, br_knee, br_hip]
+
+plt.style.use('_mp1-gallery')
+# Create and start the plotting thread
+def log_motor_data(motors_to_plot):
+    for motor_obj in motors_to_plot:
+        motor_obj.log_data()
+
+# Create and start the logging thread
+def create_motor_subplots(motors_to_plot):
+    n_motors = len(motors_to_plot)
+    if (n_motors%2 == 0) and (n_motors > 2):
+        # If there are an even number of motors, plot them in 2 columns
+        nrows = int(n_motors/2)
+        ncols = 2
+    else:
+        nrows = n_motors
+        ncols = 1
+    fig,axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10, 5*nrows))
+    return fig, axes
+
+
+def plot_motor_data_thread(motors_to_plot, fig, axes):
     """
     Thread function to plot motor data for specified motors
     
     :param motors_to_plot: List of motor objects to plot
     """
-    while not stop_event.is_set():
-        for motor_obj in motors_to_plot:
-            motor_obj.plot_data_output_rpms()
-        time.sleep(1)  # Adjust sleep time as needed
+    plt.ion()
+    n_motors = len(motors_to_plot)
+    m1 = motors_to_plot[0]
+    axes[0].scatter(time.time(), m1.torques[-1], label=m1.motor_name, color='blue')
+    plt.show()
 
-# Create a stop event for the plotting thread
-stop_event = threading.Event()
 
-# Select motors to plot (you can modify this list as needed)
-motors_to_plot = [br_wheel1_joint, br_knee, br_hip]
-
-# Create and start the plotting thread
-plotting_thread = threading.Thread(target=plot_motor_data, args=(motors_to_plot,), daemon=True)
-plotting_thread.start()
+fig, axes = create_motor_subplots(motors_to_plot)
+log_motor_data(motors_to_plot)
+thread1 = threading.Thread(target=plot_motor_data_thread, args=(motors_to_plot, fig, axes))
+thread2 = threading.Thread(target=log_motor_data, args=(motors_to_plot,))
+thread1.start()
+thread2.start()
 
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
@@ -102,20 +126,15 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
         # Call joystick controller:
         controller.control(m,d)
-        # controller.print_all_joystick_states()
 
         vel = d.qvel[0:2]
         abs_vel = np.linalg.norm(vel)
-        print("Velocity: ", abs_vel)
 
 
         # Log motor data to plot later:
 
-        br_wheel1_joint.log_data()
-        # br_wheel1_joint.plot_data_output_rpms() 
-        # br_knee.log_data()
-        # br_hip.log_data()
-
+        log_motor_data(motors_to_plot)
+        # plot_motor_data_thread(motors_to_plot, fig, axes)
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
         
@@ -125,6 +144,5 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
 
-br_knee.plot_data_output_rpms()
-br_hip.plot_data_output_rpms()
-br_wheel1_joint.plot_data_output_rpms()
+
+# br_wheel1_joint.plot_data_output_rpms()
