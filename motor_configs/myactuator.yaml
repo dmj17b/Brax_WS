@@ -35,7 +35,7 @@ wheel_params:
   Kp: 0.5
   Kd: 0
   rated_torque: 2.15
-  stall_torque: 5.5
+  stall_torque: 3
   rated_speed: 265
   no_load_speed: 330
   gear_ratio: 20

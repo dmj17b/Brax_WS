@@ -20,7 +20,7 @@ class JoystickController:
 
         # User control variables:
         self.joystick_deadzone = 0.2
-        self.max_wheel_vel = 50
+        self.max_wheel_vel = 500
         self.max_knee_vel = 0.008
 
         # Desired setpoints

@@ -11,6 +11,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 import AutoSim
+import threading
+import time
+import multiprocessing as mp
 
 
 # Call AutoSim to generate the new robot spec:
@@ -66,6 +69,28 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 # Initialize joystick controller
 controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
+# Create logging thread:
+def plot_motor_data(motors_to_plot):
+    """
+    Thread function to plot motor data for specified motors
+    
+    :param motors_to_plot: List of motor objects to plot
+    """
+    while not stop_event.is_set():
+        for motor_obj in motors_to_plot:
+            motor_obj.plot_data_output_rpms()
+        time.sleep(1)  # Adjust sleep time as needed
+
+# Create a stop event for the plotting thread
+stop_event = threading.Event()
+
+# Select motors to plot (you can modify this list as needed)
+motors_to_plot = [br_wheel1_joint, br_knee, br_hip]
+
+# Create and start the plotting thread
+plotting_thread = threading.Thread(target=plot_motor_data, args=(motors_to_plot,), daemon=True)
+plotting_thread.start()
+
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
     start = time.time()
@@ -86,9 +111,10 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
         # Log motor data to plot later:
 
-        br_wheel1_joint.log_data() 
-        br_knee.log_data()
-        br_hip.log_data()
+        br_wheel1_joint.log_data()
+        # br_wheel1_joint.plot_data_output_rpms() 
+        # br_knee.log_data()
+        # br_hip.log_data()
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
