@@ -16,6 +16,7 @@ import time
 import multiprocessing as mp
 import matplotlib
 import matplotlib.pyplot as plt
+import zmq
 
 
 # Call AutoSim to generate the new robot spec:
@@ -73,10 +74,22 @@ controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 
 # Select motors to plot (you can modify this list as needed)
+global motors_to_plot
 motors_to_plot = [br_wheel1_joint, br_knee, br_hip]
 
-# Create and start the plotting thread
+# Create and start the plotting socket
+context = zmq.Context()
+socket = context.socket(zmq.PUB)
+socket.bind("tcp://*:5555")
 
+def gen_motor_data(socket, **kwargs):
+    kwargs['mjdata'] = d
+    data_to_send = {
+            'time': d.time,
+            'motor1_torque': motors_to_plot[0].torques[-1],
+        }
+    socket.send_pyobj(data_to_send)
+    # time.sleep(0.1)  # Adjust the sleep time as needed
 
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
@@ -93,11 +106,15 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         vel = d.qvel[0:2]
         abs_vel = np.linalg.norm(vel)
 
+        # Save desired motor data:
+        motors_to_plot = motor.log_motor_data(motors_to_plot)
 
-        # Log motor data to plot later:
+        # Send motor data to socket:
+        gen_motor_data(socket, mjdata=d)
 
-        motor.log_motor_data(motors_to_plot)
-        # plot_motor_data_thread(motors_to_plot, fig, axes)
+
+
+
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
         
@@ -107,5 +124,5 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
 
-motor.plot_motor_data_output(motors_to_plot)
+# motor.plot_motor_data_output(motors_to_plot)
 # br_wheel1_joint.plot_data_output_rpms()

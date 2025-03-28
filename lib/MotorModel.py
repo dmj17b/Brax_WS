@@ -28,6 +28,7 @@ class MotorModel:
     self.target_positions = []
     self.positions = []
     self.velocities = []
+    self.time = np.array([])
 
   def debug(self):
     # print(f"Motor name: {self.motor_name}")
@@ -94,6 +95,7 @@ class MotorModel:
 
 
   def log_data(self):
+    self.time = np.append(self.time, self.d.time)
     self.torques = np.append(self.torques,float(abs(self.limited_torque)))
     self.omegas = np.append(self.omegas,float(abs(self.d.jnt(self.motor_name).qvel[0])*self.gear_ratio))
 
@@ -151,3 +153,38 @@ class MotorModel:
     plt.xlabel('Time Step')
     plt.ylabel('Position (rad)')
     plt.show()
+
+def plot_motor_data_output(motors_to_plot):
+  """
+  Plot motor data for specified motors
+  :param motors_to_plot: List of motor objects to plot
+  """
+  plt.ion()
+  n_motors = len(motors_to_plot)
+  if n_motors == 1:
+    nrows = 1
+    ncols = 1
+  elif n_motors == 2:
+    nrows = 1
+    ncols = 2
+  else:
+    nrows = n_motors
+    ncols = 1
+  fig,axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(8,2*nrows))
+  fig.tight_layout()
+  plt.ion()
+  i = 0
+  for i in range(n_motors):
+    motor = motors_to_plot[i]
+    axes[i].set_title(f"{motor.motor_name} Input Shaft Speed Torque Curve")
+    axes[i].scatter(motor.omegas, motor.torques)
+    axes[i].set_xlabel('Angular Velocity (rad/s)')
+    axes[i].set_ylabel('Torque (Nm)')
+
+  fig.subplots_adjust(hspace=1,)
+  plt.show(block=True)
+
+def log_motor_data(motors_to_plot):
+    for motor_obj in motors_to_plot:
+        motor_obj.log_data()
+    return motors_to_plot
