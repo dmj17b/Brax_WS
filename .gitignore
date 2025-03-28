@@ -1,3 +1,4 @@
 env
 visualization
 .venv
+__pycache__
