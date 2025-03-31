@@ -15,7 +15,7 @@ class ScatterPlotApp(QWidget):
         self.socket.setsockopt_string(zmq.SUBSCRIBE, "")
         self.timer = pg.QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
-        self.timer.start(100)
+        self.timer.start(1)
 
 
     def initUI(self):
@@ -24,7 +24,8 @@ class ScatterPlotApp(QWidget):
 
         self.plot_widget = pg.PlotWidget()
         self.scatter_plot = pg.ScatterPlotItem()
-        # Set the y
+        # Set the y limit
+        self.scatter_plot.yRange = 1.0
         self.plot_widget.addItem(self.scatter_plot)
 
         layout = QVBoxLayout(self)
@@ -41,7 +42,7 @@ class ScatterPlotApp(QWidget):
         time = np.array([data_dict['time']])
         motor1_torque = np.array([data_dict['motor1_torque']])
         self.plot_data(time, motor1_torque)
-        print(f"Received data: Time={time}, Motor1 Torque={motor1_torque}")
+        # print(f"Received data: Time={time}, Motor1 Torque={motor1_torque}")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

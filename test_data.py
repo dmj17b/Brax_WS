@@ -20,33 +20,41 @@ import zmq
 
 """ Test Script for sending fake motor data to a ZeroMQ socket for plotting."""
 
-# Create and start the plotting socket
-context = zmq.Context()
-socket = context.socket(zmq.PUB)
-socket.bind("tcp://*:5555")
+class DataSender():
+    def __init__(self):
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.PUB)
+        self.socket.bind("tcp://*:5555")
 
-def gen_motor_data(socket,start):
-    t = time.time()-start
-    data_to_send = {
-            'time': t,
-            'motor1_torque': np.sin(t*10),
-        }
-    socket.send_pyobj(data_to_send)
-    time.sleep(0.002)  # Adjust the sleep time as needed
+        self.log_interval = 0.1
+        self.last_log_time = 0
+
+    def send_data(self, sim_time):
+        print(sim_time)
+        if(sim_time-self.last_log_time>=self.log_interval):
+            self.data_to_send = {
+                'time': sim_time,
+                'motor1_torque': np.sin(sim_time*10)
+            }
+            self.socket.send_pyobj(self.data_to_send)
+            self.last_log_time = sim_time
+            # print("Logged data")
 
 
 def main():
+    logger = DataSender()
     print("Starting the ZeroMQ data sender...")
     start = time.time()
+    logger.last_log_time = time.time()-start
     while True:
         try:
             # This loop will run indefinitely until interrupted
-            gen_motor_data(socket,start)
+            sim_time = time.time()-start
+            logger.send_data(sim_time)
 
-        
         except KeyboardInterrupt:
             print("Keyboard interrupt")
-            socket.close()
+            logger.socket.close()
 
 
 if __name__ == '__main__':
