@@ -3,6 +3,7 @@ import pyqtgraph as pg
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout
 import zmq
 import numpy as np
+import time
 
 class SpeedTorquePlotter(QWidget):
     def __init__(self, num_motors):
@@ -14,13 +15,13 @@ class SpeedTorquePlotter(QWidget):
         self.socket.setsockopt_string(zmq.SUBSCRIBE, "")
         self.timer = pg.QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
-        self.timer.start(1)
+        self.timer.start(0)
         self.num_motors = num_motors
         
         # Store historical data
         self.historical_data = [{'time': [], 'torque': []} for _ in range(self.num_motors)]
         # Maximum number of points to keep (to prevent memory issues)
-        self.max_points = 1000  # Adjust this based on your needs
+        self.max_points = 100  # Adjust this based on your needs
         
         self.initUI()
 
@@ -50,8 +51,12 @@ class SpeedTorquePlotter(QWidget):
         self.show()
 
     def update_plot(self):
+        # If no data is received, return
+        if self.socket.poll(0) == 0:
+            return
+
         data_dict = self.get_data()
-        time = data_dict['time']
+        t = data_dict['time']
         
         for i in range(self.num_motors):
             motor_key = f'motor{i+1}_torque'
@@ -59,7 +64,7 @@ class SpeedTorquePlotter(QWidget):
                 motor_torque = data_dict[motor_key]
                 
                 # Append new data to historical data
-                self.historical_data[i]['time'].append(time)
+                self.historical_data[i]['time'].append(t)
                 self.historical_data[i]['torque'].append(motor_torque)
                 
                 # Limit the number of points to prevent memory issues
@@ -79,5 +84,5 @@ class SpeedTorquePlotter(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    scatter_app = SpeedTorquePlotter(num_motors=5)
+    scatter_app = SpeedTorquePlotter(num_motors=3)
     sys.exit(app.exec())

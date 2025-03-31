@@ -26,24 +26,25 @@ class DataSender():
         self.socket = self.context.socket(zmq.PUB)
         self.socket.bind("tcp://*:5555")
 
-        self.log_interval = 0.1
+        self.log_interval = 0.05
         self.last_log_time = 0
 
     def send_data(self, sim_time):
-        print(sim_time)
         if(sim_time-self.last_log_time>=self.log_interval):
             self.data_to_send = {
                 'time': sim_time,
-                'motor1_torque': np.sin(sim_time*10)
+                'motor1_torque': np.sin(sim_time*2),
+                'motor2_torque': np.cos(sim_time*5),
+                'motor3_torque': np.cos(sim_time*10),
             }
+            print(sim_time)
             self.socket.send_pyobj(self.data_to_send)
             self.last_log_time = sim_time
-            # print("Logged data")
 
 
 def main():
     logger = DataSender()
-    print("Starting the ZeroMQ data sender...")
+    print("Starting the data sender...")
     start = time.time()
     logger.last_log_time = time.time()-start
     while True:
