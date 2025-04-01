@@ -11,12 +11,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 import AutoSim
-import threading
-import time
-import multiprocessing as mp
-import matplotlib
 import matplotlib.pyplot as plt
 import zmq
+import lib.Sender as sender
 
 
 # Call AutoSim to generate the new robot spec:
@@ -77,23 +74,14 @@ controller = js_ctrl.JoystickController("logitech", m, d, motors)
 global motors_to_plot
 motors_to_plot = [br_wheel1_joint, br_knee, br_hip]
 
-# Create and start the plotting socket
-context = zmq.Context()
-socket = context.socket(zmq.PUB)
-socket.bind("tcp://*:5555")
+logger = sender.DataSender()
 
-def gen_motor_data(socket, **kwargs):
-    kwargs['mjdata'] = d
-    data_to_send = {
-            'time': d.time,
-            'motor1_torque': motors_to_plot[0].torques[-1],
-        }
-    socket.send_pyobj(data_to_send)
-    # time.sleep(0.1)  # Adjust the sleep time as needed
+
 
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
     start = time.time()
+    logger.last_log_time = d.time
     while viewer.is_running():
         step_start = time.time()
 
@@ -109,14 +97,23 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         # Save desired motor data:
         motors_to_plot = motor.log_motor_data(motors_to_plot)
 
-        # Send motor data to socket:
-        gen_motor_data(socket, mjdata=d)
-
-
+        # Put together data struct for plotter:
+        data = {
+            'time': d.time,
+            'motor1_torque': motors_to_plot[0].torques[-1],
+            'motor1_speed': motors_to_plot[0].omegas[-1],
+            'motor2_torque': motors_to_plot[1].torques[-1],
+            'motor2_speed': motors_to_plot[1].omegas[-1],
+            'motor3_torque': motors_to_plot[2].torques[-1],
+            'motor3_speed': motors_to_plot[2].omegas[-1],
+        }
 
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
+
+        # Send data to the plotter
+        logger.send_data(d.time, data)
         
 
         # Rudimentary time keeping, will drift relative to wall clock.

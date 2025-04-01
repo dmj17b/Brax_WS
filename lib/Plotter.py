@@ -6,7 +6,7 @@ import numpy as np
 import time
 
 class SpeedTorquePlotter(QWidget):
-    def __init__(self, num_motors):
+    def __init__(self, num_motors, **kwargs):
         super().__init__()
         # Set up ZeroMQ context and socket
         self.context = zmq.Context()
@@ -19,15 +19,21 @@ class SpeedTorquePlotter(QWidget):
         self.num_motors = num_motors
         
         # Store historical data
-        self.historical_data = [{'time': [], 'torque': []} for _ in range(self.num_motors)]
+        self.historical_data = [{'time': [], 'torque': [], 'speed': []} for _ in range(self.num_motors)]
         # Maximum number of points to keep (to prevent memory issues)
         self.max_points = 100  # Adjust this based on your needs
+
+        if 'names' in kwargs:
+            self.names = kwargs['names']
+        else:
+            self.names = [f'Motor {i+1}' for i in range(num_motors)]
         
         self.initUI()
 
+
     def initUI(self):
         self.setWindowTitle("PyQt Scatter Plot with History")
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 400, 1000)
 
         # Initializing plot widgets and plots
         self.plot_widgets = []
@@ -42,7 +48,6 @@ class SpeedTorquePlotter(QWidget):
             
             # Use PlotDataItem instead of ScatterPlotItem for better performance with many points
             plot = plot_widget.plot(pen=None, symbol='o', symbolSize=5, symbolBrush='r')
-            
             self.plot_widgets.append(plot_widget)
             self.plots.append(plot)
             layout.addWidget(plot_widget)
@@ -57,24 +62,30 @@ class SpeedTorquePlotter(QWidget):
 
         data_dict = self.get_data()
         t = data_dict['time']
+        print(t)
         
         for i in range(self.num_motors):
             motor_key = f'motor{i+1}_torque'
+            motor_speed_key = f'motor{i+1}_speed'
             if motor_key in data_dict:
                 motor_torque = data_dict[motor_key]
+
+                if motor_speed_key in data_dict:
+                    motor_speed = data_dict[motor_speed_key]
                 
                 # Append new data to historical data
                 self.historical_data[i]['time'].append(t)
+                self.historical_data[i]['speed'].append(motor_speed)
                 self.historical_data[i]['torque'].append(motor_torque)
                 
                 # Limit the number of points to prevent memory issues
-                if len(self.historical_data[i]['time']) > self.max_points:
-                    self.historical_data[i]['time'] = self.historical_data[i]['time'][-self.max_points:]
+                if len(self.historical_data[i]['speed']) > self.max_points:
+                    self.historical_data[i]['speed'] = self.historical_data[i]['speed'][-self.max_points:]
                     self.historical_data[i]['torque'] = self.historical_data[i]['torque'][-self.max_points:]
                 
                 # Update the plot with all historical data
                 self.plots[i].setData(
-                    x=self.historical_data[i]['time'], 
+                    x=self.historical_data[i]['speed'], 
                     y=self.historical_data[i]['torque']
                 )
 
@@ -84,5 +95,5 @@ class SpeedTorquePlotter(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    scatter_app = SpeedTorquePlotter(num_motors=3)
+    scatter_app = SpeedTorquePlotter(num_motors=3, names = ['BR Hip', 'BR Knee', 'BR Wheel'])
     sys.exit(app.exec())

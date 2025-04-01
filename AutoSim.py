@@ -6,6 +6,7 @@ import yaml
 import numpy as np
 import mujoco
 import scipy
+import sys
 
 
 class GenerateModel():
@@ -490,8 +491,15 @@ class GenerateModel():
         
 
 
-    def add_box(self, pos:list, size:list):
-        self.spec.worldbody.add_body(pos=pos).add_geom(type=mujoco.mjtGeom.mjGEOM_BOX, size=size)
+    def add_box(self, pos:list, size:list, **kwargs):
+        if 'name' in kwargs:
+            name = kwargs['name']
+        else:
+            name = 'box'
+        self.spec.worldbody.add_body(pos=pos,
+                                     name=name).add_geom(
+            type=mujoco.mjtGeom.mjGEOM_BOX,
+            size=size)
 
     def randomize_test_scene(self,rng):
         # Min/Max random values:
@@ -543,12 +551,7 @@ class GenerateModel():
 
         return d
 
-    def add_stairs(self, pos: list = [2,0,0], rise: float = 0.1, run: float = 0.1, width: float=1.2, num_steps: int=5):
-        for i in range(num_steps):
-            self.add_box(
-                pos=[pos[0]+i*run, pos[1], pos[2] + i*rise],
-                size=[run, width, rise],
-            )
+
             
     def add_payload(self, mass: float = 32.0, body_loc: list = [0,0,0.2], size = [0.1, 0.1, 0.1]):
         payload = self.spec.bodies[1].add_body(
@@ -578,15 +581,26 @@ class GenerateModel():
             pos = [pos[0], pos[1], height-0.1],
             quat = [ 0, np.cos(angle_rad/2), 0, np.sin(angle_rad/2)],
         )
+
+    def add_stairs(self, pos: list = [2, 0, 0], rise: float = 0.1, run: float = 0.1, width: float = 1.2, num_steps: int = 5):
+            print("Adding stairs...")  # Debug statement
+            for i in range(num_steps):
+                step_name = f"stair_step_{i}"
+                self.add_box(
+                    name=step_name,
+                    pos=[pos[0] + i * run, pos[1], pos[2] + i * rise],
+                    size=[run / 2, width / 2, rise / 2],
+                )
         
 def main(argv=None):
-    model_config_path = 'model_config.yaml'
-    motor_config_path = 'motor_config.yaml'
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir,)))
+    model_config_path = 'model_configs/WS_Scale/model_config.yaml'
+    motor_config_path = 'model_configs/WS_Scale/motor_config.yaml'
     model_class = GenerateModel(model_config_path, motor_config_path)
 
     xml_path = os.path.join(
         os.path.dirname(__file__),
-        "WaLTER.xml",
+        "WaLTER_Senior.xml",
     )
 
     with open(xml_path, "w") as f:

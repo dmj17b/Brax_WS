@@ -95,9 +95,14 @@ class MotorModel:
 
 
   def log_data(self):
-    self.time = np.append(self.time, self.d.time)
     self.torques = np.append(self.torques,float(abs(self.limited_torque)))
     self.omegas = np.append(self.omegas,float(abs(self.d.jnt(self.motor_name).qvel[0])*self.gear_ratio))
+
+  def log_data_output(self):
+    rads_to_rpm = 9.5493
+    speed_rpm = abs(self.d.jnt(self.motor_name).qvel[0])*rads_to_rpm
+    self.torques = np.append(self.torques,float(abs(self.limited_torque)*self.gear_ratio))
+    self.omegas = np.append(self.omegas,float(speed_rpm))
 
 
   def plot_data_input(self):
