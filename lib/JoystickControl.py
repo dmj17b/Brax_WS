@@ -20,8 +20,8 @@ class JoystickController:
 
         # User control variables:
         self.joystick_deadzone = 0.2
-        self.max_wheel_vel = 500
-        self.max_knee_vel = 0.008
+        self.max_wheel_vel = 100
+        self.max_knee_vel = 0.01
 
         # Desired setpoints
         self.fr_knee_des_pos = 0
@@ -75,7 +75,6 @@ class JoystickController:
     # Function that handles button inputs
     def button_controls(self):
         if(self.a_button):
-            print("A button pressed")
             self.fr_hip_des_pos = 0
             self.fl_hip_des_pos = 0
             self.br_hip_des_pos = 0
@@ -85,7 +84,6 @@ class JoystickController:
             self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
             self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
         elif(self.b_button):
-            print("B button pressed")
             self.fr_hip_des_pos = -np.pi/2
             self.fl_hip_des_pos = -np.pi/2
             self.br_hip_des_pos = np.pi/2
@@ -96,13 +94,11 @@ class JoystickController:
             self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
             print(self.fr_knee_pos)
         elif(self.y_button):
-            print("Y button pressed")
             self.fr_hip_des_pos = -np.pi/3
             self.fl_hip_des_pos = -np.pi/3
             self.br_hip_des_pos = np.pi/3
             self.bl_hip_des_pos = np.pi/3
         elif(self.x_button):
-            print("X button pressed")
             self.fr_hip_des_pos = -np.pi/12
             self.fl_hip_des_pos = -np.pi/12
             self.br_hip_des_pos = np.pi/12
@@ -154,6 +150,8 @@ class JoystickController:
 
         # Finally send the commands to the motors
         self.send_commands()
+
+        return m,d
 
 
     # Function that sends the commands to the motors

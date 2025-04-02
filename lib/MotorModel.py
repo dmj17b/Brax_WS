@@ -193,3 +193,8 @@ def log_motor_data(motors_to_plot):
     for motor_obj in motors_to_plot:
         motor_obj.log_data()
     return motors_to_plot
+
+def log_motor_data_output(motors_to_plot):
+    for motor_obj in motors_to_plot:
+        motor_obj.log_data_output()
+    return motors_to_plot

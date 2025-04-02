@@ -18,7 +18,14 @@ import lib.Sender as sender
 
 # Call AutoSim to generate the new robot spec:
 model_config_path = os.getcwd() + '/model_configs/Test/model_config.yaml'
-motor_config_path = os.getcwd() + '/motor_configs/frameless.yaml'
+
+# Load frameless motor options:
+# motor_config_path = os.getcwd() + '/motor_configs/frameless.yaml'
+
+#
+motor_config_path = os.getcwd() + '/motor_configs/myactuator.yaml'
+
+
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
 # Generate the new robot spec:
@@ -72,7 +79,7 @@ controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 # Select motors to plot (you can modify this list as needed)
 global motors_to_plot
-motors_to_plot = [br_wheel1_joint, br_knee, br_hip]
+motors_to_plot = [br_hip, br_knee, br_wheel1_joint]
 
 logger = sender.DataSender()
 
@@ -81,25 +88,30 @@ logger = sender.DataSender()
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
     start = time.time()
-    logger.last_log_time = d.time
+    logger.last_log_time = time.time() - start
+
     while viewer.is_running():
         step_start = time.time()
+        sim_time = time.time() - start
 
         # Step the simulation forward
         mujoco.mj_step(m, d)
 
         # Call joystick controller:
-        controller.control(m,d)
+        m,d = controller.control(m,d)
 
         vel = d.qvel[0:2]
         abs_vel = np.linalg.norm(vel)
+        vel_kph = abs_vel * 3.6
+        print(f"Velocity: {vel_kph:.2f} km/h")
 
         # Save desired motor data:
-        motors_to_plot = motor.log_motor_data(motors_to_plot)
+        motors_to_plot = motor.log_motor_data_output(motors_to_plot)
 
         # Put together data struct for plotter:
         data = {
-            'time': d.time,
+            'time': time.time()-start,
+            # 'motor1_data': abs_vel
             'motor1_torque': motors_to_plot[0].torques[-1],
             'motor1_speed': motors_to_plot[0].omegas[-1],
             'motor2_torque': motors_to_plot[1].torques[-1],
@@ -113,7 +125,7 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         viewer.sync()
 
         # Send data to the plotter
-        logger.send_data(d.time, data)
+        logger.send_data(sim_time, data)
         
 
         # Rudimentary time keeping, will drift relative to wall clock.

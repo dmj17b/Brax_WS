@@ -25,13 +25,26 @@ knee_params:
   rotor_inertia: 0.0002
   damping: 2
 
+# Option 1:
+# wheel_params:
+#   Kp: 1.5
+#   Kd: 0
+#   rated_torque: 1.2
+#   stall_torque: 1.8
+#   rated_speed: 587
+#   no_load_speed: 840
+#   gear_ratio: 30
+#   rotor_inertia: 0.0002
+#   damping: 2
+
+# Option 2:
 wheel_params:
-  Kp: 1.5
+  Kp: 0.25
   Kd: 0
-  rated_torque: 1.2
-  stall_torque: 1.8
-  rated_speed: 587
+  rated_torque: 4.41
+  stall_torque: 14.5
+  rated_speed: 315
   no_load_speed: 840
-  gear_ratio: 30
-  rotor_inertia: 0.0002
+  gear_ratio: 10
+  rotor_inertia: 0.002
   damping: 2
