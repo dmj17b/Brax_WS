@@ -46,9 +46,13 @@ Now all the required dependencies should be installed and you can run the progra
 
 To run the simulation, first make sure you are in the Brax_WS directory, your Python virtual environment is activated, and the gamepad is plugged into the computer. Then you can run:
 
+```python Simulation.py```
+
+-or-
+
 ```python src/tests/27_Test.py```
 
-Most of the main test scripts will be in this folder, however the 2.7 Scale model is what we have been using for all of our actuator selection simulations.
+Most of the main test scripts will be in the src/tests folder but I have copied the 2.7 Scale test script into "Simulation.py" for ease of access. The 2.7 Scale model (with payload) is what we have been using for all motor selection simulation experiments.
 
 This should open a MuJoCo window where you can pan, zoom, and orbit with your mouse. It also allows you to adjust other visual aspects of the simulator. From here, you can pilot the robot according to the prescribed joystick policy.
 ![](/Docs/window.png)
@@ -58,7 +62,13 @@ The script "AutoSim.py" is used to automatically generate a MuJoCo XML model fil
 - 'model_config.yaml' contains fixed model properties like masses, link lengths, and wheel friction.
 - 'motor_config.yaml' contains information about the robot's joints and actuators that drive them. This includes actuator specs like stall torque and no-load-speed, as well as the gains used for control of each actuator.
 
-AutoSim.py will take in any two model/motor configuration file as long as the .yaml dictionary is defined in the same way. For example, in model_configs, we have a few different folders with pre-assigned model parameters for a WaLTER Sr, 2.5, and 2.7 scale model. These folders contain both the model and motor parameter files. The motor parameters included in these files are just extra
+AutoSim.py will take in any two model/motor configuration file as long as the .yaml dictionary is defined in the same way. For example, in model_configs, we have a few different folders with pre-assigned model parameters for a WaLTER Sr, 2.5, and 2.7 scale model. These folders contain both the model and motor parameter files. These files are here for quick access to change in the simulation. At the top of each script, you should see something like:
+
+  ```model_config_path = 'model_configs/2_7_Scale/model_config.yaml' ```
+
+  ```motor_config_path = 'motor_configs/myactuator.yaml' ```
+
+These are the paths to each configuration file. For this example, we have selected the 2.7 scale model (lengths and masses) and the model will use the "MyActuator" motor parameters to limit motor torques.
 
 If you need to add additional parameters that aren't considered in the yaml file, but are available to model in MuJoCo, you can add them directly to AutoSim.py.
 

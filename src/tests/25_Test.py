@@ -15,23 +15,25 @@ import AutoSim
 
 # Call AutoSim to generate the new robot spec:
 model_config_path = 'model_configs/2_5_Scale/model_config.yaml'
-motor_config_path = 'model_configs/2_5_Scale/motor_config.yaml'
+motor_config_path = 'motor_configs/myactuator.yaml'
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
 # Generate the new robot spec:
 walter = AutoSim.GenerateModel(model_config_path=model_config_path, motor_config_path=motor_config_path)
 
 #Add payload to walter body
-walter.add_payload(body_loc = [0,0,0.2],size = [0.2, 0.1, 0.1])
+walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
 
 # Generate the scene around the robot (groundplane and sky)
 walter.gen_scene()
 
 # Add some obstacles:
+
 walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
-
-
-
+walter.add_log(d=0.4,length = 2)
+walter.add_incline(angle_deg=40, pos = [3, 5, 0], width = 1.5, length = 4 )
+walter.add_box(pos = [5.5, 5, 2.5], size = [1, 2, 0.1])
+walter.add_incline(angle_deg=-40, pos = [8, 5, 0], width = 1.5, length = 4 )
 # Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)
@@ -62,11 +64,10 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 # Initialize joystick controller
-controller = js_ctrl.JoystickController("logitech2", m, d, motors)
+controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
-
     start = time.time()
     while viewer.is_running():
         step_start = time.time()
@@ -79,13 +80,13 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
 
         # Log motor data to plot later:
-
-        br_wheel1_joint.log_data()
+        br_wheel1_joint.log_data() 
         br_knee.log_data()
         br_hip.log_data()
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
+        
 
         # Rudimentary time keeping, will drift relative to wall clock.
         time_until_next_step = m.opt.timestep - (time.time() - step_start)

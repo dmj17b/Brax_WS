@@ -16,6 +16,8 @@ import AutoSim
 # Call AutoSim to generate the new robot spec:
 model_config_path = 'model_configs/2_7_Scale/model_config.yaml'
 motor_config_path = 'motor_configs/myactuator.yaml'
+
+# Load motor params for later access
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
 # Generate the new robot spec:
