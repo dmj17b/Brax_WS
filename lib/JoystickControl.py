@@ -92,7 +92,6 @@ class JoystickController:
             self.fl_knee_des_pos = self.nearest_pi(self.fl_knee_pos)
             self.br_knee_des_pos = self.nearest_pi(self.br_knee_pos)
             self.bl_knee_des_pos = self.nearest_pi(self.bl_knee_pos)
-            print(self.fr_knee_pos)
         elif(self.y_button):
             self.fr_hip_des_pos = -np.pi/3
             self.fl_hip_des_pos = -np.pi/3
