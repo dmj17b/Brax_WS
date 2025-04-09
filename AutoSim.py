@@ -496,10 +496,16 @@ class GenerateModel():
             name = kwargs['name']
         else:
             name = 'box'
+        if 'rotation' in kwargs:
+            rotation = kwargs['rotation']
+        else:
+            rotation = [0, 0, 0]
         self.spec.worldbody.add_body(pos=pos,
-                                     name=name).add_geom(
+                                     name=name,
+                                     euler = rotation).add_geom(
             type=mujoco.mjtGeom.mjGEOM_BOX,
-            size=size)
+            size=size,
+            )
 
     def randomize_test_scene(self,rng):
         # Min/Max random values:
@@ -582,8 +588,8 @@ class GenerateModel():
             quat = [ 0, np.cos(angle_rad/2), 0, np.sin(angle_rad/2)],
         )
 
-    def add_stairs(self, pos: list = [2, 0, 0], rise: float = 0.1, run: float = 0.1, width: float = 1.2, num_steps: int = 5):
-            print("Adding stairs...")  # Debug statement
+    def add_stairs(self, pos: list = [2, 0, 0], rise: float = 0.1, run: float = 0.1, width: float = 2.0, num_steps: int = 5):
+            pos[2] += rise / 2
             for i in range(num_steps):
                 step_name = f"stair_step_{i}"
                 self.add_box(
@@ -600,7 +606,7 @@ def main(argv=None):
 
     xml_path = os.path.join(
         os.path.dirname(__file__),
-        "WaLTER_Senior.xml",
+        "WaLTER_Model.xml",
     )
 
     with open(xml_path, "w") as f:

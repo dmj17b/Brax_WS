@@ -413,7 +413,7 @@ if __name__ == '__main__':
     # scatter_app.add_continuous_operation_region(continuous_torque=1.2, continuous_speed=3500, motor_index=2, gear_ratio=30)  # BR Wheel
 
     # Frameless wheel option 2 (new)
-    scatter_app.add_speed_torque_line(stall_torque=14.5, no_load_speed=8000, motor_index=2, gear_ratio=10)  # BR Wheel
-    scatter_app.add_continuous_operation_region(continuous_torque=4.41, continuous_speed=3000, motor_index=2, gear_ratio=10)  # BR Wheel    
+    scatter_app.add_speed_torque_line(stall_torque=14.5, no_load_speed=3100, motor_index=2, gear_ratio=8)  # BR Wheel
+    scatter_app.add_continuous_operation_region(continuous_torque=4.41, continuous_speed=3000, motor_index=2, gear_ratio=8)  # BR Wheel    
 
     sys.exit(app.exec())

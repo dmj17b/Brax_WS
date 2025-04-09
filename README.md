@@ -12,7 +12,7 @@ For example, you may want the package to be stored in your 'Documents' folder or
 
 Once in the desired directory, clone the repository using the following commands:
 
-``` git clone git@github.com:dmj17b/Brax_WS.git```
+``` git clone https://github.com/dmj17b/Brax_WS.git```
 
 Now that the repository is cloned, navigate into the folder "Brax_WS" that was just created.
 
@@ -46,15 +46,21 @@ Now all the required dependencies should be installed and you can run the progra
 
 To run the simulation, first make sure you are in the Brax_WS directory, your Python virtual environment is activated, and the gamepad is plugged into the computer. Then you can run:
 
-```python FeasibilitySim.py```
+```python src/tests/27_Test.py```
+
+Most of the main test scripts will be in this folder, however the 2.7 Scale model is what we have been using for all of our actuator selection simulations.
 
 This should open a MuJoCo window where you can pan, zoom, and orbit with your mouse. It also allows you to adjust other visual aspects of the simulator. From here, you can pilot the robot according to the prescribed joystick policy.
 ![](/Docs/window.png)
 
 ## Adjusting Model Parameters:
-Model parameters like sizes, masses, and frictions can be edited in "model_config.yaml"
+The script "AutoSim.py" is used to automatically generate a MuJoCo XML model file for the robot based on a number of different parameters contained within two different .yaml files.
+- 'model_config.yaml' contains fixed model properties like masses, link lengths, and wheel friction.
+- 'motor_config.yaml' contains information about the robot's joints and actuators that drive them. This includes actuator specs like stall torque and no-load-speed, as well as the gains used for control of each actuator.
 
-The programatic model generation occurs in "AutoSim.py". If you need to add additional parameters that aren't considered in the yaml file, this is where you would do so. 
+AutoSim.py will take in any two model/motor configuration file as long as the .yaml dictionary is defined in the same way. For example, in model_configs, we have a few different folders with pre-assigned model parameters for a WaLTER Sr, 2.5, and 2.7 scale model. These folders contain both the model and motor parameter files. The motor parameters included in these files are just extra
+
+If you need to add additional parameters that aren't considered in the yaml file, but are available to model in MuJoCo, you can add them directly to AutoSim.py.
 
 To help understand how the model is generated, it is important to know that everything builds off of the rear body segment, which will be referred to as the "torso." The torso is aligned with its length along the x-axis, width along the y-axis, and height along the z-axis.
 
@@ -143,6 +149,7 @@ or
 All three of these control schemes can be used (although gains may need to be adjusted when switching between position and velocity control) without any additional modification to the control script. The motor names are already defined in the script.
 
 Alternatively, you can directly send joint torques and further manipulate simulation data in the mjData object, d. To learn more, visit [MuJoCo Programming Reference: mjData](https://mujoco.readthedocs.io/en/stable/APIreference/APItypes.html#mjdata). This data structure holds all simulation information and can be used to extract most simulated values of interest (positions, velocities, joint torques, etc.) It is important to note, however, that if you 'go around' the existing motor model by directly manipulating mjData, the actuators will not have any defined limits. Actuator limitations are currently implemented soley in lib/MotorModel.py
+
 
 ## Troubleshooting
 ><ins>**Problem:**</ins> Unable to interact with or scale UI window. No minimize/expand/close buttons on the window. Using Ubuntu.
