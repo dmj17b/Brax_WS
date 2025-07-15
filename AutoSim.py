@@ -196,6 +196,13 @@ class GenerateModel():
                     armature = torso_children_params[child]['armature'],
                     damping = torso_children_params[child]['damping'],
                 )
+                body.add_site(
+                    name=f'{body_name}_site',
+                    pos=[0, 0, 0],
+                    type=mujoco.mjtGeom.mjGEOM_SPHERE,
+                    rgba=[1, 0, 0, 1],
+                    size=[0.01, 0.01, 0.01],
+                )
                 if(child == 'front_wheel' or child == 'rear_wheel'):
                     body.add_geom(
                         name=geom_name,
@@ -218,6 +225,7 @@ class GenerateModel():
                         mass=torso_children_params[child]['mass'],
                         rgba = color,
                     )
+                    
 
 
         # Add Head to Torso:
@@ -350,6 +358,7 @@ class GenerateModel():
                         rgba = color,
                     )
 
+
 # Adding Actuators:
         # Back left leg
         spec.add_actuator(
@@ -439,7 +448,20 @@ class GenerateModel():
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
 
-
+    # Add Sensors for structural analysis:
+        # Joint position sensor
+        spec.add_sensor(
+            name='bl_hip_pos',
+            type=mujoco.mjtSensor.mjSENS_JOINTPOS,
+            objname='torso_left_thigh_joint',
+        )
+        
+        # Joint velocity sensor
+        spec.add_sensor(
+            name='bl_hip_vel',
+            type=mujoco.mjtSensor.mjSENS_JOINTVEL,
+            objname='torso_left_thigh_joint',
+        )
 
         # Compile:
         self.mj_model = spec.compile()
