@@ -82,8 +82,11 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
 
         # Log motor data to plot later:
-        F = d.sensor('bl_hip_force')
-        print(F)
+        F_Hip = d.sensor('br_hip_force')
+        T_Hip = d.sensor('br_hip_torque')
+        F_Knee = d.sensor('br_knee_force')
+
+        print(f"Z Force at Hip: {F_Hip.data[2]}, Z Force at Knee: {F_Knee.data[2]}")
 
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.

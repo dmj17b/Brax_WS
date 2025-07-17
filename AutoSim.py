@@ -201,7 +201,7 @@ class GenerateModel():
                     pos=[0, 0, 0],
                     type=mujoco.mjtGeom.mjGEOM_SPHERE,
                     rgba=[1, 0, 0, 1],
-                    size=[0.01, 0.01, 0.01],
+                    size=[0.05, 0.05, 0.05],
                 )
                 if(child == 'front_wheel' or child == 'rear_wheel'):
                     body.add_geom(
@@ -448,19 +448,27 @@ class GenerateModel():
             trntype = mujoco.mjtTrn.mjTRN_JOINT,
         )
 
-    # Add Sensors for structural analysis:
-        # Joint position sensor
+    # Add Sensors:
         spec.add_sensor(
-            name='bl_hip_pos',
-            type=mujoco.mjtSensor.mjSENS_JOINTPOS,
-            objname='torso_left_thigh_joint',
+            name='br_hip_force',
+            type=mujoco.mjtSensor.mjSENS_FORCE,
+            objtype=mujoco.mjtObj.mjOBJ_SITE,
+            refname='torso_right_thigh',
+            objname='torso_right_thigh_site',
         )
-        
-        # Joint velocity sensor
         spec.add_sensor(
-            name='bl_hip_vel',
-            type=mujoco.mjtSensor.mjSENS_JOINTVEL,
-            objname='torso_left_thigh_joint',
+            name = 'br_hip_torque',
+            type = mujoco.mjtSensor.mjSENS_TORQUE,
+            objtype = mujoco.mjtObj.mjOBJ_SITE,
+            refname = 'torso_right_thigh',
+            objname = 'torso_right_thigh_site',
+        )
+        spec.add_sensor(
+            name='br_knee_force',
+            type=mujoco.mjtSensor.mjSENS_FORCE,
+            objtype=mujoco.mjtObj.mjOBJ_SITE,
+            refname='torso_right_shin',
+            objname='torso_right_shin_site',
         )
 
         # Compile:
@@ -508,7 +516,6 @@ class GenerateModel():
                     dir=[0, 0, -1],
                     diffuse=[0.1, 0.1, 0.1],
                     specular=[0., 0., 0.],
-                    directional=True,
                 )
         
 
