@@ -17,7 +17,7 @@ knee_params:
   Kd: 2
   stall_torque: 1.7
   no_load_speed: 5000
-  gear_ratio: 9.5
+  gear_ratio: 12
   rotor_inertia: 0.0002
   damping: 5
 

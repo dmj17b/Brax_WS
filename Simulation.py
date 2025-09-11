@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 import AutoSim
+import lib.Sender as sender
 
 
 # Call AutoSim to generate the new robot spec:
@@ -68,6 +69,9 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 # Initialize joystick controller
 controller = js_ctrl.JoystickController("logitech", m, d, motors)
 
+# Initialize data sender
+data_sender = sender.DataSender()
+
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
     start = time.time()
@@ -80,11 +84,24 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         # Call joystick controller:
         controller.control(m,d)
 
-
-        # Log motor data to plot later:
+        # Get sensor readings:
         F_Hip = d.sensor('br_hip_force')
         T_Hip = d.sensor('br_hip_torque')
         F_Knee = d.sensor('br_knee_force')
+        T_Knee = d.sensor('br_knee_torque')
+
+        # Send data to ZeroMQ socket for plotting
+        sim_time = d.time
+        data = {
+            'time': sim_time,
+            'F_Hip': F_Hip.data,
+            'T_Hip': T_Hip.data,
+            'F_Knee': F_Knee.data,
+            'T_Knee': T_Knee.data,
+        }
+        data_sender.send_data(sim_time, data)
+
+
 
         print(f"Z Force at Hip: {F_Hip.data[2]}, Z Force at Knee: {F_Knee.data[2]}")
 

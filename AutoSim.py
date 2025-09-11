@@ -334,6 +334,13 @@ class GenerateModel():
                     axis=[0, 1, 0],
                     armature = head_children_params[child]['armature'],
                     damping = head_children_params[child]['damping'],
+                )                
+                body.add_site(
+                    name=f'{body_name}_site',
+                    pos=[0, 0, 0],
+                    type=mujoco.mjtGeom.mjGEOM_SPHERE,
+                    rgba=[1, 0, 0, 1],
+                    size=[0.05, 0.05, 0.05],
                 )
                 if(child == 'front_wheel' or child == 'rear_wheel'):
                     body.add_geom(
@@ -469,6 +476,42 @@ class GenerateModel():
             objtype=mujoco.mjtObj.mjOBJ_SITE,
             refname='torso_right_shin',
             objname='torso_right_shin_site',
+        )
+        spec.add_sensor(
+            name = 'br_knee_torque',
+            type = mujoco.mjtSensor.mjSENS_TORQUE,
+            objtype = mujoco.mjtObj.mjOBJ_SITE,
+            refname = 'torso_right_shin',
+            objname = 'torso_right_shin_site',
+        )
+        spec.add_sensor(
+            name = 'fr_hip_force',
+            type = mujoco.mjtSensor.mjSENS_FORCE,
+            objtype = mujoco.mjtObj.mjOBJ_SITE,
+            refname = 'head_right_thigh',
+            objname = 'head_right_thigh_site',
+        )
+        spec.add_sensor(
+            name = 'fr_knee_force',
+            type = mujoco.mjtSensor.mjSENS_FORCE,
+            objtype = mujoco.mjtObj.mjOBJ_SITE,
+            refname = 'head_right_shin',
+            objname = 'head_right_shin_site',
+        )
+        spec.add_sensor(
+            name = 'fr_knee_torque',
+            type = mujoco.mjtSensor.mjSENS_TORQUE,
+            objtype = mujoco.mjtObj.mjOBJ_SITE,
+            refname = 'head_right_shin',
+            objname = 'head_right_shin_site',
+        )
+
+        spec.add_sensor(
+            name = 'fr_hip_torque',
+            type = mujoco.mjtSensor.mjSENS_TORQUE,
+            objtype = mujoco.mjtObj.mjOBJ_SITE,
+            refname = 'head_right_thigh',
+            objname = 'head_right_thigh_site',
         )
 
         # Compile:
