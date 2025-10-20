@@ -20,7 +20,7 @@ class JoystickController:
 
         # User control variables:
         self.joystick_deadzone = 0.2
-        self.max_wheel_vel = 100
+        self.max_wheel_vel = 20
         self.max_knee_vel = 0.01
 
         # Desired setpoints
@@ -155,6 +155,7 @@ class JoystickController:
 
     # Function that sends the commands to the motors
     def send_commands(self):
+
         self.motors[0].pos_control(self.fr_hip_des_pos)
         self.motors[1].pos_control(self.fl_hip_des_pos)
         self.motors[2].pos_control(self.br_hip_des_pos)

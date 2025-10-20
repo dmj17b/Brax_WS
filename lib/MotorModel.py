@@ -116,6 +116,7 @@ class MotorModel:
     plt.plot(w_range, T_line, 'r--')
     plt.show()
     
+
   def plot_data_output(self):
     w_range = np.linspace(0, self.w_no_load/self.gear_ratio, 1000)
     stall_torque = self.t_stall*self.gear_ratio

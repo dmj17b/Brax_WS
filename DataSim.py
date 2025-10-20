@@ -12,6 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 import AutoSim
+import pandas as pd
 
 
 # Call AutoSim to generate the new robot spec:
@@ -99,7 +100,7 @@ def get_wheel_contacts(m, d):
     
     return wheel_contacts
 
-# Get desired position and actual position of all motors for contact predictor
+# Get desired positions and velocities from joystick controller
 def get_motor_targets(controller):
     target_positions = []
     target_positions.append(controller.fr_hip_des_pos)
@@ -120,20 +121,18 @@ def get_motor_targets(controller):
     target_positions.append(controller.left_wheel_vel_des)
     return target_positions
 
+# Get actual motor positions/velocities from motor models
 def get_motor_positions(motors):
     actual_positions = []
-    actual_names = []
     for motor in motors:
         if "wheel" in motor.motor_name:
             q = motor.d.jnt(motor.motor_name).qvel
-            actual_names.append(motor.motor_name)
         else:
             q = motor.d.jnt(motor.motor_name).qpos
-            actual_names.append(motor.motor_name)
         actual_positions.append(float(q[0]))
-
     return actual_positions
 
+data_log = []
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
     start = time.time()
@@ -146,14 +145,32 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         # Call joystick controller:
         controller.control(m,d)
 
-        # Wheel contact debugging info
+        # Get info for contact predictor
         wheel_contacts = get_wheel_contacts(m, d)
-        # print(f"Wheel contacts: {wheel_contacts}")
         actual_positions = get_motor_positions(motors)
         target_positions = get_motor_targets(controller)
-        print(f"Target positions: {target_positions}")
-        print(f"Actual positions: {actual_positions}")
+
+        row_data = {}
+                # Add actual positions
+        for i, pos in enumerate(actual_positions):
+            row_data[f'actual_{i}'] = pos
         
+        # Add target positions
+        for i, pos in enumerate(target_positions):
+            row_data[f'target_{i}'] = pos
+        
+        # Add wheel contacts
+        for i, contact in enumerate(wheel_contacts):
+            row_data[f'wheel_contact_{i}'] = int(contact)
+        
+
+        
+        # Append to log
+        data_log.append(row_data)
+
+
+
+
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
         
@@ -163,3 +180,8 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
 
+            
+# After the simulation ends, save to CSV
+df = pd.DataFrame(data_log)
+df.to_csv('simulation_data.csv', index=False)
+print(f"Data saved to simulation_data.csv with {len(df)} rows")
