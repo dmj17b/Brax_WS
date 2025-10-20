@@ -11,11 +11,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 import AutoSim
+import lib.Sender as sender
 
 
 # Call AutoSim to generate the new robot spec:
-model_config_path = 'model_configs/2_7_Scale/model_config.yaml'
-motor_config_path = 'motor_configs/myactuator.yaml'
+model_config_path = 'model_configs/WS_Scale/model_config.yaml'
+motor_config_path = 'model_configs/WS_Scale/motor_config.yaml'
 
 # Load motor params for later access
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
@@ -24,7 +25,7 @@ motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 walter = AutoSim.GenerateModel(model_config_path=model_config_path, motor_config_path=motor_config_path)
 
 #Add payload to walter body
-walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
+# walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
 
 # Generate the scene around the robot (groundplane and sky)
 walter.gen_scene()
@@ -66,37 +67,11 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 # Initialize joystick controller
-controller = js_ctrl.JoystickController("logitech", m, d, motors)
+controller = js_ctrl.JoystickController("logitech2", m, d, motors)
 
-def get_wheel_contacts(m, d):
-    """
-    Returns a binary array indicating which wheels are in contact with any geometry.
-    
-    Returns:
-        numpy array with 1 if wheel is in contact, 0 otherwise
-    """
-    # Find all wheel geometries
-    wheel_geom_ids = []
-    for i in range(m.ngeom):
-        geom_name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, i)
-        if geom_name and 'wheel' in geom_name.lower():
-            wheel_geom_ids.append(i)
-    
-    # Initialize contact array
-    wheel_contacts = np.zeros(len(wheel_geom_ids), dtype=int)
-    
-    # Check all active contacts
-    for i in range(d.ncon):
-        contact = d.contact[i]
-        geom1 = contact.geom1
-        geom2 = contact.geom2
-        
-        # Check if either geometry in the contact pair is a wheel
-        for idx, wheel_id in enumerate(wheel_geom_ids):
-            if geom1 == wheel_id or geom2 == wheel_id:
-                wheel_contacts[idx] = 1
-    
-    return wheel_contacts
+# Initialize data sender
+data_sender = sender.DataSender()
+
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
     start = time.time()
@@ -109,9 +84,28 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         # Call joystick controller:
         controller.control(m,d)
 
-        # Wheel contact debugging info
-        wheel_contacts = get_wheel_contacts(m, d)
-        print(f"Wheel contacts: {wheel_contacts}")
+        # # Get sensor readings:
+        # F_Hip = d.sensor('br_hip_force')
+        # T_Hip = d.sensor('br_hip_torque')
+        # F_Knee = d.sensor('br_knee_force')
+        # T_Knee = d.sensor('br_knee_torque')
+
+        # # Send data to ZeroMQ socket for plotting
+        # sim_time = d.time
+        # data = {
+        #     'time': sim_time,
+        #     'F_Hip': F_Hip.data,
+        #     'T_Hip': T_Hip.data,
+        #     'F_Knee': F_Knee.data,
+        #     'T_Knee': T_Knee.data,
+        # }
+        # data_sender.send_data(sim_time, data)
+
+
+
+        # print(f"Z Force at Hip: {F_Hip.data[2]}, Z Force at Knee: {F_Knee.data[2]}")
+
+
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
         
@@ -121,3 +115,6 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
 
+# br_wheel1_joint.plot_data_output_rpms()
+# br_knee.plot_data_output_rpms()
+# br_hip.plot_data_output_rpms()
