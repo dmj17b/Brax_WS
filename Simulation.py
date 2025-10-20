@@ -1,4 +1,5 @@
 import time
+from tkinter.font import names
 import mujoco
 import mujoco.viewer
 import numpy as np
@@ -97,6 +98,42 @@ def get_wheel_contacts(m, d):
                 wheel_contacts[idx] = 1
     
     return wheel_contacts
+
+# Get desired position and actual position of all motors for contact predictor
+def get_motor_targets(controller):
+    target_positions = []
+    target_positions.append(controller.fr_hip_des_pos)
+    target_positions.append(controller.fl_hip_des_pos)
+    target_positions.append(controller.br_hip_des_pos)
+    target_positions.append(controller.bl_hip_des_pos)
+    target_positions.append(controller.fr_knee_des_pos)
+    target_positions.append(controller.fl_knee_des_pos)
+    target_positions.append(controller.br_knee_des_pos)
+    target_positions.append(controller.bl_knee_des_pos)
+    target_positions.append(controller.right_wheel_vel_des)
+    target_positions.append(controller.right_wheel_vel_des)
+    target_positions.append(controller.left_wheel_vel_des)
+    target_positions.append(controller.left_wheel_vel_des)
+    target_positions.append(controller.right_wheel_vel_des)
+    target_positions.append(controller.right_wheel_vel_des)
+    target_positions.append(controller.left_wheel_vel_des)
+    target_positions.append(controller.left_wheel_vel_des)
+    return target_positions
+
+def get_motor_positions(motors):
+    actual_positions = []
+    actual_names = []
+    for motor in motors:
+        if "wheel" in motor.motor_name:
+            q = motor.d.jnt(motor.motor_name).qvel
+            actual_names.append(motor.motor_name)
+        else:
+            q = motor.d.jnt(motor.motor_name).qpos
+            actual_names.append(motor.motor_name)
+        actual_positions.append(float(q[0]))
+
+    return actual_positions
+
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
     start = time.time()
@@ -111,7 +148,12 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
         # Wheel contact debugging info
         wheel_contacts = get_wheel_contacts(m, d)
-        print(f"Wheel contacts: {wheel_contacts}")
+        # print(f"Wheel contacts: {wheel_contacts}")
+        actual_positions = get_motor_positions(motors)
+        target_positions = get_motor_targets(controller)
+        print(f"Target positions: {target_positions}")
+        print(f"Actual positions: {actual_positions}")
+        
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
         
