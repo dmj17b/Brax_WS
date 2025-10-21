@@ -132,6 +132,19 @@ def get_motor_positions(motors):
         actual_positions.append(float(q[0]))
     return actual_positions
 
+# Get motor torques from motor models
+def get_motor_torques(motors):
+    torques = []
+    for motor in motors:
+        torques.append(float(motor.limited_torque))
+    return torques
+
+# Get body orientation (quaternion) for a given body name
+def get_body_orientation(d, body_name):
+    body_id = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, body_name)
+    quat = d.xquat[body_id]
+    return quat
+
 data_log = []
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
@@ -151,14 +164,29 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         target_positions = get_motor_targets(controller)
 
         row_data = {}
-                # Add actual positions
+        # Add actual positions
         for i, pos in enumerate(actual_positions):
             row_data[f'actual_{i}'] = pos
         
-        # Add target positions
-        for i, pos in enumerate(target_positions):
-            row_data[f'target_{i}'] = pos
-        
+        # Add motor torques
+        motor_torques = get_motor_torques(motors)
+        for i, torque in enumerate(motor_torques):
+            row_data[f'torque_{i}'] = torque
+
+        # Get torso orientation
+        torso_quat = get_body_orientation(d, 'torso')
+        row_data['torso_quat_w'] = torso_quat[0]
+        row_data['torso_quat_x'] = torso_quat[1]
+        row_data['torso_quat_y'] = torso_quat[2]
+        row_data['torso_quat_z'] = torso_quat[3]
+
+        # Get head orientation
+        head_quat = get_body_orientation(d, 'head')
+        row_data['head_quat_w'] = head_quat[0]
+        row_data['head_quat_x'] = head_quat[1]
+        row_data['head_quat_y'] = head_quat[2]
+        row_data['head_quat_z'] = head_quat[3]
+
         # Add wheel contacts
         for i, contact in enumerate(wheel_contacts):
             row_data[f'wheel_contact_{i}'] = int(contact)
