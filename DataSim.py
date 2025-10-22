@@ -17,7 +17,7 @@ import pandas as pd
 
 # Call AutoSim to generate the new robot spec:
 model_config_path = 'model_configs/2_7_Scale/model_config.yaml'
-motor_config_path = 'motor_configs/myactuator.yaml'
+motor_config_path = 'model_configs/2_7_Scale/motor_config.yaml'
 
 # Load motor params for later access
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
@@ -38,6 +38,7 @@ walter.add_log(d=0.4,length = 2)
 walter.add_incline(angle_deg=40, pos = [3, 5, 0], width = 1.5, length = 4 )
 walter.add_box(pos = [5.5, 5, 2.5], size = [1, 2, 0.1])
 walter.add_incline(angle_deg=-40, pos = [8, 5, 0], width = 1.5, length = 4 )
+walter.add_box(pos = [-2, -2, 0.05], size = [1, 1, 0.1], name = 'box2')
 # Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)
@@ -167,6 +168,7 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         # Add actual positions
         for i, pos in enumerate(actual_positions):
             row_data[f'actual_{i}'] = pos
+
         
         # Add motor torques
         motor_torques = get_motor_torques(motors)
@@ -190,6 +192,8 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         # Add wheel contacts
         for i, contact in enumerate(wheel_contacts):
             row_data[f'wheel_contact_{i}'] = int(contact)
+
+        print(wheel_contacts)
         
 
         
@@ -210,6 +214,6 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
             
 # After the simulation ends, save to CSV
-df = pd.DataFrame(data_log)
-df.to_csv('simulation_data.csv', index=False)
-print(f"Data saved to simulation_data.csv with {len(df)} rows")
+# df = pd.DataFrame(data_log)
+# df.to_csv('simulation_data.csv', index=False)
+# print(f"Data saved to simulation_data.csv with {len(df)} rows")

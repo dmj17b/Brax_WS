@@ -12,7 +12,7 @@ y = data[[col for col in data.columns if 'wheel_contact' in col]].values
 
 print(x.shape, y.shape)
 
-initializer = tf.keras.initializers.HeNormal()
+initializer = tf.keras.initializers.GlorotUniform()
 
 model = tf.keras.Sequential()
 
@@ -23,23 +23,40 @@ model.add(tf.keras.layers.InputLayer(input_shape=(x.shape[1],)))
 model.add(tf.keras.layers.Normalization(axis=-1))
 
 # Add hidden layers:
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer = initializer))
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer = initializer))
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer = initializer))
-model.add(tf.keras.layers.Dense(128, activation='relu', kernel_initializer = initializer))
-model.add(tf.keras.layers.Dense(64, activation='relu', kernel_initializer = initializer))
+model.add(tf.keras.layers.Dense(128,
+                                 activation='relu',
+                                  kernel_initializer=initializer,))
+model.add(tf.keras.layers.Dense(256,
+                                 activation='relu',
+                                  kernel_initializer=initializer,))
+model.add(tf.keras.layers.Dense(256,
+                                 activation='relu',
+                                  kernel_initializer=initializer,))
+model.add(tf.keras.layers.Dense(128,
+                                 activation='relu',
+                                  kernel_initializer=initializer,))
+
+model.add(tf.keras.layers.Dense(64,
+                                 activation='relu',
+                                  kernel_initializer=initializer,))
 
 # Add output layer with 8 outputs (one for each wheel contact):
-model.add(tf.keras.layers.Dense(y.shape[1], activation='sigmoid', kernel_initializer = initializer))
+model.add(tf.keras.layers.Dense(y.shape[1], activation='sigmoid', kernel_initializer=initializer))
 
 model.summary()
+
+# Callback to stop training if training accuracy does not improve for 20 consecutive epochs
+early_stopping = tf.keras.callbacks.EarlyStopping(monitor='accuracy', min_delta=0.005, patience=120, restore_best_weights=True)
+
+# Callback to reduce learning rate if training accuracy does not improve for 15 consecutive epochs
+reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='accuracy', min_delta=0.005, factor=0.8, patience=30, min_lr=1e-7, restore_best_weights=True)
 
 # Compile the model
 optimizer = tf.keras.optimizers.Adam()
 model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
 
-history = model.fit(x, y, epochs=10000, batch_size=1024)
+history = model.fit(x, y, epochs=5000, batch_size=1024, callbacks=[early_stopping, reduce_lr])
 
 model.save('contact_predictor_model.keras')
 
