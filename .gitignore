@@ -2,3 +2,5 @@ env
 visualization
 .venv
 __pycache__
+simulation_data.csv
+contact_predictor_model.keras
