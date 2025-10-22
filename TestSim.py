@@ -13,11 +13,13 @@ import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 import AutoSim
 import pandas as pd
+import tensorflow as tf
+import keras
 
 
 # Call AutoSim to generate the new robot spec:
 model_config_path = 'model_configs/2_7_Scale/model_config.yaml'
-motor_config_path = 'model_configs/2_7_Scale/motor_config.yaml'
+motor_config_path = 'motor_configs/myactuator.yaml'
 
 # Load motor params for later access
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
@@ -146,42 +148,25 @@ def get_body_orientation(d, body_name):
     quat = d.xquat[body_id]
     return quat
 
-class RobustDebouncer:
-    def __init__(self, num_contacts, activation_steps=3, deactivation_steps=5):
-        self.num_contacts = num_contacts
-        self.activation_steps = activation_steps
-        self.deactivation_steps = deactivation_steps
-        self.contact_on_counters = np.zeros(num_contacts, dtype=int)
-        self.contact_off_counters = np.zeros(num_contacts, dtype=int)
-        self.debounced_state = np.zeros(num_contacts, dtype=int)
+
+# Load the trained contact predictor model
+prediction_model = tf.keras.models.load_model('contact_predictor_model.keras')
+
+def predict_contacts(model, input_data):
+    """
+    Predict wheel contacts using the trained model.
     
-    def update(self, raw_contacts):
-        """Robust debouncing with asymmetric thresholds"""
-        for i in range(self.num_contacts):
-            if raw_contacts[i] == 1:
-                self.contact_on_counters[i] += 1
-                self.contact_off_counters[i] = 0
-                
-                # Turn on if threshold reached
-                if self.contact_on_counters[i] >= self.activation_steps:
-                    self.debounced_state[i] = 1
-            else:
-                self.contact_off_counters[i] += 1
-                self.contact_on_counters[i] = 0
-                
-                # Turn off if threshold reached
-                if self.contact_off_counters[i] >= self.deactivation_steps:
-                    self.debounced_state[i] = 0
+    Args:
+        model: Trained TensorFlow/Keras model
+        input_data: Numpy array of data inputs
         
-        return self.debounced_state.copy()
-
-# Initialize before simulation loop
-contact_debouncer = RobustDebouncer(
-    num_contacts=8, 
-    activation_steps=30,    # Quick to detect contact
-    deactivation_steps=30   # Slower to lose contact (more stable)
-)
-
+    Returns:
+        Numpy array of predicted contacts (num_samples, num_wheels)
+    """
+    predictions = model.predict(input_data)
+    # Convert probabilities to binary contacts (0 or 1) using a threshold of 0.5
+    binary_contacts = (predictions >= 0.5).astype(int)
+    return binary_contacts
 
 data_log = []
 # Main simulation loop:
@@ -197,46 +182,31 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         controller.control(m,d)
 
         # Get info for contact predictor
-        raw_wheel_contacts = get_wheel_contacts(m, d)
-        wheel_contacts = contact_debouncer.update(raw_wheel_contacts)
+        wheel_contacts = get_wheel_contacts(m, d)
         actual_positions = get_motor_positions(motors)
         target_positions = get_motor_targets(controller)
-
-        row_data = {}
-        # Add actual positions
-        for i, pos in enumerate(actual_positions):
-            row_data[f'actual_{i}'] = pos
-
         
         # Add motor torques
         motor_torques = get_motor_torques(motors)
-        for i, torque in enumerate(motor_torques):
-            row_data[f'torque_{i}'] = torque
+
 
         # Get torso orientation
         torso_quat = get_body_orientation(d, 'torso')
-        row_data['torso_quat_w'] = torso_quat[0]
-        row_data['torso_quat_x'] = torso_quat[1]
-        row_data['torso_quat_y'] = torso_quat[2]
-        row_data['torso_quat_z'] = torso_quat[3]
+
 
         # Get head orientation
         head_quat = get_body_orientation(d, 'head')
-        row_data['head_quat_w'] = head_quat[0]
-        row_data['head_quat_x'] = head_quat[1]
-        row_data['head_quat_y'] = head_quat[2]
-        row_data['head_quat_z'] = head_quat[3]
 
-        # Add wheel contacts
-        for i, contact in enumerate(wheel_contacts):
-            row_data[f'wheel_contact_{i}'] = int(contact)
+        # Predict wheel contacts:
+        input_features = np.concatenate([
+            np.array(actual_positions), 
+            np.array(motor_torques), 
+            torso_quat, 
+            head_quat
+        ])
+        predicted_contacts = predict_contacts(prediction_model, input_features.reshape(1, -1))
 
-        print(wheel_contacts)
-        
-
-        
-        # Append to log
-        data_log.append(row_data)
+        print("Predicted Contacts:", predicted_contacts, "Actual Contacts:", wheel_contacts)
 
 
 
@@ -251,7 +221,3 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
             time.sleep(time_until_next_step)
 
             
-# After the simulation ends, save to CSV
-# df = pd.DataFrame(data_log)
-# df.to_csv('simulation_data.csv', index=False)
-# print(f"Data saved to simulation_data.csv with {len(df)} rows")
