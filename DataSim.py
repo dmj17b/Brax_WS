@@ -24,12 +24,15 @@ motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
 # Generate the new robot spec:
 walter = AutoSim.GenerateModel(model_config_path=model_config_path, motor_config_path=motor_config_path)
-
-#Add payload to walter body
-walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
-
 # Generate the scene around the robot (groundplane and sky)
 walter.gen_scene()
+#Add payload to walter body
+# walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
+
+#Add wheel contact sensors
+walter.add_wheel_sensors()
+
+
 
 # Add some obstacles:
 
@@ -42,6 +45,12 @@ walter.add_box(pos = [-2, -2, 0.05], size = [1, 1, 0.1], name = 'box2')
 # Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)
+
+m.opt.timestep = 0.001
+m.opt.cone = 1
+m.opt.ccd_iterations=100
+m.opt.sdf_iterations = 100
+step_dt = 0.02
 
 # Initializing motor models (ignore this part)
 fr_hip = motor.MotorModel(m, d, 'head_right_thigh_joint', motor_config['hip_params'], 12)
@@ -69,7 +78,7 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 
 
 # Initialize joystick controller
-controller = js_ctrl.JoystickController("logitech", m, d, motors)
+controller = js_ctrl.JoystickController("logitech2", m, d, motors)
 
 def get_wheel_contacts(m, d):
     """
@@ -128,6 +137,8 @@ def get_motor_positions(motors):
     for motor in motors:
         if "wheel" in motor.motor_name:
             q = motor.d.jnt(motor.motor_name).qvel
+        if "knee" in motor.motor_name:
+            q = motor.d.jnt(motor.motor_name).qpos%(2*np.pi)
         else:
             q = motor.d.jnt(motor.motor_name).qpos
         actual_positions.append(float(q[0]))
@@ -145,6 +156,30 @@ def get_body_orientation(d, body_name):
     body_id = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, body_name)
     quat = d.xquat[body_id]
     return quat
+
+def get_wheel_sensor_data(m, d):
+    """
+    Get wheel distance sensor readings.
+    Returns array of distances from wheels to ground.
+    """
+    sensor_data = []
+    sensor_names = [
+        'bl_front_wheel_dist', 'bl_rear_wheel_dist',
+        'br_front_wheel_dist', 'br_rear_wheel_dist',
+        'fl_front_wheel_dist', 'fl_rear_wheel_dist',
+        'fr_front_wheel_dist', 'fr_rear_wheel_dist'
+    ]
+    
+    for sensor_name in sensor_names:
+        sensor_id = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SENSOR, sensor_name)
+        if sensor_id >= 0:
+            # Get sensor address in sensordata array
+            sensor_adr = m.sensor_adr[sensor_id]
+            sensor_data.append(d.sensordata[sensor_adr])
+        else:
+            sensor_data.append(np.nan)  # Sensor not found
+    
+    return np.array(sensor_data)
 
 class RobustDebouncer:
     def __init__(self, num_contacts, activation_steps=3, deactivation_steps=5):
@@ -178,8 +213,8 @@ class RobustDebouncer:
 # Initialize before simulation loop
 contact_debouncer = RobustDebouncer(
     num_contacts=8, 
-    activation_steps=30,    # Quick to detect contact
-    deactivation_steps=30   # Slower to lose contact (more stable)
+    activation_steps=10,    # Quick to detect contact
+    deactivation_steps=10   # Slower to lose contact (more stable)
 )
 
 
@@ -191,14 +226,16 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         step_start = time.time()
 
         # Step the simulation forward
-        mujoco.mj_step(m, d)
+        for _ in range(int(step_dt / m.opt.timestep)):
+            mujoco.mj_step(m, d)
+            raw_wheel_contacts = get_wheel_contacts(m, d)
+            wheel_contacts = contact_debouncer.update(raw_wheel_contacts)
+            # Call joystick controller:
+            controller.control(m,d)
 
-        # Call joystick controller:
-        controller.control(m,d)
+        
 
         # Get info for contact predictor
-        raw_wheel_contacts = get_wheel_contacts(m, d)
-        wheel_contacts = contact_debouncer.update(raw_wheel_contacts)
         actual_positions = get_motor_positions(motors)
         target_positions = get_motor_targets(controller)
 
@@ -231,7 +268,12 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         for i, contact in enumerate(wheel_contacts):
             row_data[f'wheel_contact_{i}'] = int(contact)
 
-        print(wheel_contacts)
+        # Add wheel sensor distances
+        wheel_distances = get_wheel_sensor_data(m, d)
+        for i, dist in enumerate(wheel_distances):
+            row_data[f'wheel_distance_{i}'] = dist
+
+        print(f"Wheel distances: {wheel_distances}")  # Print sensor distances for debugging
         
 
         
@@ -239,19 +281,17 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         data_log.append(row_data)
 
 
-
-
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
         
 
         # Rudimentary time keeping, will drift relative to wall clock.
-        time_until_next_step = m.opt.timestep - (time.time() - step_start)
+        time_until_next_step = (step_dt - (time.time() - step_start))
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
 
             
 # After the simulation ends, save to CSV
 # df = pd.DataFrame(data_log)
-# df.to_csv('simulation_data.csv', index=False)
-# print(f"Data saved to simulation_data.csv with {len(df)} rows")
+# df.to_csv('validation_data.csv', index=False)
+# print(f"Data saved to validation_data.csv with {len(df)} rows")

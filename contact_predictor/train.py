@@ -10,6 +10,12 @@ data = pd.read_csv('simulation_data.csv')
 x = data.drop(columns=[col for col in data.columns if 'wheel_contact' in col]).values
 y = data[[col for col in data.columns if 'wheel_contact' in col]].values
 
+
+# Preprocess validation data:
+validation_data = pd.read_csv('validation_data.csv')
+x_val = validation_data.drop(columns=[col for col in validation_data.columns if 'wheel_contact' in col]).values
+y_val = validation_data[[col for col in validation_data.columns if 'wheel_contact' in col]].values
+
 print(x.shape, y.shape)
 
 initializer = tf.keras.initializers.GlorotUniform()
@@ -23,22 +29,23 @@ model.add(tf.keras.layers.InputLayer(input_shape=(x.shape[1],)))
 model.add(tf.keras.layers.Normalization(axis=-1))
 
 # Add hidden layers:
-model.add(tf.keras.layers.Dense(128,
-                                 activation='relu',
-                                  kernel_initializer=initializer,))
-model.add(tf.keras.layers.Dense(256,
-                                 activation='relu',
-                                  kernel_initializer=initializer,))
-model.add(tf.keras.layers.Dense(256,
-                                 activation='relu',
-                                  kernel_initializer=initializer,))
-model.add(tf.keras.layers.Dense(128,
-                                 activation='relu',
-                                  kernel_initializer=initializer,))
-
 model.add(tf.keras.layers.Dense(64,
-                                 activation='relu',
-                                  kernel_initializer=initializer,))
+                                 activation='swish',
+                                  kernel_initializer=initializer,
+                                  kernel_regularizer=regularizers.L2(0.00001),))
+
+model.add(tf.keras.layers.Dense(128,
+                                 activation='swish',
+                                  kernel_initializer=initializer,
+                                  kernel_regularizer=regularizers.L2(0.00001),))
+model.add(tf.keras.layers.Dense(128,
+                                 activation='swish',
+                                  kernel_initializer=initializer,
+                                  kernel_regularizer=regularizers.L2(0.00001),))
+model.add(tf.keras.layers.Dense(64,
+                                 activation='swish',
+                                  kernel_initializer=initializer,
+                                  kernel_regularizer=regularizers.L2(0.00001),))
 
 # Add output layer with 8 outputs (one for each wheel contact):
 model.add(tf.keras.layers.Dense(y.shape[1], activation='sigmoid', kernel_initializer=initializer))
@@ -46,17 +53,17 @@ model.add(tf.keras.layers.Dense(y.shape[1], activation='sigmoid', kernel_initial
 model.summary()
 
 # Callback to stop training if training accuracy does not improve for 20 consecutive epochs
-early_stopping = tf.keras.callbacks.EarlyStopping(monitor='accuracy', min_delta=0.005, patience=120, restore_best_weights=True)
+early_stopping = tf.keras.callbacks.EarlyStopping(monitor='accuracy', min_delta=0.005, patience=250, restore_best_weights=True)
 
 # Callback to reduce learning rate if training accuracy does not improve for 15 consecutive epochs
-reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='accuracy', min_delta=0.005, factor=0.8, patience=30, min_lr=1e-7, restore_best_weights=True)
+reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='accuracy', min_delta=0.005, factor=0.8, patience=30, min_lr=1e-6, restore_best_weights=True)
 
 # Compile the model
 optimizer = tf.keras.optimizers.Adam()
 model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
 
-history = model.fit(x, y, epochs=5000, batch_size=1024, callbacks=[early_stopping, reduce_lr])
+history = model.fit(x, y, validation_data=(x_val, y_val), epochs=5000, batch_size=32, callbacks=[reduce_lr])
 
 model.save('contact_predictor_model.keras')
 

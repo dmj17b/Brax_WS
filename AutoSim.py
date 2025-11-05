@@ -18,6 +18,7 @@ class GenerateModel():
         # Build model using Mujoco Spec:
         spec = mujoco.MjSpec()
 
+        self.condim = 1
         color = np.array([177/255, 166/255, 136/255, 1])
 
         # Parse Configs:
@@ -98,6 +99,7 @@ class GenerateModel():
 
 
         wheel_armature = wheel_rotor_inertia*wheel_gear_ratio**2
+
 
 
         # Add Torso to World Body:
@@ -207,6 +209,7 @@ class GenerateModel():
                         friction = wheel_friction,
                         solref = wheel_solref,
                         rgba = color,
+                        condim = self.condim,
                     )
                 else:
                     body.add_geom(
@@ -338,6 +341,8 @@ class GenerateModel():
                         friction = wheel_friction,
                         solref = wheel_solref,
                         rgba = color,
+                        condim = self.condim,
+
                     )
                 else:
                     body.add_geom(
@@ -446,6 +451,85 @@ class GenerateModel():
         self.model_xml = spec.to_xml()
         self.spec = spec
 
+    def add_wheel_sensors(self):
+        # The ground plane geom needs to be named explicitly in gen_scene()
+        ground_geom = 'groundplane'
+        
+        # Back left wheels - fix geom names to match actual naming pattern
+        self.spec.add_sensor(
+            name='bl_front_wheel_dist',
+            type=mujoco.mjtSensor.mjSENS_GEOMDIST,
+            objtype=mujoco.mjtObj.mjOBJ_GEOM,
+            objname='torso_left_front_wheel_geom',
+            reftype=mujoco.mjtObj.mjOBJ_GEOM,
+            refname=ground_geom,
+        )
+        self.spec.add_sensor(
+            name='bl_rear_wheel_dist',
+            type=mujoco.mjtSensor.mjSENS_GEOMDIST,
+            objtype=mujoco.mjtObj.mjOBJ_GEOM,
+            objname='torso_left_rear_wheel_geom',
+            reftype=mujoco.mjtObj.mjOBJ_GEOM,
+            refname=ground_geom,
+        )
+        
+        # Back right wheels
+        self.spec.add_sensor(
+            name='br_front_wheel_dist',
+            type=mujoco.mjtSensor.mjSENS_GEOMDIST,
+            objtype=mujoco.mjtObj.mjOBJ_GEOM,
+            objname='torso_right_front_wheel_geom',
+            reftype=mujoco.mjtObj.mjOBJ_GEOM,
+            refname=ground_geom,
+        )
+        self.spec.add_sensor(
+            name='br_rear_wheel_dist',
+            type=mujoco.mjtSensor.mjSENS_GEOMDIST,
+            objtype=mujoco.mjtObj.mjOBJ_GEOM,
+            objname='torso_right_rear_wheel_geom',
+            reftype=mujoco.mjtObj.mjOBJ_GEOM,
+            refname=ground_geom,
+        )
+        
+        # Front left wheels
+        self.spec.add_sensor(
+            name='fl_front_wheel_dist',
+            type=mujoco.mjtSensor.mjSENS_GEOMDIST,
+            objtype=mujoco.mjtObj.mjOBJ_GEOM,
+            objname='head_left_front_wheel_geom',
+            reftype=mujoco.mjtObj.mjOBJ_GEOM,
+            refname=ground_geom,
+        )
+        self.spec.add_sensor(
+            name='fl_rear_wheel_dist',
+            type=mujoco.mjtSensor.mjSENS_GEOMDIST,
+            objtype=mujoco.mjtObj.mjOBJ_GEOM,
+            objname='head_left_rear_wheel_geom',
+            reftype=mujoco.mjtObj.mjOBJ_GEOM,
+            refname=ground_geom,
+        )
+        
+        # Front right wheels
+        self.spec.add_sensor(
+            name='fr_front_wheel_dist',
+            type=mujoco.mjtSensor.mjSENS_GEOMDIST,
+            objtype=mujoco.mjtObj.mjOBJ_GEOM,
+            objname='head_right_front_wheel_geom',
+            reftype=mujoco.mjtObj.mjOBJ_GEOM,
+            refname=ground_geom,
+        )
+        self.spec.add_sensor(
+            name='fr_rear_wheel_dist',
+            type=mujoco.mjtSensor.mjSENS_GEOMDIST,
+            objtype=mujoco.mjtObj.mjOBJ_GEOM,
+            objname='head_right_rear_wheel_geom',
+            reftype=mujoco.mjtObj.mjOBJ_GEOM,
+            refname=ground_geom,
+        )
+        
+        # Recompile after adding sensors
+        self.mj_model = self.spec.compile()
+        self.model_xml = self.spec.to_xml()
 
 
     def gen_scene(self):
@@ -459,15 +543,16 @@ class GenerateModel():
                               rgb2=[0.5, 0.9, 0.8],
                               markrgb=[0.8, 0.8, 0.8])
         
-        self.spec.add_material(name="groundplane",
+        self.spec.add_material(name="groundplanematerial",
                               texrepeat=[2, 2],
                               reflectance=0., 
                               ).textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = 'ground_texture'
         
         self.spec.worldbody.add_geom(
+            name='groundplane',  # Explicitly name the ground plane
             type=mujoco.mjtGeom.mjGEOM_PLANE,
             size=[0, 0, 0.05],
-            material="groundplane",
+            material="groundplanematerial",
         )
 
 
