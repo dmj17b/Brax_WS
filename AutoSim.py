@@ -454,6 +454,7 @@ class GenerateModel():
     def add_wheel_sensors(self):
         # The ground plane geom needs to be named explicitly in gen_scene()
         ground_geom = 'groundplane'
+        cutoff = 1.5
         
         # Back left wheels - fix geom names to match actual naming pattern
         self.spec.add_sensor(
@@ -463,6 +464,7 @@ class GenerateModel():
             objname='torso_left_front_wheel_geom',
             reftype=mujoco.mjtObj.mjOBJ_GEOM,
             refname=ground_geom,
+            cutoff=cutoff,
         )
         self.spec.add_sensor(
             name='bl_rear_wheel_dist',
@@ -471,6 +473,7 @@ class GenerateModel():
             objname='torso_left_rear_wheel_geom',
             reftype=mujoco.mjtObj.mjOBJ_GEOM,
             refname=ground_geom,
+            cutoff=cutoff,
         )
         
         # Back right wheels
@@ -481,6 +484,7 @@ class GenerateModel():
             objname='torso_right_front_wheel_geom',
             reftype=mujoco.mjtObj.mjOBJ_GEOM,
             refname=ground_geom,
+            cutoff=cutoff,
         )
         self.spec.add_sensor(
             name='br_rear_wheel_dist',
@@ -489,6 +493,7 @@ class GenerateModel():
             objname='torso_right_rear_wheel_geom',
             reftype=mujoco.mjtObj.mjOBJ_GEOM,
             refname=ground_geom,
+            cutoff=cutoff,
         )
         
         # Front left wheels
@@ -499,6 +504,7 @@ class GenerateModel():
             objname='head_left_front_wheel_geom',
             reftype=mujoco.mjtObj.mjOBJ_GEOM,
             refname=ground_geom,
+            cutoff=cutoff,
         )
         self.spec.add_sensor(
             name='fl_rear_wheel_dist',
@@ -507,6 +513,7 @@ class GenerateModel():
             objname='head_left_rear_wheel_geom',
             reftype=mujoco.mjtObj.mjOBJ_GEOM,
             refname=ground_geom,
+            cutoff=cutoff,
         )
         
         # Front right wheels
@@ -517,6 +524,7 @@ class GenerateModel():
             objname='head_right_front_wheel_geom',
             reftype=mujoco.mjtObj.mjOBJ_GEOM,
             refname=ground_geom,
+            cutoff=cutoff,
         )
         self.spec.add_sensor(
             name='fr_rear_wheel_dist',
@@ -525,6 +533,7 @@ class GenerateModel():
             objname='head_right_rear_wheel_geom',
             reftype=mujoco.mjtObj.mjOBJ_GEOM,
             refname=ground_geom,
+            cutoff=cutoff,
         )
         
         # Recompile after adding sensors

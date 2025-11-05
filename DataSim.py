@@ -181,7 +181,7 @@ def get_wheel_sensor_data(m, d):
     
     return np.array(sensor_data)
 
-def infer_contacts(wheel_distances, threshold=0.05):
+def infer_contacts(wheel_distances, threshold=0.01):
     """
     Infer wheel contacts based on distance sensor readings.
     
@@ -205,11 +205,9 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         step_start = time.time()
 
         # Step the simulation forward
-        for _ in range(int(step_dt / m.opt.timestep)):
-            mujoco.mj_step(m, d)
-            raw_wheel_contacts = get_wheel_contacts(m, d)
-            # Call joystick controller:
-            controller.control(m,d)
+        mujoco.mj_step(m, d)
+        # Call joystick controller:
+        controller.control(m,d)
 
         
 
@@ -242,16 +240,18 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         row_data['head_quat_y'] = head_quat[2]
         row_data['head_quat_z'] = head_quat[3]
 
+        # Get target pos/vels
+        for i, target in enumerate(target_positions):
+            row_data[f'target_{i}'] = target
  
-        # Add wheel sensor distances
+        # Get wheel sensor distances
         wheel_distances = get_wheel_sensor_data(m, d)
-        for i, dist in enumerate(wheel_distances):
-            row_data[f'wheel_distance_{i}'] = dist
 
-        print(f"Wheel distances: {wheel_distances}")  # Print sensor distances for debugging
-        print(f"Wheel contacts: {infer_contacts(wheel_distances)}")  # Print inferred contacts for debugging
-        
-
+        # Add inferred contacts to row data
+        inferred_contacts = infer_contacts(wheel_distances)
+        print(f"Inferred contacts: {inferred_contacts}")
+        for i, contact in enumerate(inferred_contacts):
+            row_data[f'wheel_contact_{i}'] = contact
         
         # Append to log
         data_log.append(row_data)
@@ -262,12 +262,12 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         
 
         # Rudimentary time keeping, will drift relative to wall clock.
-        time_until_next_step = (step_dt - (time.time() - step_start))
+        time_until_next_step = (m.opt.timestep - (time.time() - step_start))
         if time_until_next_step > 0:
             time.sleep(time_until_next_step)
 
             
 # After the simulation ends, save to CSV
-# df = pd.DataFrame(data_log)
-# df.to_csv('validation_data.csv', index=False)
-# print(f"Data saved to validation_data.csv with {len(df)} rows")
+df = pd.DataFrame(data_log)
+df.to_csv('validation_data.csv', index=False)
+print(f"Data saved to validation_data.csv with {len(df)} rows")

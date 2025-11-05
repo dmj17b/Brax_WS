@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from keras import regularizers
 
-data = pd.read_csv('simulation_data.csv')
+data = pd.read_csv('test_data.csv')
 
 
 # Preprocess data - separate wheel contacts from the rest of data:
@@ -29,23 +29,28 @@ model.add(tf.keras.layers.InputLayer(input_shape=(x.shape[1],)))
 model.add(tf.keras.layers.Normalization(axis=-1))
 
 # Add hidden layers:
-model.add(tf.keras.layers.Dense(64,
-                                 activation='swish',
-                                  kernel_initializer=initializer,
-                                  kernel_regularizer=regularizers.L2(0.00001),))
+# model.add(tf.keras.layers.Dense(64,
+#                                  activation='tanh',
+#                                   kernel_initializer=initializer,
+#                                   ))
 
 model.add(tf.keras.layers.Dense(128,
-                                 activation='swish',
+                                 activation='tanh',
                                   kernel_initializer=initializer,
-                                  kernel_regularizer=regularizers.L2(0.00001),))
+                                  ))
+
+model.add(tf.keras.layers.Dense(256,
+                                 activation='tanh',
+                                  kernel_initializer=initializer,
+                                  ))
 model.add(tf.keras.layers.Dense(128,
-                                 activation='swish',
+                                 activation='tanh',
                                   kernel_initializer=initializer,
-                                  kernel_regularizer=regularizers.L2(0.00001),))
-model.add(tf.keras.layers.Dense(64,
-                                 activation='swish',
-                                  kernel_initializer=initializer,
-                                  kernel_regularizer=regularizers.L2(0.00001),))
+                                 ))
+# model.add(tf.keras.layers.Dense(64,
+#                                  activation='tanh',
+#                                   kernel_initializer=initializer,
+#                                   kernel_regularizer=regularizers.l2(1e-5)))
 
 # Add output layer with 8 outputs (one for each wheel contact):
 model.add(tf.keras.layers.Dense(y.shape[1], activation='sigmoid', kernel_initializer=initializer))
@@ -63,7 +68,7 @@ optimizer = tf.keras.optimizers.Adam()
 model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
 
-history = model.fit(x, y, validation_data=(x_val, y_val), epochs=5000, batch_size=32, callbacks=[reduce_lr])
+history = model.fit(x, y, validation_data=(x_val, y_val), epochs=5000, batch_size=64, callbacks=[reduce_lr])
 
 model.save('contact_predictor_model.keras')
 
