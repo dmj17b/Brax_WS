@@ -181,41 +181,20 @@ def get_wheel_sensor_data(m, d):
     
     return np.array(sensor_data)
 
-class RobustDebouncer:
-    def __init__(self, num_contacts, activation_steps=3, deactivation_steps=5):
-        self.num_contacts = num_contacts
-        self.activation_steps = activation_steps
-        self.deactivation_steps = deactivation_steps
-        self.contact_on_counters = np.zeros(num_contacts, dtype=int)
-        self.contact_off_counters = np.zeros(num_contacts, dtype=int)
-        self.debounced_state = np.zeros(num_contacts, dtype=int)
+def infer_contacts(wheel_distances, threshold=0.05):
+    """
+    Infer wheel contacts based on distance sensor readings.
     
-    def update(self, raw_contacts):
-        """Robust debouncing with asymmetric thresholds"""
-        for i in range(self.num_contacts):
-            if raw_contacts[i] == 1:
-                self.contact_on_counters[i] += 1
-                self.contact_off_counters[i] = 0
-                
-                # Turn on if threshold reached
-                if self.contact_on_counters[i] >= self.activation_steps:
-                    self.debounced_state[i] = 1
-            else:
-                self.contact_off_counters[i] += 1
-                self.contact_on_counters[i] = 0
-                
-                # Turn off if threshold reached
-                if self.contact_off_counters[i] >= self.deactivation_steps:
-                    self.debounced_state[i] = 0
-        
-        return self.debounced_state.copy()
+    Args:
+        wheel_distances: numpy array of wheel distance sensor readings
+        threshold: distance threshold below which contact is inferred
+    
+    Returns:
+        numpy array with 1 if wheel is in contact, 0 otherwise
+    """
+    contacts = (abs(wheel_distances) < threshold).astype(int)
+    return contacts
 
-# Initialize before simulation loop
-contact_debouncer = RobustDebouncer(
-    num_contacts=8, 
-    activation_steps=10,    # Quick to detect contact
-    deactivation_steps=10   # Slower to lose contact (more stable)
-)
 
 
 data_log = []
@@ -229,7 +208,6 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         for _ in range(int(step_dt / m.opt.timestep)):
             mujoco.mj_step(m, d)
             raw_wheel_contacts = get_wheel_contacts(m, d)
-            wheel_contacts = contact_debouncer.update(raw_wheel_contacts)
             # Call joystick controller:
             controller.control(m,d)
 
@@ -264,16 +242,14 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         row_data['head_quat_y'] = head_quat[2]
         row_data['head_quat_z'] = head_quat[3]
 
-        # Add wheel contacts
-        for i, contact in enumerate(wheel_contacts):
-            row_data[f'wheel_contact_{i}'] = int(contact)
-
+ 
         # Add wheel sensor distances
         wheel_distances = get_wheel_sensor_data(m, d)
         for i, dist in enumerate(wheel_distances):
             row_data[f'wheel_distance_{i}'] = dist
 
         print(f"Wheel distances: {wheel_distances}")  # Print sensor distances for debugging
+        print(f"Wheel contacts: {infer_contacts(wheel_distances)}")  # Print inferred contacts for debugging
         
 
         
