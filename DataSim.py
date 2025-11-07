@@ -24,32 +24,28 @@ motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 
 # Generate the new robot spec:
 walter = AutoSim.GenerateModel(model_config_path=model_config_path, motor_config_path=motor_config_path)
+
 # Generate the scene around the robot (groundplane and sky)
 walter.gen_scene()
-#Add payload to walter body
-# walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
 
 #Add wheel contact sensors
 walter.add_wheel_sensors()
 
-
-
 # Add some obstacles:
-
 walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
 walter.add_log(d=0.4,length = 2)
 walter.add_incline(angle_deg=40, pos = [3, 5, 0], width = 1.5, length = 4 )
 walter.add_box(pos = [5.5, 5, 2.5], size = [1, 2, 0.1])
 walter.add_incline(angle_deg=-40, pos = [8, 5, 0], width = 1.5, length = 4 )
 walter.add_box(pos = [-2, -2, 0.05], size = [1, 1, 0.1], name = 'box2')
+
+
 # Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)
 
 m.opt.timestep = 0.001
-m.opt.cone = 1
-m.opt.ccd_iterations=100
-m.opt.sdf_iterations = 100
+
 step_dt = 0.02
 
 # Initializing motor models (ignore this part)
@@ -80,35 +76,7 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 # Initialize joystick controller
 controller = js_ctrl.JoystickController("logitech2", m, d, motors)
 
-def get_wheel_contacts(m, d):
-    """
-    Returns a binary array indicating which wheels are in contact with any geometry.
-    
-    Returns:
-        numpy array with 1 if wheel is in contact, 0 otherwise
-    """
-    # Find all wheel geometries
-    wheel_geom_ids = []
-    for i in range(m.ngeom):
-        geom_name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, i)
-        if geom_name and 'wheel' in geom_name.lower():
-            wheel_geom_ids.append(i)
-    
-    # Initialize contact array
-    wheel_contacts = np.zeros(len(wheel_geom_ids), dtype=int)
-    
-    # Check all active contacts
-    for i in range(d.ncon):
-        contact = d.contact[i]
-        geom1 = contact.geom1
-        geom2 = contact.geom2
-        
-        # Check if either geometry in the contact pair is a wheel
-        for idx, wheel_id in enumerate(wheel_geom_ids):
-            if geom1 == wheel_id or geom2 == wheel_id:
-                wheel_contacts[idx] = 1
-    
-    return wheel_contacts
+
 
 # Get desired positions and velocities from joystick controller
 def get_motor_targets(controller):
@@ -117,10 +85,10 @@ def get_motor_targets(controller):
     target_positions.append(controller.fl_hip_des_pos)
     target_positions.append(controller.br_hip_des_pos)
     target_positions.append(controller.bl_hip_des_pos)
-    target_positions.append(controller.fr_knee_des_pos)
-    target_positions.append(controller.fl_knee_des_pos)
-    target_positions.append(controller.br_knee_des_pos)
-    target_positions.append(controller.bl_knee_des_pos)
+    target_positions.append((controller.fr_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
+    target_positions.append((controller.fl_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
+    target_positions.append((controller.br_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
+    target_positions.append((controller.bl_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
     target_positions.append(controller.right_wheel_vel_des)
     target_positions.append(controller.right_wheel_vel_des)
     target_positions.append(controller.left_wheel_vel_des)
@@ -135,11 +103,11 @@ def get_motor_targets(controller):
 def get_motor_positions(motors):
     actual_positions = []
     for motor in motors:
-        if "wheel" in motor.motor_name:
+        if "wheel_joint" in motor.motor_name:
             q = motor.d.jnt(motor.motor_name).qvel
-        if "knee" in motor.motor_name:
-            q = motor.d.jnt(motor.motor_name).qpos%(2*np.pi)
-        else:
+        if "shin_joint" in motor.motor_name:
+            q = (motor.d.jnt(motor.motor_name).qpos+np.pi) % (2*np.pi) - np.pi
+        if "thigh_joint" in motor.motor_name:
             q = motor.d.jnt(motor.motor_name).qpos
         actual_positions.append(float(q[0]))
     return actual_positions
@@ -181,7 +149,7 @@ def get_wheel_sensor_data(m, d):
     
     return np.array(sensor_data)
 
-def infer_contacts(wheel_distances, threshold=0.01):
+def infer_contacts(wheel_distances, threshold=0.005):
     """
     Infer wheel contacts based on distance sensor readings.
     
@@ -195,9 +163,37 @@ def infer_contacts(wheel_distances, threshold=0.01):
     contacts = (abs(wheel_distances) < threshold).astype(int)
     return contacts
 
+def extract_observation(actual_positions, target_positions, motor_torques, torso_quat, head_quat):
+    """
+    Extract observation features (without contacts) as a dictionary.
+    This will be used for both current and historical observations.
+    """
+    obs = {}
+    
+    # Add actual positions
+    for i, pos in enumerate(actual_positions):
+        obs[f'actual_{i}'] = pos
+    
+    # Add errors
+    error_vec = np.array(target_positions) - np.array(actual_positions)
+    for i, error in enumerate(error_vec):
+        obs[f'error_{i}'] = error*100
+    
+    # Add motor torques
+    for i, torque in enumerate(motor_torques):
+        obs[f'torque_{i}'] = torque
+    
+
+    # obs['head_quat_z'] = head_quat[3]
+    
+    return obs
 
 
 data_log = []
+previous_obs_history = []
+num_history_steps = 5  # Number of previous steps to store
+step_count = 0
+
 # Main simulation loop:
 with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as viewer:
     start = time.time()
@@ -209,57 +205,51 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         # Call joystick controller:
         controller.control(m,d)
 
-        
-
         # Get info for contact predictor
         actual_positions = get_motor_positions(motors)
         target_positions = get_motor_targets(controller)
-
-        row_data = {}
-        # Add actual positions
-        for i, pos in enumerate(actual_positions):
-            row_data[f'actual_{i}'] = pos
-
-        
-        # Add motor torques
         motor_torques = get_motor_torques(motors)
-        for i, torque in enumerate(motor_torques):
-            row_data[f'torque_{i}'] = torque
-
-        # Get torso orientation
         torso_quat = get_body_orientation(d, 'torso')
-        row_data['torso_quat_w'] = torso_quat[0]
-        row_data['torso_quat_x'] = torso_quat[1]
-        row_data['torso_quat_y'] = torso_quat[2]
-        row_data['torso_quat_z'] = torso_quat[3]
-
-        # Get head orientation
         head_quat = get_body_orientation(d, 'head')
-        row_data['head_quat_w'] = head_quat[0]
-        row_data['head_quat_x'] = head_quat[1]
-        row_data['head_quat_y'] = head_quat[2]
-        row_data['head_quat_z'] = head_quat[3]
 
-        # Get target pos/vels
-        for i, target in enumerate(target_positions):
-            row_data[f'target_{i}'] = target
- 
-        # Get wheel sensor distances
+        # Extract current observation (without contacts)
+        current_obs = extract_observation(actual_positions, target_positions, motor_torques, torso_quat, head_quat)
+        
+        # Build row data with history
+        row_data = {}
+        
+        # Add current observation
+        for key, value in current_obs.items():
+            row_data[f'current_{key}'] = value
+        
+        # Add historical observations (oldest to newest)
+        # for history_idx, hist_obs in enumerate(previous_obs_history):
+        #     for key, value in hist_obs.items():
+        #         row_data[f'history_{history_idx}_{key}'] = value
+        
+        # # Pad with zeros if we don't have enough history yet
+        # for history_idx in range(len(previous_obs_history), num_history_steps):
+        #     for key in current_obs.keys():
+        #         row_data[f'history_{history_idx}_{key}'] = 0.0
+
+        # Get wheel sensor distances and inferred contacts (only for current step)
         wheel_distances = get_wheel_sensor_data(m, d)
-
-        # Add inferred contacts to row data
         inferred_contacts = infer_contacts(wheel_distances)
-        print(f"Inferred contacts: {inferred_contacts}")
         for i, contact in enumerate(inferred_contacts):
             row_data[f'wheel_contact_{i}'] = contact
         
         # Append to log
         data_log.append(row_data)
+        
+        # Update history: add current observation and maintain only last n steps
+        previous_obs_history.append(current_obs)
+        if len(previous_obs_history) > num_history_steps:
+            previous_obs_history.pop(0)  # Remove oldest
 
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
-        
+        step_count += 1
 
         # Rudimentary time keeping, will drift relative to wall clock.
         time_until_next_step = (m.opt.timestep - (time.time() - step_start))
@@ -269,5 +259,5 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
             
 # After the simulation ends, save to CSV
 df = pd.DataFrame(data_log)
-df.to_csv('validation_data.csv', index=False)
+df.to_csv('test_data.csv', index=False)
 print(f"Data saved to validation_data.csv with {len(df)} rows")

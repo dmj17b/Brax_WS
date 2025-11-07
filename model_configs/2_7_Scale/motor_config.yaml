@@ -4,8 +4,8 @@ waist_params:
   range: [-25, 25]
 
 hip_params:
-  Kp: 20
-  Kd: 10
+  Kp: 15
+  Kd: 8
   stall_torque: 1.8
   no_load_speed: 8000
   gear_ratio: 160
@@ -13,8 +13,8 @@ hip_params:
   damping: 2
 
 knee_params:
-  Kp: 20
-  Kd: 10
+  Kp: 15
+  Kd: 8
   stall_torque: 1.8
   no_load_speed: 8000
   gear_ratio: 120
@@ -22,7 +22,7 @@ knee_params:
   damping: 2
 
 wheel_params:
-  Kp: 0.5
+  Kp: 0.05
   Kd: 0
   stall_torque: 1.8
   no_load_speed: 8000

@@ -30,5 +30,5 @@ wheel_params:
   width: 0.1
   mass: 2.25
   offset: [0, 0.00, 0]
-  friction: [1, 0.005, 0.0001]
+  friction: [1, 0.005, 0.015]
   solref: [-8080, -100]
