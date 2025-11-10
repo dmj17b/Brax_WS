@@ -36,68 +36,81 @@ model.add(normalizer)
 
 # Add hidden layers:
 
-
+# Layer 1
 model.add(tf.keras.layers.Dense(64,
-                                 activation='relu',
                                   kernel_initializer=initializer,
                                   ))
-model.add(tf.keras.layers.Dropout(0.2))
 model.add(tf.keras.layers.BatchNormalization())
+model.add(tf.keras.layers.ReLU())
 
-
+# Layer 2
 model.add(tf.keras.layers.Dense(128,
-                                 activation='relu',
                                   kernel_initializer=initializer,
                                   ))
-model.add(tf.keras.layers.Dropout(0.2))
 model.add(tf.keras.layers.BatchNormalization())
+model.add(tf.keras.layers.ReLU())
+model.add(tf.keras.layers.Dropout(0.2))
 
-# model.add(tf.keras.layers.Dense(256,
-#                                  activation='relu',
-#                                   kernel_initializer=initializer,
-#                                   ))
-# model.add(tf.keras.layers.Dropout(0.2))
-# model.add(tf.keras.layers.BatchNormalization())
+model.add(tf.keras.layers.Dense(256,
+                                  kernel_initializer=initializer,
+                                  ))
+model.add(tf.keras.layers.BatchNormalization())
+model.add(tf.keras.layers.ReLU())
+model.add(tf.keras.layers.Dropout(0.2))
 
+# Layer 3
 model.add(tf.keras.layers.Dense(128,
-                                 activation='relu',
                                   kernel_initializer=initializer,
                                   ))
-model.add(tf.keras.layers.Dropout(0.2))
 model.add(tf.keras.layers.BatchNormalization())
+model.add(tf.keras.layers.ReLU())
+model.add(tf.keras.layers.Dropout(0.2))
 
+# Layer 4
 model.add(tf.keras.layers.Dense(64,
-                                 activation='relu',
                                   kernel_initializer=initializer,
                                  )) 
-model.add(tf.keras.layers.Dropout(0.2))
 model.add(tf.keras.layers.BatchNormalization())
+model.add(tf.keras.layers.ReLU())
 
 
 # Add output layer with 8 outputs (one for each wheel contact):
-model.add(tf.keras.layers.Dense(y.shape[1], activation='sigmoid', kernel_initializer=initializer))
+model.add(tf.keras.layers.Dense(y.shape[1], kernel_initializer=initializer))
 
 model.summary()
 
-# Callback to stop training if training accuracy does not improve 
-early_stopping = tf.keras.callbacks.EarlyStopping(monitor='accuracy', min_delta=0.005, patience=250, restore_best_weights=True)
 
 # Callback to reduce learning rate if training accuracy does not improve
-reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='accuracy', min_delta=0.005, factor=0.8, patience=30, min_lr=1e-7, restore_best_weights=True)
+reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', min_delta=0.005, factor=0.8, patience=10, min_lr=1e-7, restore_best_weights=True)
+
+# Callback to save the best model during training
+best_model = tf.keras.callbacks.ModelCheckpoint('best_contact_predictor_model.keras', monitor='val_loss', save_best_only=True)
+
+# Callback to stop training early if validation loss does not improve
+early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=60, restore_best_weights=True)
+
+# Optimizer
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+
+# M
+binary_accuracy_metric = tf.keras.metrics.BinaryAccuracy(threshold=0.5, name='binary_acc')
+pr_auc_metric = tf.keras.metrics.AUC(curve='PR', name='pr_auc', multi_label=True)
+
+
+loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits = True, label_smoothing=0.05)
 
 # Compile the model
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
-model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=optimizer, loss=loss_fn, metrics=['accuracy', binary_accuracy_metric, pr_auc_metric])
 
 # Train the model
-history = model.fit(x, y, validation_data=(x_val, y_val), epochs=20000, batch_size=64, callbacks=[reduce_lr])
+history = model.fit(x, y, validation_data=(x_val, y_val), epochs=500, batch_size=64, callbacks=[reduce_lr, best_model, early_stopping], shuffle=True)
 
 model.save('contact_predictor_model.keras')
 
 # Plot training accuracy and loss
-plt.plot(history.history['accuracy'], label='accuracy')
+plt.plot(history.history['binary_acc'], label='Binary Accuracy')
 plt.plot(history.history['loss'], label='loss')
-plt.plot(history.history['val_accuracy'], label='val_accuracy')
+plt.plot(history.history['val_binary_acc'], label='Val_Binary_Accuracy')
 plt.plot(history.history['val_loss'], label='val_loss')
 plt.xlabel('Epoch')
 plt.ylabel('Value')

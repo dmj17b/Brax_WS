@@ -13,7 +13,7 @@ import lib.MotorModel as motor
 import lib.JoystickControl as js_ctrl
 import AutoSim
 import pandas as pd
-
+import lib.ContactDataGrabber as cdg
 
 # Call AutoSim to generate the new robot spec:
 model_config_path = 'model_configs/2_7_Scale/model_config.yaml'
@@ -77,118 +77,6 @@ motors = [fr_hip, fl_hip, br_hip, bl_hip,
 controller = js_ctrl.JoystickController("logitech2", m, d, motors)
 
 
-
-# Get desired positions and velocities from joystick controller
-def get_motor_targets(controller):
-    target_positions = []
-    target_positions.append(controller.fr_hip_des_pos)
-    target_positions.append(controller.fl_hip_des_pos)
-    target_positions.append(controller.br_hip_des_pos)
-    target_positions.append(controller.bl_hip_des_pos)
-    target_positions.append((controller.fr_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
-    target_positions.append((controller.fl_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
-    target_positions.append((controller.br_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
-    target_positions.append((controller.bl_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
-    target_positions.append(controller.right_wheel_vel_des)
-    target_positions.append(controller.right_wheel_vel_des)
-    target_positions.append(controller.left_wheel_vel_des)
-    target_positions.append(controller.left_wheel_vel_des)
-    target_positions.append(controller.right_wheel_vel_des)
-    target_positions.append(controller.right_wheel_vel_des)
-    target_positions.append(controller.left_wheel_vel_des)
-    target_positions.append(controller.left_wheel_vel_des)
-    return target_positions
-
-# Get actual motor positions/velocities from motor models
-def get_motor_positions(motors):
-    actual_positions = []
-    for motor in motors:
-        if "wheel_joint" in motor.motor_name:
-            q = motor.d.jnt(motor.motor_name).qvel
-        if "shin_joint" in motor.motor_name:
-            q = (motor.d.jnt(motor.motor_name).qpos+np.pi) % (2*np.pi) - np.pi
-        if "thigh_joint" in motor.motor_name:
-            q = motor.d.jnt(motor.motor_name).qpos
-        actual_positions.append(float(q[0]))
-    return actual_positions
-
-# Get motor torques from motor models
-def get_motor_torques(motors):
-    torques = []
-    for motor in motors:
-        torques.append(float(motor.limited_torque))
-    return torques
-
-# Get body orientation (quaternion) for a given body name
-def get_body_orientation(d, body_name):
-    body_id = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, body_name)
-    quat = d.xquat[body_id]
-    return quat
-
-def get_wheel_sensor_data(m, d):
-    """
-    Get wheel distance sensor readings.
-    Returns array of distances from wheels to ground.
-    """
-    sensor_data = []
-    sensor_names = [
-        'bl_front_wheel_dist', 'bl_rear_wheel_dist',
-        'br_front_wheel_dist', 'br_rear_wheel_dist',
-        'fl_front_wheel_dist', 'fl_rear_wheel_dist',
-        'fr_front_wheel_dist', 'fr_rear_wheel_dist'
-    ]
-    
-    for sensor_name in sensor_names:
-        sensor_id = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SENSOR, sensor_name)
-        if sensor_id >= 0:
-            # Get sensor address in sensordata array
-            sensor_adr = m.sensor_adr[sensor_id]
-            sensor_data.append(d.sensordata[sensor_adr])
-        else:
-            sensor_data.append(np.nan)  # Sensor not found
-    
-    return np.array(sensor_data)
-
-def infer_contacts(wheel_distances, threshold=0.005):
-    """
-    Infer wheel contacts based on distance sensor readings.
-    
-    Args:
-        wheel_distances: numpy array of wheel distance sensor readings
-        threshold: distance threshold below which contact is inferred
-    
-    Returns:
-        numpy array with 1 if wheel is in contact, 0 otherwise
-    """
-    contacts = (abs(wheel_distances) < threshold).astype(int)
-    return contacts
-
-def extract_observation(actual_positions, target_positions, motor_torques, torso_quat, head_quat):
-    """
-    Extract observation features (without contacts) as a dictionary.
-    This will be used for both current and historical observations.
-    """
-    obs = {}
-    
-    # Add actual positions
-    for i, pos in enumerate(actual_positions):
-        obs[f'actual_{i}'] = pos
-    
-    # Add errors
-    error_vec = np.array(target_positions) - np.array(actual_positions)
-    for i, error in enumerate(error_vec):
-        obs[f'error_{i}'] = error*100
-    
-    # Add motor torques
-    for i, torque in enumerate(motor_torques):
-        obs[f'torque_{i}'] = torque
-    
-
-    # obs['head_quat_z'] = head_quat[3]
-    
-    return obs
-
-
 data_log = []
 previous_obs_history = []
 num_history_steps = 5  # Number of previous steps to store
@@ -206,14 +94,14 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         controller.control(m,d)
 
         # Get info for contact predictor
-        actual_positions = get_motor_positions(motors)
-        target_positions = get_motor_targets(controller)
-        motor_torques = get_motor_torques(motors)
-        torso_quat = get_body_orientation(d, 'torso')
-        head_quat = get_body_orientation(d, 'head')
+        actual_positions = cdg.get_motor_positions(motors)
+        target_positions = cdg.get_motor_targets(controller)
+        motor_torques = cdg.get_motor_torques(motors)
+        torso_quat = cdg.get_body_orientation(m, d, 'torso')
+        head_quat = cdg.get_body_orientation(m, d, 'head')
 
         # Extract current observation (without contacts)
-        current_obs = extract_observation(actual_positions, target_positions, motor_torques, torso_quat, head_quat)
+        current_obs = cdg.extract_observation(actual_positions, target_positions, motor_torques, torso_quat, head_quat)
         
         # Build row data with history
         row_data = {}
@@ -222,29 +110,16 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         for key, value in current_obs.items():
             row_data[f'current_{key}'] = value
         
-        # Add historical observations (oldest to newest)
-        # for history_idx, hist_obs in enumerate(previous_obs_history):
-        #     for key, value in hist_obs.items():
-        #         row_data[f'history_{history_idx}_{key}'] = value
-        
-        # # Pad with zeros if we don't have enough history yet
-        # for history_idx in range(len(previous_obs_history), num_history_steps):
-        #     for key in current_obs.keys():
-        #         row_data[f'history_{history_idx}_{key}'] = 0.0
 
         # Get wheel sensor distances and inferred contacts (only for current step)
-        wheel_distances = get_wheel_sensor_data(m, d)
-        inferred_contacts = infer_contacts(wheel_distances)
+        wheel_distances = cdg.get_wheel_sensor_data(m, d)
+        inferred_contacts = cdg.infer_contacts(wheel_distances)
         for i, contact in enumerate(inferred_contacts):
             row_data[f'wheel_contact_{i}'] = contact
         
         # Append to log
         data_log.append(row_data)
         
-        # Update history: add current observation and maintain only last n steps
-        previous_obs_history.append(current_obs)
-        if len(previous_obs_history) > num_history_steps:
-            previous_obs_history.pop(0)  # Remove oldest
 
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
