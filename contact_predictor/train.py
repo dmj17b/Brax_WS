@@ -5,7 +5,13 @@ from keras import regularizers
 import matplotlib.pyplot as plt
 
 
-data = pd.read_csv('test_data.csv')
+# Load datasets
+random_data = pd.read_csv('random_data.csv')
+joystick_data = pd.read_csv('joystick_data.csv')
+
+# Combine datasets
+data = pd.concat([random_data, joystick_data], ignore_index=True)
+print(data.head())
 
 
 # Preprocess data - separate wheel contacts from the rest of data:
@@ -84,7 +90,7 @@ model.summary()
 reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', min_delta=0.005, factor=0.8, patience=10, min_lr=1e-7, restore_best_weights=True)
 
 # Callback to save the best model during training
-best_model = tf.keras.callbacks.ModelCheckpoint('best_contact_predictor_model.keras', monitor='val_loss', save_best_only=True)
+best_model = tf.keras.callbacks.ModelCheckpoint('contact_predictor/best_contact_predictor_model.keras', monitor='val_loss', save_best_only=True)
 
 # Callback to stop training early if validation loss does not improve
 early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=60, restore_best_weights=True)
@@ -103,9 +109,9 @@ loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits = True, label_smoothing
 model.compile(optimizer=optimizer, loss=loss_fn, metrics=['accuracy', binary_accuracy_metric, pr_auc_metric])
 
 # Train the model
-history = model.fit(x, y, validation_data=(x_val, y_val), epochs=500, batch_size=64, callbacks=[reduce_lr, best_model, early_stopping], shuffle=True)
+history = model.fit(x, y, validation_data=(x_val, y_val), epochs=500, batch_size=64, callbacks=[reduce_lr, best_model], shuffle=True)
 
-model.save('contact_predictor_model.keras')
+model.save('contact_predictor/contact_predictor_model.keras')
 
 # Plot training accuracy and loss
 plt.plot(history.history['binary_acc'], label='Binary Accuracy')

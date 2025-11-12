@@ -32,20 +32,12 @@ walter.gen_scene()
 #Add wheel contact sensors
 walter.add_wheel_sensors()
 
-# # Add some obstacles:
-# walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
-# walter.add_log(d=0.4,length = 2)
-# walter.add_incline(angle_deg=40, pos = [3, 5, 0], width = 1.5, length = 4 )
-# walter.add_box(pos = [5.5, 5, 2.5], size = [1, 2, 0.1])
-# walter.add_incline(angle_deg=-40, pos = [8, 5, 0], width = 1.5, length = 4 )
-# walter.add_box(pos = [-2, -2, 0.05], size = [1, 1, 0.1], name = 'box2')
-
 
 # Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)
 
-m.opt.timestep = 0.001
+m.opt.timestep = 0.01
 
 step_dt = 0.02
 
@@ -84,7 +76,7 @@ num_history_steps = 5  # Number of previous steps to store
 step_count = 0
 
 # Load the trained contact predictor model
-contact_network = tf.keras.models.load_model('best_contact_predictor_model.keras')
+contact_network = tf.keras.models.load_model('contact_predictor/best_contact_predictor_model.keras')
 contact_network.compile()  # Ensure model is compiled for faster inference
 
 # Main simulation loop:
@@ -115,7 +107,6 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
 
         if step_count % 10 == 0:
             print(f"Predicted Contacts: {predicted_contacts}\nSimulated Contacts: {cdg.infer_contacts(cdg.get_wheel_sensor_data(m, d) )}\n")
-        # print(f"Simulated Contacts: {cdg.infer_contacts(cdg.get_wheel_sensor_data(m, d) )}")
         
         
 
@@ -129,7 +120,3 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
             time.sleep(time_until_next_step)
 
             
-# After the simulation ends, save to CSV
-# df = pd.DataFrame(data_log)
-# df.to_csv('test_data.csv', index=False)
-# print(f"Data saved to validation_data.csv with {len(df)} rows")

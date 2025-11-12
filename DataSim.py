@@ -31,14 +31,6 @@ walter.gen_scene()
 #Add wheel contact sensors
 walter.add_wheel_sensors()
 
-# Add some obstacles:
-walter.add_stairs(rise=0.2,run=0.3,num_steps=15)
-walter.add_log(d=0.4,length = 2)
-walter.add_incline(angle_deg=40, pos = [3, 5, 0], width = 1.5, length = 4 )
-walter.add_box(pos = [5.5, 5, 2.5], size = [1, 2, 0.1])
-walter.add_incline(angle_deg=-40, pos = [8, 5, 0], width = 1.5, length = 4 )
-walter.add_box(pos = [-2, -2, 0.05], size = [1, 1, 0.1], name = 'box2')
-
 
 # Compile the model:
 m = walter.spec.compile()
@@ -93,34 +85,35 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         # Call joystick controller:
         controller.control(m,d)
 
-        # Get info for contact predictor
-        actual_positions = cdg.get_motor_positions(motors)
-        target_positions = cdg.get_motor_targets(controller)
-        motor_torques = cdg.get_motor_torques(motors)
-        torso_quat = cdg.get_body_orientation(m, d, 'torso')
-        head_quat = cdg.get_body_orientation(m, d, 'head')
+        # Only save data every n steps:
+        if step_count % 5 == 0:
+            # Get info for contact predictor
+            actual_positions = cdg.get_motor_positions(motors)
+            target_positions = cdg.get_motor_targets(controller)
+            motor_torques = cdg.get_motor_torques(motors)
+            torso_quat = cdg.get_body_orientation(m, d, 'torso')
+            head_quat = cdg.get_body_orientation(m, d, 'head')
 
-        # Extract current observation (without contacts)
-        current_obs = cdg.extract_observation(actual_positions, target_positions, motor_torques, torso_quat, head_quat)
-        
-        # Build row data with history
-        row_data = {}
-        
-        # Add current observation
-        for key, value in current_obs.items():
-            row_data[f'current_{key}'] = value
-        
+            # Extract current observation (without contacts)
+            current_obs = cdg.extract_observation(actual_positions, target_positions, motor_torques, torso_quat, head_quat)
+            
+            # Build row data with history
+            row_data = {}
+            
+            # Add current observation
+            for key, value in current_obs.items():
+                row_data[f'current_{key}'] = value
+            
 
-        # Get wheel sensor distances and inferred contacts (only for current step)
-        wheel_distances = cdg.get_wheel_sensor_data(m, d)
-        inferred_contacts = cdg.infer_contacts(wheel_distances)
-        for i, contact in enumerate(inferred_contacts):
-            row_data[f'wheel_contact_{i}'] = contact
+            # Get wheel sensor distances and inferred contacts (only for current step)
+            wheel_distances = cdg.get_wheel_sensor_data(m, d)
+            inferred_contacts = cdg.infer_contacts(wheel_distances)
+            for i, contact in enumerate(inferred_contacts):
+                row_data[f'wheel_contact_{i}'] = contact
+            
+            # Append to log
+            data_log.append(row_data)
         
-        # Append to log
-        data_log.append(row_data)
-        
-
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()
@@ -134,5 +127,5 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
             
 # After the simulation ends, save to CSV
 df = pd.DataFrame(data_log)
-df.to_csv('test_data.csv', index=False)
-print(f"Data saved to validation_data.csv with {len(df)} rows")
+df.to_csv('joystick_data.csv', index=False)
+print(f"Data saved to joystick_data.csv with {len(df)} rows")
