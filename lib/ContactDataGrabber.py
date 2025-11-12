@@ -3,6 +3,7 @@ import pandas as pd
 import mujoco
 
 def get_motor_targets(controller):
+    #TODO: Fix wheel target velocities. Make sure they match between joystick and random controllers
     target_positions = []
     target_positions.append(controller.fr_hip_des_pos)
     target_positions.append(controller.fl_hip_des_pos)

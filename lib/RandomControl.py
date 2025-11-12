@@ -71,12 +71,12 @@ class RandomController:
         self.br_knee_des_pos += np.random.uniform(-self.random_knee_amplitude, self.random_knee_amplitude)*np.sin(time.time()/6)*self.dt
         self.bl_knee_des_pos += np.random.uniform(-self.random_knee_amplitude, self.random_knee_amplitude)*np.sin(time.time()/6)*self.dt
 
-        self.wheel1_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
-        self.wheel2_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
-        self.wheel3_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
-        self.wheel4_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
-        self.wheel5_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
-        self.wheel6_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
+        self.wheel1_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
+        self.wheel2_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
+        self.wheel3_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
+        self.wheel4_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
+        self.wheel5_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
+        self.wheel6_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
         self.wheel7_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
 
         if self.check_health() == False:
@@ -99,14 +99,14 @@ class RandomController:
         self.motors[6].pos_control(self.br_knee_des_pos)
         self.motors[7].pos_control(self.bl_knee_des_pos)
 
-        self.motors[9].vel_control(self.right_wheel_vel_des)
-        self.motors[8].vel_control(self.right_wheel_vel_des)
-        self.motors[10].vel_control(self.left_wheel_vel_des)
-        self.motors[11].vel_control(self.left_wheel_vel_des)
-        self.motors[12].vel_control(self.right_wheel_vel_des)
-        self.motors[13].vel_control(self.right_wheel_vel_des)
-        self.motors[14].vel_control(self.left_wheel_vel_des)
-        self.motors[15].vel_control(self.left_wheel_vel_des)
+        self.motors[9].vel_control(self.wheel1_des_vel)
+        self.motors[8].vel_control(self.wheel2_des_vel)
+        self.motors[10].vel_control(self.wheel3_des_vel)
+        self.motors[11].vel_control(self.wheel4_des_vel)
+        self.motors[12].vel_control(self.wheel5_des_vel)
+        self.motors[13].vel_control(self.wheel6_des_vel)
+        self.motors[14].vel_control(self.wheel7_des_vel)
+        self.motors[15].vel_control(self.wheel8_des_vel)
 
     def check_health(self):
         # Check if robot is flipped over (z position of torso)
