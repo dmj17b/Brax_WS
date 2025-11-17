@@ -3,4 +3,5 @@ visualization
 .venv
 __pycache__
 simulation_data.csv
-contact_predictor_model.keras
+contact_predictor/contact_predictor_model.keras
+contact_predictor/best_contact_predictor_model.keras
