@@ -13,14 +13,14 @@ def get_motor_targets(controller):
     target_positions.append((controller.fl_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
     target_positions.append((controller.br_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
     target_positions.append((controller.bl_knee_des_pos + np.pi) % (2*np.pi) - np.pi)
-    target_positions.append(controller.right_wheel_vel_des)
-    target_positions.append(controller.right_wheel_vel_des)
-    target_positions.append(controller.left_wheel_vel_des)
-    target_positions.append(controller.left_wheel_vel_des)
-    target_positions.append(controller.right_wheel_vel_des)
-    target_positions.append(controller.right_wheel_vel_des)
-    target_positions.append(controller.left_wheel_vel_des)
-    target_positions.append(controller.left_wheel_vel_des)
+    target_positions.append(controller.wheel1_des_vel)
+    target_positions.append(controller.wheel2_des_vel)
+    target_positions.append(controller.wheel3_des_vel)
+    target_positions.append(controller.wheel4_des_vel)
+    target_positions.append(controller.wheel5_des_vel)
+    target_positions.append(controller.wheel6_des_vel)
+    target_positions.append(controller.wheel7_des_vel)
+    target_positions.append(controller.wheel8_des_vel)
     return target_positions
 
 # Get actual motor positions/velocities from motor models
@@ -73,6 +73,29 @@ def get_wheel_sensor_data(m, d):
     
     return np.array(sensor_data)
 
+def get_projected_gravity(m, d, sensor_name):
+    beta = 0.01
+    acc_data = d.sensor(f"{sensor_name}_acc").data
+    gyro_data = d.sensor(f"{sensor_name}_gyro").data
+
+
+    # If first call, initialize g_est
+    if not hasattr(get_projected_gravity, "g_est"):
+        get_projected_gravity.g_est = -acc_data / np.linalg.norm(acc_data)
+
+
+
+    g_pred = get_projected_gravity.g_est + m.opt.timestep*np.cross(gyro_data, get_projected_gravity.g_est)
+    g_pred /= np.linalg.norm(g_pred)
+
+    a_dir = -acc_data / np.linalg.norm(acc_data)
+
+    g_est = (1-beta) * g_pred + beta * a_dir
+    g_est /= np.linalg.norm(g_est)
+
+    return g_est
+
+
 def infer_contacts(wheel_distances, threshold=0.005):
     """
     Infer wheel contacts based on distance sensor readings.
@@ -87,7 +110,7 @@ def infer_contacts(wheel_distances, threshold=0.005):
     contacts = (abs(wheel_distances) < threshold).astype(int)
     return contacts
 
-def extract_observation(actual_positions, target_positions, motor_torques, torso_quat, head_quat):
+def extract_observation(actual_positions, target_positions, motor_torques, head_projected_grav, torso_projected_grav):
     """
     Extract observation features (without contacts) as a dictionary.
     This will be used for both current and historical observations.
@@ -107,12 +130,18 @@ def extract_observation(actual_positions, target_positions, motor_torques, torso
     for i, torque in enumerate(motor_torques):
         obs[f'torque_{i}'] = torque
     
+    # Add projected gravity components
+    # obs['head_grav_x'] = head_projected_grav[0]
+    # obs['head_grav_y'] = head_projected_grav[1]
+    # obs['head_grav_z'] = head_projected_grav[2]
+    # obs['torso_grav_x'] = torso_projected_grav[0]
+    # obs['torso_grav_y'] = torso_projected_grav[1]
+    # obs['torso_grav_z'] = torso_projected_grav[2]
 
-    # obs['head_quat_z'] = head_quat[3]
     
     return obs
 
-def extract_observation_with_noise(actual_positions, target_positions, motor_torques, torso_quat, head_quat):
+def extract_observation_with_noise(actual_positions, target_positions, motor_torques, head_projected_grav, torso_projected_grav):
     """
     Extract observation features (without contacts) as a dictionary.
     This will be used for both current and historical observations.
@@ -121,6 +150,7 @@ def extract_observation_with_noise(actual_positions, target_positions, motor_tor
     state_noise = 0.001  # Small noise to add to state features
     error_noise = 0.001  # Small noise to add to error features
     torque_noise = 0.01  # Small noise to add to torque features
+    gravity_noise = 0.001  # Small noise to add to gravity features
 
     obs = {}
     
@@ -137,12 +167,17 @@ def extract_observation_with_noise(actual_positions, target_positions, motor_tor
     for i, torque in enumerate(motor_torques):
         obs[f'torque_{i}'] = torque + np.random.uniform(-torque_noise, torque_noise)
 
-    # obs['head_quat_z'] = head_quat[3]
-    
+    # # Add projected gravity components
+    # obs['head_grav_x'] = head_projected_grav[0] + np.random.uniform(-gravity_noise, gravity_noise)
+    # obs['head_grav_y'] = head_projected_grav[1] + np.random.uniform(-gravity_noise, gravity_noise)
+    # obs['head_grav_z'] = head_projected_grav[2] + np.random.uniform(-gravity_noise, gravity_noise)
+    # obs['torso_grav_x'] = torso_projected_grav[0] + np.random.uniform(-gravity_noise, gravity_noise)
+    # obs['torso_grav_y'] = torso_projected_grav[1] + np.random.uniform(-gravity_noise, gravity_noise)
+    # obs['torso_grav_z'] = torso_projected_grav[2] + np.random.uniform(-gravity_noise, gravity_noise)
     return obs
 
 
-def extract_obs_array(actual_positions, target_positions, motor_torques, torso_quat, head_quat):
+def extract_obs_array(actual_positions, target_positions, motor_torques, torso_projected_grav, head_projected_grav):
     """
     Extract observation features (without contacts) as a numpy array.
     This will be used for both current and historical observations.
@@ -159,6 +194,7 @@ def extract_obs_array(actual_positions, target_positions, motor_torques, torso_q
     # Add motor torques
     obs.extend(motor_torques)
     
-    # obs.append(head_quat[3])  # head_quat_z
+    # obs.extend(torso_projected_grav)
+    # obs.extend(head_projected_grav)
     
     return np.array(obs)

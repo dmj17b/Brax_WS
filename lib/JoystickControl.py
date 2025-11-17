@@ -44,6 +44,15 @@ class JoystickController:
         self.br_hip_des_vel = 0
         self.bl_hip_des_vel = 0
 
+        self.wheel1_des_vel = 0
+        self.wheel2_des_vel = 0
+        self.wheel3_des_vel = 0
+        self.wheel4_des_vel = 0
+        self.wheel5_des_vel = 0
+        self.wheel6_des_vel = 0
+        self.wheel7_des_vel = 0
+        self.wheel8_des_vel = 0
+
         self.right_wheel_vel_des = 0
         self.left_wheel_vel_des = 0
 
@@ -61,6 +70,14 @@ class JoystickController:
         # Control the wheels with basic joystick control
         self.left_wheel_vel_des = self.max_wheel_vel*(-self.left_stick_ud + self.left_stick_lr)
         self.right_wheel_vel_des = self.max_wheel_vel*(-self.left_stick_ud - self.left_stick_lr)
+        self.wheel1_des_vel = self.right_wheel_vel_des
+        self.wheel2_des_vel = self.right_wheel_vel_des
+        self.wheel3_des_vel = self.left_wheel_vel_des
+        self.wheel4_des_vel = self.left_wheel_vel_des
+        self.wheel5_des_vel = self.right_wheel_vel_des
+        self.wheel6_des_vel = self.right_wheel_vel_des
+        self.wheel7_des_vel = self.left_wheel_vel_des
+        self.wheel8_des_vel = self.left_wheel_vel_des
 
     def control_knees(self):
         self.left_knee_des_vel = self.max_knee_vel*(-self.right_stick_ud + self.right_stick_lr)

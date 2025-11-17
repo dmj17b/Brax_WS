@@ -32,12 +32,17 @@ walter.gen_scene()
 #Add wheel contact sensors
 walter.add_wheel_sensors()
 
+# Add IMU sensors
+walter.add_imu_sensors()
+
+std_color = np.array([177/255, 166/255, 136/255, 1])
+
 
 # Compile the model:
 m = walter.spec.compile()
 d = mujoco.MjData(m)
 
-m.opt.timestep = 0.01
+m.opt.timestep = 0.001
 
 step_dt = 0.02
 
@@ -74,6 +79,8 @@ data_log = []
 previous_obs_history = []
 num_history_steps = 5  # Number of previous steps to store
 step_count = 0
+num_prediction_steps = 0
+step_accuracy_sum = 0.0
 
 # Load the trained contact predictor model
 contact_network = tf.keras.models.load_model('contact_predictor/best_contact_predictor_model.keras')
@@ -97,18 +104,58 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
         torso_quat = cdg.get_body_orientation(m, d, 'torso')
         head_quat = cdg.get_body_orientation(m, d, 'head')
 
-        # Extract current observation (without contacts)
-        current_obs = cdg.extract_obs_array(actual_positions, target_positions, motor_torques, torso_quat, head_quat)
+        head_projected_grav = cdg.get_projected_gravity(m, d, 'head_imu')
+        torso_projected_grav = cdg.get_projected_gravity(m, d, 'torso_imu')
 
-        # Call contact predictor to predict wheel contacts
-        input_obs = np.expand_dims(current_obs, axis=0).astype(np.float32)  # Add batch dimension: (1, 48)
-        predicted_contacts = contact_network(input_obs, training=False).numpy()  # Direct call instead of predict()
-        predicted_contacts = (predicted_contacts[0] > 0.5).astype(int)  # Binarize predictions at 0.5 threshold
+
+        # Extract current observation (without contacts)
+        current_obs = cdg.extract_obs_array(actual_positions,
+                                            target_positions,
+                                            motor_torques, 
+                                            head_projected_grav, 
+                                            torso_projected_grav)
+
+
+        # Print IMU readings from torso and head
+
 
         if step_count % 10 == 0:
-            print(f"Predicted Contacts: {predicted_contacts}\nSimulated Contacts: {cdg.infer_contacts(cdg.get_wheel_sensor_data(m, d) )}\n")
-        
-        
+            # Call contact predictor to predict wheel contacts
+            input_obs = np.expand_dims(current_obs, axis=0).astype(np.float32)  # Add batch dimension: (1, 48)
+            predicted_contacts = contact_network(input_obs, training=False).numpy()  # Direct call instead of predict()
+            predicted_contacts = (predicted_contacts[0] > 0.5).astype(int)  # Binarize predictions at 0.5 threshold
+
+            # Change color of wheels based on predicted contacts
+            #Back left wheels:
+            m.geom_rgba[4] = [1, 0, 0, 1] if predicted_contacts[0] == 1 else std_color  
+            m.geom_rgba[5] = [1, 0, 0, 1] if predicted_contacts[1] == 1 else std_color 
+
+            #Back right wheels:
+            m.geom_rgba[8] = [1, 0, 0, 1] if predicted_contacts[2] == 1 else std_color
+            m.geom_rgba[9] = [1, 0, 0, 1] if predicted_contacts[3] == 1 else std_color
+
+            #Front left wheels:
+            m.geom_rgba[12] = [1, 0, 0, 1] if predicted_contacts[4] == 1 else std_color
+            m.geom_rgba[13] = [1, 0, 0, 1] if predicted_contacts[5] == 1 else std_color
+
+            #Front right wheels:
+            m.geom_rgba[17] = [1, 0, 0, 1] if predicted_contacts[6] == 1 else std_color
+            m.geom_rgba[18] = [1, 0, 0, 1] if predicted_contacts[7] == 1 else std_color
+            # For evaluation, get actual simulated contacts
+            sim_contacts = cdg.infer_contacts(cdg.get_wheel_sensor_data(m, d))
+
+            # Compute accuracy for this simulation step
+            step_accuracy = np.mean(predicted_contacts == sim_contacts)
+
+            # Accumulate accuracy and count prediction steps
+            num_prediction_steps += 1
+            step_accuracy_sum += step_accuracy
+            total_sim_accuracy = step_accuracy_sum / num_prediction_steps
+
+            print(f"Predicted Contacts: {predicted_contacts}\nSimulated Contacts: {sim_contacts}\n")
+            print(f"Total Simulation Contact Prediction Accuracy: {total_sim_accuracy*100:.2f}%\n")
+
+
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.
         viewer.sync()

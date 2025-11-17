@@ -77,8 +77,8 @@ class RandomController:
         self.wheel4_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
         self.wheel5_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
         self.wheel6_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
-        self.wheel7_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
-
+        self.wheel7_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
+        self.wheel8_des_vel = np.random.uniform(-self.random_wheel_amplitude, self.random_wheel_amplitude)*np.sin(time.time()/20)
         if self.check_health() == False:
             print("Robot flipped over! Resetting position.")
             mujoco.mj_resetData(m, d)

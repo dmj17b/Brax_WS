@@ -120,6 +120,12 @@ class GenerateModel():
             mass=torso_mass,
             rgba = color,
         )
+        torso_body.add_site(
+            name = 'torso_imu_site',
+            pos = [0,0,0],
+            size = [0.01, 0.01, 0.01],  # small sphere
+            rgba = [1,0,0,1],  # red color
+        )
 
         # Torso Kinematic Chain:
         parents = ['torso', 'thigh', 'shin', 'shin']
@@ -251,6 +257,12 @@ class GenerateModel():
             quat=[1, 0, 0, 0],
             mass=head_mass,
             rgba = color,
+        )
+        head_body.add_site(
+            name = 'head_imu_site',
+            pos = [0,0,0],
+            size = [0.01, 0.01, 0.01],  # small sphere
+            rgba = [1,0,0,1],  # red color
         )
 
         # Head Kinematic Chain:
@@ -450,6 +462,37 @@ class GenerateModel():
         self.mj_model = spec.compile()
         self.model_xml = spec.to_xml()
         self.spec = spec
+        
+    def add_imu_sensors(self):
+        # Add IMU sensors at torso and head
+        self.spec.add_sensor(
+            name='torso_imu_acc',
+            type=mujoco.mjtSensor.mjSENS_ACCELEROMETER,
+            objtype=mujoco.mjtObj.mjOBJ_SITE,
+            objname='torso_imu_site',
+        )
+        self.spec.add_sensor(
+            name='torso_imu_gyro',
+            type=mujoco.mjtSensor.mjSENS_GYRO,
+            objtype=mujoco.mjtObj.mjOBJ_SITE,
+            objname='torso_imu_site',
+        )
+        self.spec.add_sensor(
+            name='head_imu_acc',
+            type=mujoco.mjtSensor.mjSENS_ACCELEROMETER,
+            objtype=mujoco.mjtObj.mjOBJ_SITE,
+            objname='head_imu_site',
+        )
+        self.spec.add_sensor(
+            name='head_imu_gyro',
+            type=mujoco.mjtSensor.mjSENS_GYRO,
+            objtype=mujoco.mjtObj.mjOBJ_SITE,
+            objname='head_imu_site',
+        )
+
+        # Recompile after adding sensors
+        self.mj_model = self.spec.compile()
+        self.model_xml = self.spec.to_xml()
 
     def add_wheel_sensors(self):
         # The ground plane geom needs to be named explicitly in gen_scene()
