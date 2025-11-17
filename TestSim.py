@@ -135,8 +135,8 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
             m.geom_rgba[9] = [1, 0, 0, 1] if predicted_contacts[3] == 1 else std_color
 
             #Front left wheels:
-            m.geom_rgba[12] = [1, 0, 0, 1] if predicted_contacts[4] == 1 else std_color
-            m.geom_rgba[13] = [1, 0, 0, 1] if predicted_contacts[5] == 1 else std_color
+            m.geom_rgba[13] = [1, 0, 0, 1] if predicted_contacts[4] == 1 else std_color
+            m.geom_rgba[14] = [1, 0, 0, 1] if predicted_contacts[5] == 1 else std_color
 
             #Front right wheels:
             m.geom_rgba[17] = [1, 0, 0, 1] if predicted_contacts[6] == 1 else std_color
