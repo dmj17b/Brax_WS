@@ -583,6 +583,91 @@ class GenerateModel():
         self.mj_model = self.spec.compile()
         self.model_xml = self.spec.to_xml()
 
+    def gen_terrain(self):
+        ground = self.spec.add_texture(type = mujoco.mjtTexture.mjTEXTURE_2D,
+                        name="ground_texture",
+                        builtin=mujoco.mjtBuiltin.mjBUILTIN_CHECKER, 
+                        width=200, 
+                        height=200, 
+                        rgb1=[0.5, 0.8, 0.9], 
+                        rgb2=[0.5, 0.9, 0.8],
+                        markrgb=[0.8, 0.8, 0.8])
+
+        self.spec.add_material(name="groundplanematerial",
+                              texrepeat=[2, 2],
+                              reflectance=0., 
+                              ).textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = 'ground_texture'
+        
+        # Generate heightmap data        
+        nrow, ncol = 256, 256
+        size = [10.0, 10.0, 1.0, 0.01]  # [x_span, y_span, z_height, base_offset]
+        rng = np.random.default_rng(seed=42)
+        elevation_data = rng.uniform(0, 1, size=(nrow, ncol))
+        
+        # Optional: Apply smoothing using scipy
+        from scipy.ndimage import gaussian_filter
+        elevation_data = gaussian_filter(elevation_data, sigma=5)
+        
+        # Flatten to 1D array (row-major order)
+        elevation_flat = elevation_data.flatten()
+        
+        # Add heightfield asset to spec
+        self.spec.add_hfield(
+            name='terrain_hfield',
+            nrow=nrow,
+            ncol=ncol,
+            size=size,  # [x_span, y_span, z_height, base_offset]
+            userdata=elevation_flat,
+        )
+        
+        # Add texture for the heightfield
+        ground = self.spec.add_texture(
+            type=mujoco.mjtTexture.mjTEXTURE_2D,
+            name="hfield_texture",
+            builtin=mujoco.mjtBuiltin.mjBUILTIN_CHECKER,
+            width=200,
+            height=200,
+            rgb1=[0.5, 0.8, 0.9],
+            rgb2=[0.5, 0.9, 0.8],
+            markrgb=[0.8, 0.8, 0.8]
+        )
+        
+        # Add material for heightfield
+        self.spec.add_material(
+            name="hfield_material",
+            texrepeat=[5, 5],
+            reflectance=0.0,
+        ).textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = 'hfield_texture'
+        
+        # Add heightfield geom to worldbody
+        self.spec.worldbody.add_geom(
+            name='groundplane',
+            type=mujoco.mjtGeom.mjGEOM_HFIELD,
+            hfieldname='terrain_hfield',
+            pos=[0, 0, -1],
+            material='hfield_material',
+        )
+        
+        # Add skybox and lighting
+        self.spec.add_texture(
+            type=mujoco.mjtTexture.mjTEXTURE_SKYBOX,
+            builtin=mujoco.mjtBuiltin.mjBUILTIN_GRADIENT,
+            width=300,
+            height=300,
+            name="skybox"
+        )
+        
+        # Add lights
+        for i in range(5):
+            for j in range(5):
+                self.spec.worldbody.add_light(
+                    pos=[2*i, 2*j, 15],
+                    dir=[0, 0, -1],
+                    diffuse=[0.1, 0.1, 0.1],
+                    specular=[0., 0., 0.],
+                )
+        
+
 
     def gen_scene(self):
         # Create ground plane texture/material

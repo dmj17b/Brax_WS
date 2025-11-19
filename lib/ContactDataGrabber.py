@@ -110,6 +110,7 @@ def infer_contacts(wheel_distances, threshold=0.005):
     contacts = (abs(wheel_distances) < threshold).astype(int)
     return contacts
 
+
 def extract_observation(actual_positions, target_positions, motor_torques, head_projected_grav, torso_projected_grav):
     """
     Extract observation features (without contacts) as a dictionary.
