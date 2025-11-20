@@ -101,13 +101,12 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
                                             torso_projected_grav)
 
 
-        # Print IMU readings from torso and head
-
+        true_contacts = cdg.get_sim_wheel_collisions(m,d)
+        filtered_true_contacts = cdg.filter_sim_wheel_collisions(true_contacts)
 
         if step_count % 10 == 0:
             # Call contact data grabber to get true wheel contacts
-            true_contacts = cdg.get_sim_wheel_collisions(m,d)
-            filtered_true_contacts = cdg.filter_sim_wheel_collisions(true_contacts)
+
 
             # Call contact predictor to predict wheel contacts
             input_obs = np.expand_dims(current_obs, axis=0).astype(np.float32)  # Add batch dimension: (1, 48)

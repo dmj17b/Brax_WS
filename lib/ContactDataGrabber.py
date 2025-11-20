@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import mujoco
+from collections import deque
 
 def get_motor_targets(controller):
     #TODO: Fix wheel target velocities. Make sure they match between joystick and random controllers
@@ -77,20 +78,28 @@ def get_sim_wheel_collisions(m,d):
 def filter_sim_wheel_collisions(raw_contacts):
     """
     Apply filtering to raw wheel contact data to reduce noise.
-    Simple majority filter over last 3 readings.
+    Contact can only change state if it has been stable for n consecutive readings.
     """
-    filtered_contacts = []
-    window_size = 3
-    padded_contacts = np.pad(raw_contacts, (window_size//2, window_size//2), mode='edge')
-    
-    for i in range(len(raw_contacts)):
-        window = padded_contacts[i:i+window_size]
-        if np.sum(window) > window_size / 2:
-            filtered_contacts.append(1)
-        else:
-            filtered_contacts.append(0)
-    
-    return np.array(filtered_contacts)
+    n_readings = 20
+
+    # Initialize history buffer on first call
+    if not hasattr(filter_sim_wheel_collisions, "history"):
+        filter_sim_wheel_collisions.history = deque(maxlen=n_readings)
+        # Pre-fill with zeros so early calls behave sensibly
+        for _ in range(n_readings):
+            filter_sim_wheel_collisions.history.append(np.zeros_like(raw_contacts, dtype=float))
+
+    # Append current reading (as floats)
+    filter_sim_wheel_collisions.history.append(raw_contacts.astype(float))
+
+    # Compute running average over the stored readings and threshold at 0.5
+    history_stack = np.stack(filter_sim_wheel_collisions.history, axis=0)
+    avg_contacts = np.mean(history_stack, axis=0)
+    filtered_contacts = (avg_contacts >= 0.5).astype(int)
+
+    return filtered_contacts
+
+
 
 def get_wheel_sensor_data(m, d):
     """
