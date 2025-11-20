@@ -143,6 +143,7 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
             m.geom_rgba[18] = [1, 0, 0, 1] if predicted_contacts[7] == 1 else std_color
             # For evaluation, get actual simulated contacts
             sim_contacts = cdg.infer_contacts(cdg.get_wheel_sensor_data(m, d))
+            true_sim_contacts = cdg.get_sim_wheel_collisions(m,d)
 
             # Compute accuracy for this simulation step
             step_accuracy = np.mean(predicted_contacts == sim_contacts)
@@ -153,6 +154,7 @@ with mujoco.viewer.launch_passive(m,d,show_left_ui=False,show_right_ui=False) as
             total_sim_accuracy = step_accuracy_sum / num_prediction_steps
 
             print(f"Predicted Contacts: {predicted_contacts}\nSimulated Contacts: {sim_contacts}\n")
+            print(f"True Sim Contacts: {true_sim_contacts}\n")
             print(f"Total Simulation Contact Prediction Accuracy: {total_sim_accuracy*100:.2f}%\n")
 
 

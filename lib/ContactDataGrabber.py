@@ -49,6 +49,49 @@ def get_body_orientation(m, d, body_name):
     quat = d.xquat[body_id]
     return quat
 
+def get_sim_wheel_collisions(m,d):
+    """
+    Get wheel contact information from simulation data.
+    Returns array with 1 if wheel is in contact, 0 otherwise.
+    """
+    contact_data = []
+    wheel_geom_names = [
+        'torso_left_front_wheel_geom', 'torso_left_rear_wheel_geom',
+        'torso_right_front_wheel_geom', 'torso_right_rear_wheel_geom',
+        'head_left_front_wheel_geom', 'head_left_rear_wheel_geom',
+        'head_right_front_wheel_geom', 'head_right_rear_wheel_geom'
+    ]
+    
+    for geom_name in wheel_geom_names:
+        geom_id = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, geom_name)
+        in_contact = 0
+        for i in range(d.ncon):
+            contact = d.contact[i]
+            if contact.geom1 == geom_id or contact.geom2 == geom_id:
+                in_contact = 1
+                break
+        contact_data.append(in_contact)
+    
+    return np.array(contact_data)
+
+def filter_sim_wheel_collisions(raw_contacts):
+    """
+    Apply filtering to raw wheel contact data to reduce noise.
+    Simple majority filter over last 3 readings.
+    """
+    filtered_contacts = []
+    window_size = 3
+    padded_contacts = np.pad(raw_contacts, (window_size//2, window_size//2), mode='edge')
+    
+    for i in range(len(raw_contacts)):
+        window = padded_contacts[i:i+window_size]
+        if np.sum(window) > window_size / 2:
+            filtered_contacts.append(1)
+        else:
+            filtered_contacts.append(0)
+    
+    return np.array(filtered_contacts)
+
 def get_wheel_sensor_data(m, d):
     """
     Get wheel distance sensor readings.
