@@ -35,6 +35,7 @@ m = walter.spec.compile()
 d = mujoco.MjData(m)
 
 m.opt.timestep = 0.001
+m.geom_margin = -0.005
 
 step_dt = 0.02
 

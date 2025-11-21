@@ -80,7 +80,7 @@ def filter_sim_wheel_collisions(raw_contacts):
     Apply filtering to raw wheel contact data to reduce noise.
     Contact can only change state if it has been stable for n consecutive readings.
     """
-    n_readings = 20
+    n_readings = 30
 
     # Initialize history buffer on first call
     if not hasattr(filter_sim_wheel_collisions, "history"):
