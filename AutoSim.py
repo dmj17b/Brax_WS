@@ -486,7 +486,7 @@ class GenerateModel():
                     dir=[0, 0, -1],
                     diffuse=[0.1, 0.1, 0.1],
                     specular=[0., 0., 0.],
-                    directional=True,
+                    
                 )
         
 

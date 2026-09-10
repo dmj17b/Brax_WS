@@ -14,8 +14,8 @@ import AutoSim
 
 
 # Call AutoSim to generate the new robot spec:
-model_config_path = 'model_configs/2_7_Scale/model_config.yaml'
-motor_config_path = 'motor_configs/myactuator.yaml'
+model_config_path = 'model_configs/WS_Scale/model_config.yaml'
+motor_config_path = 'model_configs/WS_Scale/motor_config.yaml'
 
 # Load motor params for later access
 motor_config = yaml.safe_load(Path(motor_config_path).read_text())
@@ -24,7 +24,7 @@ motor_config = yaml.safe_load(Path(motor_config_path).read_text())
 walter = AutoSim.GenerateModel(model_config_path=model_config_path, motor_config_path=motor_config_path)
 
 #Add payload to walter body
-walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
+# walter.add_payload(mass = 32, body_loc = [0,0,0.2], size = [0.2, 0.1, 0.1])
 
 # Generate the scene around the robot (groundplane and sky)
 walter.gen_scene()
